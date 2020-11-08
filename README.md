@@ -4,5 +4,5 @@
 
 ## Todo
 
-* [ ] LuCI ACL Settings
+* [x] LuCI ACL Settings
 * [ ] V2Ray Running Status Check

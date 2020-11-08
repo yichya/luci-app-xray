@@ -4,6 +4,14 @@
         "action": {
             "type": "view",
             "path": "v2fly"
+        },
+        "depends": {
+            "acl": [
+                "luci-app-v2fly"
+            ],
+            "uci": {
+                "v2fly": true
+            }
         }
     }
 }
