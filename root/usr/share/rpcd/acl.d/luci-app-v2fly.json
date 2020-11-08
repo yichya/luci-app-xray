@@ -1,0 +1,15 @@
+{
+    "luci-app-v2fly": {
+        "description": "Grant access to v2fly configurations",
+        "read": {
+            "uci": [
+                "v2fly"
+            ]
+        },
+        "write": {
+            "uci": [
+                "v2fly"
+            ]
+        }
+    }
+}

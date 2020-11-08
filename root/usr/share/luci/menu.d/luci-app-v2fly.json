@@ -1,0 +1,9 @@
+{
+    "admin/services/v2fly": {
+        "title": "V2Fly",
+        "action": {
+            "type": "view",
+            "path": "v2fly"
+        }
+    }
+}
