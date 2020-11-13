@@ -2,7 +2,12 @@
 
 [luci-app-v2ray](https://github.com/yichya/luci-app-v2ray) refined to client side rendering (and switched to v2fly as well)
 
+## Changelog
+
+* 2020-11-14 feature: basic transparent proxy function
+
 ## Todo
 
 * [x] LuCI ACL Settings
 * [ ] V2Ray Running Status Check
+* [ ] transparent proxy access control for LAN

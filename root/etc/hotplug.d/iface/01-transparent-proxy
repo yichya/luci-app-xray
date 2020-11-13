@@ -1,0 +1,7 @@
+#!/bin/sh
+
+ipset flush tp_spec_def_gw
+ipset destory tp_spec_def_gw
+ipset create tp_spec_def_gw hash:net hashsize 64
+DEFAULT_GATEWAY=$(ip route | grep default | awk '{print $3}')
+ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | awk '{print $9}')

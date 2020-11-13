@@ -21,22 +21,16 @@ return view.extend({
 
         o = s.taboption('general', form.Value, 'v2ray_bin', _('V2Ray Executable Path'))
 
-        o = s.taboption('general', form.ListValue, "startup_delay", _("Startup Delay"))
-        o.datatype = "uinteger"
-        o.value(0, _("Not Enabled"))
-        o.value(5, _("5 seconds"))
-        o.value(10, _("10 seconds"))
-        o.value(15, _("15 seconds"))
-        o.value(25, _("25 seconds"))
-        o.value(40, _("40 seconds"))
-        o.default = 0
-        o.rmempty = false
-
         o = s.taboption('general', form.ListValue, 'main_server', _('Main Server'))
         for (var v of L.uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
+        o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
+
+        o = s.taboption('general', form.Flag, 'transparent_proxy_udp', _('Transparent Proxy for UDP'))
+        o.depends("transparent_proxy_enable", "1")
+        
         s.tab('proxy', _('Proxy Settings'));
 
         o = s.taboption('proxy', form.Value, 'tproxy_port', _('Transparent Proxy Port'))
@@ -73,6 +67,16 @@ return view.extend({
         o.datatype = 'ip4addr'
         o.placeholder = "8.8.8.8"
 
+        s.tab('access_control', _('Transparent Proxy Rules'));
+
+        o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"),  _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
+        o.datatype = "ip4addr"
+        o.rmempty = false
+        
+        o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
+        o.datatype = "ip4addr"
+        o.rmempty = true
+        
         s = m.section(form.GridSection, 'servers', _('V2Fly Servers'))
 
         s.sortable = true

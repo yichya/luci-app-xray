@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-v2fly
 PKG_VERSION:=v4.32.1
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
@@ -16,7 +16,7 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for V2Fly
-	DEPENDS:=+iptables +ca-bundle +luci-compat
+	DEPENDS:=+iptables +ca-bundle
 endef
 
 define Package/$(PKG_NAME)/description
@@ -124,8 +124,8 @@ define Package/$(PKG_NAME)/conffiles
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/usr/share/v2fly
 	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) ./root/usr/bin/transparent-proxy-rules $(1)/usr/bin/transparent-proxy-rules
 ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_V2RAY
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(V2RAY_BIN) $(1)/usr/bin/v2ray
 endif
@@ -136,6 +136,8 @@ endif
 ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 	$(INSTALL_DATA) ./root/etc/ssl/certs/origin_ca_ecc_root.pem $(1)/etc/ssl/certs/origin_ca_ecc_root.pem
 endif
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy $(1)/etc/hotplug.d/iface/01-transparent-proxy
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./root/etc/init.d/v2fly $(1)/etc/init.d/v2fly
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
@@ -147,13 +149,13 @@ endif
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/luci-app-v2fly.json $(1)/usr/share/rpcd/acl.d/luci-app-v2fly.json
 	$(INSTALL_DIR) $(1)/usr/share/v2fly
+	$(INSTALL_BIN) ./root/usr/share/v2fly/gen_config.lua $(1)/usr/share/v2fly/gen_config.lua
 ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_GEOIP
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geoip.dat $(1)/usr/share/v2fly/
 endif
 ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_GEOSITE
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geosite.dat $(1)/usr/share/v2fly/
 endif
-	$(INSTALL_BIN) ./root/usr/share/v2fly/gen_config.lua $(1)/usr/share/v2fly/gen_config.lua
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
