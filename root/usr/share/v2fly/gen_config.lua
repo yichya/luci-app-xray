@@ -213,6 +213,10 @@ local function vmess_outbound()
 end
 
 local function vless_outbound()
+    local flow = server.vless_flow
+    if server.vless_flow == "none" then
+        flow = nil
+    end
     return {
         protocol = "vless",
         tag = "outbound",
@@ -224,7 +228,7 @@ local function vless_outbound()
                     users = {
                         {
                             id = server.password,
-                            flow = server.vless_flow,
+                            flow = flow,
                             encryption = server.vless_encryption
                         }
                     }

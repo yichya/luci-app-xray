@@ -65,8 +65,8 @@ ipset_init() {
 		$(sed -e "s/^/add tp_spec_dst_fw /" ${WAN_FW_LIST:=/dev/null} )
 		$(for ip in $WAN_FW_IP; do echo "add tp_spec_dst_fw $ip"; done)
 EOF
-	DEFAULT_GATEWAY=$(ip route | grep default | awk '{print $3}')
-	ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | awk '{print $9}')
+	DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
+	ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
 	return 0
 }
 
