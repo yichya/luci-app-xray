@@ -206,7 +206,7 @@ return view.extend({
 
         o = s.taboption('protocol', form.ListValue, "vless_flow", _("[vless] Flow"))
         o.depends("protocol", "vless")
-        o.value("", "[none]")
+        o.value("none", "none")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
         o.value("xtls-rprx-direct", "xtls-rprx-direct")
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
