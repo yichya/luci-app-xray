@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-v2fly
 PKG_VERSION:=v4.32.1
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
@@ -16,7 +16,7 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for V2Fly
-	DEPENDS:=+iptables +ca-bundle
+	DEPENDS:=+iptables +iptables-mod-tproxy +ca-bundle
 endef
 
 define Package/$(PKG_NAME)/description

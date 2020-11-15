@@ -5,6 +5,7 @@
 ## Changelog
 
 * 2020-11-14 feature: basic transparent proxy function
+* 2020-11-15 fix: vless flow settings & compatible with busybox ip command
 
 ## Todo
 
