@@ -1,5 +1,5 @@
 config general
-        option v2ray_bin '/usr/bin/v2ray'
+        option xray_bin '/usr/bin/xray'
         option main_server 'cfg034a8f'
         option transparent_proxy_enable '1'
         option transparent_proxy_udp '1'

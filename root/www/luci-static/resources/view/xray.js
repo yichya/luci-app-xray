@@ -6,12 +6,12 @@
 
 return view.extend({
     load: function () {
-        return L.uci.load("v2fly")
+        return L.uci.load("xray")
     },
 
     render: function (config_data) {
         var m, s, o;
-        m = new form.Map('v2fly', [_('V2Fly')]);
+        m = new form.Map('xray', [_('Xray')]);
 
         s = m.section(form.TypedSection, 'general', 'General Settings',);
         s.addremove = false;
@@ -19,7 +19,7 @@ return view.extend({
 
         s.tab('general', _('General Settings'));
 
-        o = s.taboption('general', form.Value, 'v2ray_bin', _('V2Ray Executable Path'))
+        o = s.taboption('general', form.Value, 'xray_bin', _('Xray Executable Path'))
 
         o = s.taboption('general', form.ListValue, 'main_server', _('Main Server'))
         for (var v of L.uci.sections(config_data, "servers")) {
@@ -45,7 +45,7 @@ return view.extend({
         o.datatype = 'port'
         o.default = 5000
 
-        o = s.taboption('proxy', form.Value, 'dns_port', _('V2Fly DNS Server Port'))
+        o = s.taboption('proxy', form.Value, 'dns_port', _('Xray DNS Server Port'))
         o.datatype = 'port'
         o.default = 5000
 
@@ -77,7 +77,7 @@ return view.extend({
         o.datatype = "ip4addr"
         o.rmempty = true
         
-        s = m.section(form.GridSection, 'servers', _('V2Fly Servers'))
+        s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
         s.sortable = true
         s.anonymous = true

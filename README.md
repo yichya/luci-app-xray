@@ -1,6 +1,6 @@
-# luci-app-v2fly
+# luci-app-xray
 
-[luci-app-v2ray](https://github.com/yichya/luci-app-v2ray) refined to client side rendering (and switched to v2fly as well)
+[luci-app-v2ray](https://github.com/yichya/luci-app-v2ray) refined to client side rendering (and switched to xray as well)
 
 ## Changelog
 
@@ -10,5 +10,6 @@
 ## Todo
 
 * [x] LuCI ACL Settings
-* [ ] V2Ray Running Status Check
+* [x] migrate to xray-core
+* [ ] Xray Running Status Check
 * [ ] transparent proxy access control for LAN

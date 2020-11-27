@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=luci-app-v2fly
-PKG_VERSION:=v4.32.1
-PKG_RELEASE:=5
+PKG_NAME:=luci-app-xray
+PKG_VERSION:=v1.0.0
+PKG_RELEASE:=1
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
@@ -15,88 +15,80 @@ include $(INCLUDE_DIR)/package.mk
 define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
-	TITLE:=LuCI Support for V2Fly
+	TITLE:=LuCI Support for Xray
 	DEPENDS:=+iptables +iptables-mod-tproxy +ca-bundle
 endef
 
 define Package/$(PKG_NAME)/description
-	LuCI Support for V2Fly (Client-side Rendered).
+	LuCI Support for Xray (Client-side Rendered).
 endef
 
 define Package/$(PKG_NAME)/config
-menu "V2Fly Configuration"
+menu "Xray Configuration"
 	depends on PACKAGE_$(PKG_NAME)
 
-config PACKAGE_V2FLY_INCLUDE_V2RAY
-	bool "Include v2ray"
+config PACKAGE_XRAY_INCLUDE_XRAY
+	bool "Include xray"
 	default y
 
-config PACKAGE_V2FLY_SOFTFLOAT
+config PACKAGE_XRAY_SOFTFLOAT
 	bool "Use soft-float binaries (mips/mipsle only)"
 	depends on mipsel || mips || mips64el || mips64
 	default n
 
-config PACKAGE_V2FLY_INCLUDE_V2CTL
-	bool "Include v2ctl"
-	depends on PACKAGE_V2FLY_INCLUDE_V2RAY
-	default y
-
-config PACKAGE_V2FLY_INCLUDE_GEOIP
+config PACKAGE_XRAY_INCLUDE_GEOIP
 	bool "Include geoip.dat"
-	depends on PACKAGE_V2FLY_INCLUDE_V2RAY
+	depends on PACKAGE_XRAY_INCLUDE_XRAY
 	default n
 
-config PACKAGE_V2FLY_INCLUDE_GEOSITE
+config PACKAGE_XRAY_INCLUDE_GEOSITE
 	bool "Include geosite.dat"
-	depends on PACKAGE_V2FLY_INCLUDE_V2RAY
+	depends on PACKAGE_XRAY_INCLUDE_XRAY
 	default n
 
-config PACKAGE_V2FLY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
+config PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 	bool "Include Cloudflare Origin Root CA"
-	depends on PACKAGE_V2FLY_INCLUDE_V2RAY
+	depends on PACKAGE_XRAY_INCLUDE_XRAY
 	default n
 
 endmenu
 endef
 
 ifeq ($(ARCH),x86_64)
-	PKG_ARCH_V2FLY:=linux-64
+	PKG_ARCH_XRAY:=linux-64
 endif
 ifeq ($(ARCH),mipsel)
-	PKG_ARCH_V2FLY:=linux-mipsle
+	PKG_ARCH_XRAY:=linux-mipsle
 endif
 ifeq ($(ARCH),mips)
-	PKG_ARCH_V2FLY:=linux-mips
+	PKG_ARCH_XRAY:=linux-mips
 endif
 ifeq ($(ARCH),i386)
-	PKG_ARCH_V2FLY:=linux-32
+	PKG_ARCH_XRAY:=linux-32
 endif
 ifeq ($(ARCH),arm)
-	PKG_ARCH_V2FLY:=linux-arm
+	PKG_ARCH_XRAY:=linux-arm
 endif
 ifeq ($(ARCH),aarch64)
-	PKG_ARCH_V2FLY:=linux-arm64
+	PKG_ARCH_XRAY:=linux-arm64
 endif
 
-V2RAY_BIN:=v2ray
-V2CTL_BIN:=v2ctl
+XRAY_BIN:=xray
 
 ifeq ($(ARCH),arm)
 	ifneq ($(BOARD),bcm53xx)
-		V2RAY_BIN:=v2ray_armv7
-		V2CTL_BIN:=v2ctl_armv7
+		XRAY_BIN:=xray_armv7
 	endif
 endif
 
-ifdef CONFIG_PACKAGE_V2FLY_SOFTFLOAT
-	V2RAY_BIN:=v2ray_softfloat
-	V2CTL_BIN:=v2ctl_softfloat
+ifdef CONFIG_PACKAGE_XRAY_SOFTFLOAT
+	XRAY_BIN:=xray_softfloat
 endif
 
 define Build/Prepare
 	$(foreach po,$(wildcard ${CURDIR}/files/luci/i18n/*.po), po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
-	[ ! -f $(PKG_BUILD_DIR)/v2ray-$(PKG_VERSION)-$(PKG_ARCH_V2FLY).zip ] && proxychains wget https://github.com/v2fly/v2ray-core/releases/download/$(PKG_VERSION)/v2ray-$(PKG_ARCH_V2FLY).zip -O $(PKG_BUILD_DIR)/v2ray-$(PKG_VERSION)-$(PKG_ARCH_V2FLY).zip
-	unzip -o $(PKG_BUILD_DIR)/v2ray-$(PKG_VERSION)-$(PKG_ARCH_V2FLY).zip -d $(PKG_BUILD_DIR)
+	[ ! -f $(PKG_BUILD_DIR)/XRAY-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip ] && proxychains wget https://github.com/xtls/xray-core/releases/download/$(PKG_VERSION)/xray-$(PKG_ARCH_XRAY).zip -O $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip
+	unzip -o $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip -d $(PKG_BUILD_DIR)
 	proxychains wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O $(PKG_BUILD_DIR)/geoip.dat
 	proxychains wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O $(PKG_BUILD_DIR)/geosite.dat
 endef
@@ -110,9 +102,9 @@ endef
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 if [[ -z "$${IPKG_INSTROOT}" ]]; then
-	if [[ -f /etc/uci-defaults/luci-v2fly ]]; then
-		( . /etc/uci-defaults/luci-v2fly ) && \
-		rm -f /etc/uci-defaults/luci-v2fly
+	if [[ -f /etc/uci-defaults/luci-xray ]]; then
+		( . /etc/uci-defaults/luci-xray ) && \
+		rm -f /etc/uci-defaults/luci-xray
 	fi
 	rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
 fi
@@ -120,41 +112,38 @@ exit 0
 endef
 
 define Package/$(PKG_NAME)/conffiles
-/etc/config/v2fly
+/etc/config/xray
 endef
 
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./root/usr/bin/transparent-proxy-rules $(1)/usr/bin/transparent-proxy-rules
-ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_V2RAY
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(V2RAY_BIN) $(1)/usr/bin/v2ray
-endif
-ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_V2CTL
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(V2CTL_BIN) $(1)/usr/bin/v2ctl
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_XRAY
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(XRAY_BIN) $(1)/usr/bin/xray
 endif
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
-ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 	$(INSTALL_DATA) ./root/etc/ssl/certs/origin_ca_ecc_root.pem $(1)/etc/ssl/certs/origin_ca_ecc_root.pem
 endif
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy $(1)/etc/hotplug.d/iface/01-transparent-proxy
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./root/etc/init.d/v2fly $(1)/etc/init.d/v2fly
+	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/etc/init.d/xray
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./root/etc/uci-defaults/v2fly $(1)/etc/uci-defaults/v2fly
+	$(INSTALL_BIN) ./root/etc/uci-defaults/xray $(1)/etc/uci-defaults/xray
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view
-	$(INSTALL_DATA) ./root/www/luci-static/resources/view/v2fly.js $(1)/www/luci-static/resources/view/v2fly.js
+	$(INSTALL_DATA) ./root/www/luci-static/resources/view/xray.js $(1)/www/luci-static/resources/view/xray.js
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) ./root/usr/share/luci/menu.d/luci-app-v2fly.json $(1)/usr/share/luci/menu.d/luci-app-v2fly.json
+	$(INSTALL_DATA) ./root/usr/share/luci/menu.d/luci-app-xray.json $(1)/usr/share/luci/menu.d/luci-app-xray.json
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/luci-app-v2fly.json $(1)/usr/share/rpcd/acl.d/luci-app-v2fly.json
-	$(INSTALL_DIR) $(1)/usr/share/v2fly
-	$(INSTALL_BIN) ./root/usr/share/v2fly/gen_config.lua $(1)/usr/share/v2fly/gen_config.lua
-ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_GEOIP
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geoip.dat $(1)/usr/share/v2fly/
+	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/luci-app-xray.json $(1)/usr/share/rpcd/acl.d/luci-app-xray.json
+	$(INSTALL_DIR) $(1)/usr/share/xray
+	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_GEOIP
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geoip.dat $(1)/usr/share/xray/
 endif
-ifdef CONFIG_PACKAGE_V2FLY_INCLUDE_GEOSITE
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geosite.dat $(1)/usr/share/v2fly/
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_GEOSITE
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geosite.dat $(1)/usr/share/xray/
 endif
 endef
 

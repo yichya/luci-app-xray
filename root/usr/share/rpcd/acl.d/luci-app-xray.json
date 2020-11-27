@@ -1,14 +1,14 @@
 {
-    "luci-app-v2fly": {
-        "description": "Grant access to v2fly configurations",
+    "luci-app-xray": {
+        "description": "Grant access to xray configurations",
         "read": {
             "uci": [
-                "v2fly"
+                "xray"
             ]
         },
         "write": {
             "uci": [
-                "v2fly"
+                "xray"
             ]
         }
     }

@@ -44,7 +44,7 @@ flush_rules() {
 	for setname in $(ipset -n list | grep "tp_spec"); do
 		ipset destroy $setname 
 	done
-	FWI=$(uci get firewall.v2fly.path )
+	FWI=$(uci get firewall.xray.path )
 	[ -n "$FWI" ] && echo '# firewall include file' >$FWI
 	return 0
 }

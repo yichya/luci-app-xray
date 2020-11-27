@@ -3,9 +3,9 @@
 START=90
 STOP=15
 USE_PROCD=1
-NAME=v2fly
+NAME=xray
 
-GENERATE_CONF="/usr/share/v2fly/gen_config.lua"
+GENERATE_CONF="/usr/share/xray/gen_config.lua"
 
 uci_get_by_name() {
     local ret=$(uci get ${NAME}.$1.$2 2> /dev/null)
@@ -60,23 +60,23 @@ gen_config_file() {
     echo ${config_file}
 }
 
-# 启动v2fly服务
-start_v2fly() {
-    v2ray_bin=$(uci_get_by_type general v2ray_bin)
-    command -v ${v2ray_bin} > /dev/null 2>&1 || return 1
+# 启动xray服务
+start_xray() {
+    xray_bin=$(uci_get_by_type general xray_bin)
+    command -v ${xray_bin} > /dev/null 2>&1 || return 1
     local main_server=$(uci_get_by_type general main_server)
     validate_server ${main_server} || return 1
-    echo "server=/#/127.0.0.1#$(uci_get_by_type general dns_port)" > /tmp/dnsmasq.d/v2fly.conf
+    echo "server=/#/127.0.0.1#$(uci_get_by_type general dns_port)" > /tmp/dnsmasq.d/xray.conf
     procd_open_instance
     procd_set_param respawn
-    procd_set_param command $v2ray_bin
+    procd_set_param command $xray_bin
     procd_append_param command -config
     procd_append_param command $(gen_config_file ${main_server})
     procd_set_param limits nofile="8192 16384"
-    procd_set_param env V2RAY_LOCATION_ASSET=/usr/share/v2fly
+    procd_set_param env XRAY_LOCATION_ASSET=/usr/share/xray
     procd_set_param stdout 1
     procd_set_param stderr 1
-    procd_set_param file /etc/config/v2fly
+    procd_set_param file /etc/config/xray
     procd_close_instance
     /etc/init.d/dnsmasq restart
 }
@@ -85,15 +85,15 @@ start_service() {
     config_load ${NAME}
     mkdir -p /var/run /var/etc
     create_when_enable || /usr/bin/transparent-proxy-rules -f
-    start_v2fly 
+    start_xray 
 }
 
 stop_service() {
-    rm /tmp/dnsmasq.d/v2fly.conf
+    rm /tmp/dnsmasq.d/xray.conf
     /etc/init.d/dnsmasq restart
     flush_when_disable
 }
 
 service_triggers() {
-    procd_add_reload_trigger "/etc/config/v2fly"
+    procd_add_reload_trigger "/etc/config/xray"
 }

@@ -1,16 +1,16 @@
 {
-    "admin/services/v2fly": {
-        "title": "V2Fly",
+    "admin/services/xray": {
+        "title": "Xray",
         "action": {
             "type": "view",
-            "path": "v2fly"
+            "path": "xray"
         },
         "depends": {
             "acl": [
-                "luci-app-v2fly"
+                "luci-app-xray"
             ],
             "uci": {
-                "v2fly": true
+                "xray": true
             }
         }
     }

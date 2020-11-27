@@ -2,11 +2,11 @@
 local ucursor = require "luci.model.uci"
 local json = require "luci.jsonc"
 
-local proxy_section = ucursor:get_first("v2fly", "general")
-local proxy = ucursor:get_all("v2fly", proxy_section)
+local proxy_section = ucursor:get_first("xray", "general")
+local proxy = ucursor:get_all("xray", proxy_section)
 
 local server_section = proxy.main_server
-local server = ucursor:get_all("v2fly", server_section)
+local server = ucursor:get_all("xray", server_section)
 
 local function direct_outbound()
     return {
@@ -388,7 +388,7 @@ local function dns_conf()
     }
 end
 
-local v2ray = {
+local xray = {
     inbounds = {
         http_inbound(),
         tproxy_inbound(),
@@ -430,4 +430,4 @@ local v2ray = {
     }
 }
 
-print(json.stringify(v2ray, true))
+print(json.stringify(xray, true))
