@@ -209,8 +209,10 @@ return view.extend({
         o.value("none", "none")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
         o.value("xtls-rprx-direct", "xtls-rprx-direct")
+        o.value("xtls-rprx-splice", "xtls-rprx-splice")
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
         o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
+        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
         o.rmempty = false
         o.modalonly = true
 
