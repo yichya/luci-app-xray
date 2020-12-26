@@ -30,7 +30,7 @@ return view.extend({
 
         o = s.taboption('general', form.Flag, 'transparent_proxy_udp', _('Transparent Proxy for UDP'))
         o.depends("transparent_proxy_enable", "1")
-        
+
         s.tab('proxy', _('Proxy Settings'));
 
         o = s.taboption('proxy', form.Value, 'tproxy_port', _('Transparent Proxy Port'))
@@ -69,14 +69,14 @@ return view.extend({
 
         s.tab('access_control', _('Transparent Proxy Rules'));
 
-        o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"),  _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
+        o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
         o.datatype = "ip4addr"
         o.rmempty = false
-        
+
         o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
         o.rmempty = true
-        
+
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
         s.sortable = true
@@ -106,7 +106,7 @@ return view.extend({
         o.value("trojan", "Trojan")
         o.value("shadowsocks", "Shadowsocks")
         o.rmempty = false
-        
+
         o = s.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
         o.depends("protocol", "shadowsocks")
         o.value("none", "none")
@@ -158,6 +158,18 @@ return view.extend({
 
         o = s.taboption('protocol', form.Flag, "trojan_xtls_insecure", _("[trojan][xtls] Allow Insecure"))
         o.depends("trojan_tls", "xtls")
+        o.rmempty = false
+        o.modalonly = true
+
+        o = s.taboption('protocol', form.ListValue, "trojan_flow", _("[trojan] Flow"))
+        o.depends("protocol", "trojan")
+        o.value("none", "none")
+        o.value("xtls-rprx-origin", "xtls-rprx-origin")
+        o.value("xtls-rprx-direct", "xtls-rprx-direct")
+        o.value("xtls-rprx-splice", "xtls-rprx-splice")
+        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
+        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
+        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
         o.rmempty = false
         o.modalonly = true
 
