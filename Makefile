@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=v1.1.5
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
@@ -26,6 +26,10 @@ endef
 define Package/$(PKG_NAME)/config
 menu "Xray Configuration"
 	depends on PACKAGE_$(PKG_NAME)
+
+config PACKAGE_XRAY_FETCH_VIA_PROXYCHAINS
+	bool "Fetch release files using proxychains (not recommended)"
+	default n
 
 config PACKAGE_XRAY_INCLUDE_XRAY
 	bool "Include xray"
@@ -85,12 +89,17 @@ ifdef CONFIG_PACKAGE_XRAY_SOFTFLOAT
 	XRAY_BIN:=xray_softfloat
 endif
 
+PROXYCHAINS:=
+
+ifdef CONFIG_PACKAGE_XRAY_FETCH_VIA_PROXYCHAINS
+	PROXYCHAINS:=proxychains
+endif
+
 define Build/Prepare
-	$(foreach po,$(wildcard ${CURDIR}/files/luci/i18n/*.po), po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
-	[ ! -f $(PKG_BUILD_DIR)/XRAY-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip ] && proxychains wget https://github.com/xtls/xray-core/releases/download/$(PKG_VERSION)/xray-$(PKG_ARCH_XRAY).zip -O $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip
+	[ ! -f $(PKG_BUILD_DIR)/XRAY-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip ] && $(PROXYCHAINS) wget https://github.com/xtls/xray-core/releases/download/$(PKG_VERSION)/xray-$(PKG_ARCH_XRAY).zip -O $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip
 	unzip -o $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip -d $(PKG_BUILD_DIR)
-	proxychains wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O $(PKG_BUILD_DIR)/geoip.dat
-	proxychains wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O $(PKG_BUILD_DIR)/geosite.dat
+	$(PROXYCHAINS) wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O $(PKG_BUILD_DIR)/geoip.dat
+	$(PROXYCHAINS) wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O $(PKG_BUILD_DIR)/geosite.dat
 endef
 
 define Build/Configure
@@ -103,8 +112,7 @@ define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 if [[ -z "$${IPKG_INSTROOT}" ]]; then
 	if [[ -f /etc/uci-defaults/luci-xray ]]; then
-		( . /etc/uci-defaults/luci-xray ) && \
-		rm -f /etc/uci-defaults/luci-xray
+		( . /etc/uci-defaults/luci-xray ) && rm -f /etc/uci-defaults/luci-xray
 	fi
 	rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
 fi
@@ -140,10 +148,10 @@ endif
 	$(INSTALL_DIR) $(1)/usr/share/xray
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_GEOIP
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geoip.dat $(1)/usr/share/xray/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/geoip.dat $(1)/usr/share/xray/
 endif
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_GEOSITE
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/geosite.dat $(1)/usr/share/xray/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/geosite.dat $(1)/usr/share/xray/
 endif
 endef
 
