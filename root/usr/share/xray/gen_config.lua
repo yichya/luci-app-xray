@@ -259,6 +259,10 @@ local function vless_outbound()
 end
 
 local function trojan_outbound()
+    local flow = server.trojan_flow
+    if server.trojan_flow == "none" then
+        flow = nil
+    end
     return {
         protocol = "trojan",
         tag = "outbound",
@@ -268,6 +272,7 @@ local function trojan_outbound()
                     address = server.server,
                     port = tonumber(server.server_port),
                     password = server.password,
+                    flow = flow,
                 }
             }
         },
