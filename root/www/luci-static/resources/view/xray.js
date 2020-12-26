@@ -132,6 +132,18 @@ return view.extend({
         o.depends("shadowsocks_tls", "tls")
         o.rmempty = false
         o.modalonly = true
+        
+        o = s.taboption('protocol', form.ListValue, "trojan_flow", _("[trojan] Flow"))
+        o.depends("protocol", "trojan")
+        o.value("none", "none")
+        o.value("xtls-rprx-origin", "xtls-rprx-origin")
+        o.value("xtls-rprx-direct", "xtls-rprx-direct")
+        o.value("xtls-rprx-splice", "xtls-rprx-splice")
+        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
+        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
+        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
+        o.rmempty = false
+        o.modalonly = true
 
         o = s.taboption('protocol', form.ListValue, "trojan_tls", _("[trojan] Stream Security"))
         o.depends("protocol", "trojan")
@@ -158,18 +170,6 @@ return view.extend({
 
         o = s.taboption('protocol', form.Flag, "trojan_xtls_insecure", _("[trojan][xtls] Allow Insecure"))
         o.depends("trojan_tls", "xtls")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.ListValue, "trojan_flow", _("[trojan] Flow"))
-        o.depends("protocol", "trojan")
-        o.value("none", "none")
-        o.value("xtls-rprx-origin", "xtls-rprx-origin")
-        o.value("xtls-rprx-direct", "xtls-rprx-direct")
-        o.value("xtls-rprx-splice", "xtls-rprx-splice")
-        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
-        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
-        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
         o.rmempty = false
         o.modalonly = true
 
