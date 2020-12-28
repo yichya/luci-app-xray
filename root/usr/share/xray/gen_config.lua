@@ -332,19 +332,6 @@ local function tproxy_inbound()
     }
 end
 
-local function dns_server_inbound()
-    return {
-        port = proxy.dns_port,
-        protocol = "dokodemo-door",
-        tag = "dns_server_inbound",
-        settings = {
-            address = "208.67.220.220",
-            port = 443,
-            network = "tcp,udp"
-        }
-    }
-end
-
 local function http_inbound()
     return {
         port = proxy.http_port,
@@ -363,6 +350,19 @@ local function socks_inbound()
         tag = "socks_inbound",
         settings = {
             udp = true
+        }
+    }
+end
+
+local function dns_server_inbound()
+    return {
+        port = proxy.dns_port,
+        protocol = "dokodemo-door",
+        tag = "dns_server_inbound",
+        settings = {
+            address = "208.67.220.220",
+            port = 443,
+            network = "tcp,udp"
         }
     }
 end
@@ -393,19 +393,51 @@ local function dns_conf()
     }
 end
 
-local xray = {
-    inbounds = {
+local function api_conf()
+    if proxy.xray_api == '1' then
+        return {
+            tag = "api",
+            services = {
+                "HandlerService",
+                "LoggerService",
+                "StatsService"
+            }
+        }
+    else
+        return nil
+    end
+end
+
+local function inbounds()
+    local i = {
         http_inbound(),
         tproxy_inbound(),
         socks_inbound(),
         dns_server_inbound()
-    },
+    }
+    if proxy.xray_api == '1' then
+        table.insert(i, {
+            listen = "127.0.0.1",
+            port = 8080,
+            protocol = "dokodemo-door",
+            settings = {
+                address = "127.0.0.1"
+            },
+            tag = "api"
+        })
+    end
+    return i
+end
+
+local xray = {
+    inbounds = inbounds(),
     outbounds = {
         server_outbound(),
         direct_outbound(),
         dns_server_outbound()
     },
     dns = dns_conf(),
+    api = api_conf(),
     routing = {
         domainStrategy = "AsIs",
         rules = {
@@ -430,6 +462,11 @@ local xray = {
                 type = "field",
                 inboundTag = {"dns_server_inbound"},
                 outboundTag = "dns_server_outbound"
+            },
+            {
+                type = "field",
+                inboundTag = {"api"},
+                outboundTag = "api"
             }
         }
     }

@@ -31,6 +31,8 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'transparent_proxy_udp', _('Transparent Proxy for UDP'))
         o.depends("transparent_proxy_enable", "1")
 
+        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'))
+
         s.tab('proxy', _('Proxy Settings'));
 
         o = s.taboption('proxy', form.Value, 'tproxy_port', _('Transparent Proxy Port'))
@@ -132,7 +134,7 @@ return view.extend({
         o.depends("shadowsocks_tls", "tls")
         o.rmempty = false
         o.modalonly = true
-        
+
         o = s.taboption('protocol', form.ListValue, "trojan_flow", _("[trojan] Flow"))
         o.depends("protocol", "trojan")
         o.value("none", "none")
