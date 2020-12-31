@@ -36,7 +36,7 @@ logger_level() {
 
 flush_rules() {
     iptables-save -c | grep -v "TP_SPEC" | iptables-restore -c
-    if command -v ip; then
+    if command -v ip >/dev/null; then
         ip rule del fwmark 251 lookup 251 
         ip route del local default dev lo table 252
         ip rule del fwmark 252 lookup 252
@@ -66,7 +66,7 @@ ipset_init() {
 		$(for ip in $WAN_FW_IP; do echo "add tp_spec_dst_fw $ip"; done)
 	EOF
     DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
-    ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
+    [ -n "$DEFAULT_GATEWAY" ] && ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
     return 0
 }
 
