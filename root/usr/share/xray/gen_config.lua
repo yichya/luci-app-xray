@@ -326,7 +326,8 @@ local function tproxy_inbound()
         },
         streamSettings = {
             sockopt = {
-                tproxy = "tproxy"
+                tproxy = "tproxy",
+                mark = tonumber(proxy.mark)
             }
         }
     }
