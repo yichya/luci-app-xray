@@ -1,22 +1,31 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=v1.1.5
-PKG_RELEASE:=7
+PKG_VERSION:=8fc2d3b61fce1d7393910fe08873daef31e139e0
+PKG_RELEASE:=1
 
-PKG_LICENSE:=GPLv3
+PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=yichya <mail@yichya.dev>
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+PKG_SOURCE:=Xray-core-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/XTLS/Xray-core/tar.gz/${PKG_VERSION}?
+PKG_HASH:=772c0cc931864f5fd29d77e7b3a2720a14c213202f8cbe0852f033bad08a8dd6
+PKG_SOURCE_VERSION:=8fc2d3b61fce1d7393910fe08873daef31e139e0
+
+PKG_BUILD_DEPENDS:=golang/host
+PKG_BUILD_PARALLEL:=1
+
+GO_PKG:=github.com/XTLS/Xray-core
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/../feeds/packages/lang/golang/golang-package.mk
 
 define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray
-	DEPENDS:=+iptables +iptables-mod-tproxy +ca-bundle
+	DEPENDS:=$(GO_ARCH_DEPENDS) +iptables +iptables-mod-tproxy +ca-bundle
 endef
 
 define Package/$(PKG_NAME)/description
@@ -58,54 +67,23 @@ config PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 endmenu
 endef
 
-ifeq ($(ARCH),x86_64)
-	PKG_ARCH_XRAY:=linux-64
-endif
-ifeq ($(ARCH),mipsel)
-	PKG_ARCH_XRAY:=linux-mipsle
-endif
-ifeq ($(ARCH),mips)
-	PKG_ARCH_XRAY:=linux-mips
-endif
-ifeq ($(ARCH),i386)
-	PKG_ARCH_XRAY:=linux-32
-endif
-ifeq ($(ARCH),arm)
-	PKG_ARCH_XRAY:=linux-arm
-endif
-ifeq ($(ARCH),aarch64)
-	PKG_ARCH_XRAY:=linux-arm64
-endif
-
-XRAY_BIN:=xray
-
-ifeq ($(ARCH),arm)
-	ifneq ($(BOARD),bcm53xx)
-		XRAY_BIN:=xray_armv7
-	endif
-endif
-
-ifdef CONFIG_PACKAGE_XRAY_SOFTFLOAT
-	XRAY_BIN:=xray_softfloat
-endif
-
 PROXYCHAINS:=
 
 ifdef CONFIG_PACKAGE_XRAY_FETCH_VIA_PROXYCHAINS
 	PROXYCHAINS:=proxychains
 endif
 
-define Build/Prepare
-	[ ! -f $(PKG_BUILD_DIR)/XRAY-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip ] && $(PROXYCHAINS) wget https://github.com/xtls/xray-core/releases/download/$(PKG_VERSION)/xray-$(PKG_ARCH_XRAY).zip -O $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip
-	unzip -o $(PKG_BUILD_DIR)/xray-$(PKG_VERSION)-$(PKG_ARCH_XRAY).zip -d $(PKG_BUILD_DIR)
+MAKE_PATH:=$(GO_PKG_WORK_DIR_NAME)/build/src/$(GO_PKG)
+MAKE_VARS += $(GO_PKG_VARS)
+
+define Build/Patch
+	$(CP) $(PKG_BUILD_DIR)/../Xray-core-$(PKG_VERSION)/* $(PKG_BUILD_DIR)
 	$(PROXYCHAINS) wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O $(PKG_BUILD_DIR)/geoip.dat
 	$(PROXYCHAINS) wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O $(PKG_BUILD_DIR)/geosite.dat
 endef
 
-define Build/Configure
-endef
-
 define Build/Compile
+	cd $(PKG_BUILD_DIR)/main; $(GO_PKG_VARS) GOPROXY=https://goproxy.io,direct CGO_ENABLED=0 go build -o $(PKG_INSTALL_DIR)/bin/xray .; 
 endef
 
 define Package/$(PKG_NAME)/postinst
@@ -127,7 +105,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./root/usr/bin/transparent-proxy-rules $(1)/usr/bin/transparent-proxy-rules
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_XRAY
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(XRAY_BIN) $(1)/usr/bin/xray
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/xray $(1)/usr/bin/xray
 endif
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
