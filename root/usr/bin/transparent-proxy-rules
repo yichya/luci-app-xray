@@ -13,17 +13,18 @@ usage() {
 
 		Valid options are:
 
-			-l <local_port>         port number of local transparent proxy server
+			-m <mark number>        set mark number
+			-t <tcp_local_port>     port number of local transparent proxy server (tcp)
+			-u <udp_local_port>     port number of local transparent proxy server (udp)
 			-B <ip_list_file>       a file whose content is bypassed ip list
 			-b <wan_ips>            wan ip of will be bypassed
 			-W <ip_list_file>       a file whose content is forwarded ip list
 			-w <wan_ips>            wan ip of will be forwarded
 			-I <interface>          proxy only for the given interface
+			-i <fwi_file>           filewall include name for openwrt
 			-d <target>             the default target of lan access control
 			-a <lan_hosts>          mac addr of access control, need a prefix to define proxy type
-			-i <fwi_file>           filewall include name for openwrt
 			-f                      flush the rules
-			-m <mark number>        set mark number
 			-h                      show this help message and exit
 	EOF
     exit $1
@@ -74,7 +75,7 @@ ipset_init() {
 }
 
 ipt_mangle() {
-    logger_level 6 "ipt_mangle local_port $local_port"
+    logger_level 6 "ipt_mangle tcp_local_port $tcp_local_port udp_local_port $udp_local_port"
     if !(lsmod | grep -q TPROXY && command -v ip >/dev/null); then
         logger_level 4 "TPROXY or ip not found."
         return 0
@@ -82,8 +83,8 @@ ipt_mangle() {
     ip rule add fwmark 251 lookup 251
     ip route add local default dev lo table 251
     include_ac_rules
-    iptables -t mangle -A TP_SPEC_WAN_FW -p tcp -j TPROXY --on-port $local_port --tproxy-mark 251
-    iptables -t mangle -A TP_SPEC_WAN_FW -p udp -j TPROXY --on-port $local_port --tproxy-mark 251
+    iptables -t mangle -A TP_SPEC_WAN_FW -p tcp -j TPROXY --on-port $tcp_local_port --tproxy-mark 251
+    iptables -t mangle -A TP_SPEC_WAN_FW -p udp -j TPROXY --on-port $udp_local_port --tproxy-mark 251
     return $?
 }
 
@@ -190,10 +191,16 @@ gen_prerouting_rules() {
     done
 }
 
-while getopts ":m:l:B:b:W:w:I:i:d:a:fh" arg; do
+while getopts ":m:t:u:B:b:W:w:I:i:d:a:fh" arg; do
     case "$arg" in
-        l)
-            local_port=$OPTARG
+        m)
+            MARK_NUMBER=$OPTARG
+            ;;
+        t)
+            tcp_local_port=$OPTARG
+            ;;
+        u)
+            udp_local_port=$OPTARG
             ;;
         B)
             WAN_BP_LIST=$OPTARG
@@ -210,17 +217,14 @@ while getopts ":m:l:B:b:W:w:I:i:d:a:fh" arg; do
         I)
             IFNAMES=$OPTARG
             ;;
+        i)
+            FWI=$OPTARG
+            ;;
         d)
             LAN_TARGET=$OPTARG
             ;;
         a)
             LAN_HOSTS=$OPTARG
-            ;;
-        m)
-            MARK_NUMBER=$OPTARG
-            ;;
-        i)
-            FWI=$OPTARG
             ;;
         f)
             flush_rules
@@ -232,7 +236,8 @@ while getopts ":m:l:B:b:W:w:I:i:d:a:fh" arg; do
     esac
 done
 
-[ -z "$local_port" ] && usage 2
+[ -z "$tcp_local_port" ] && usage 2
+[ -z "$udp_local_port" ] && usage 2
 
 flush_rules && ipset_init && ipt_mangle && ipt_mangle_output && export_ipt_rules
 RET=$?

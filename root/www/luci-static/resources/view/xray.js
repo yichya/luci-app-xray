@@ -26,30 +26,37 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
+        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'))
+
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
 
-        o = s.taboption('general', form.Flag, 'transparent_proxy_udp', _('Transparent Proxy for UDP'))
+        o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
-
-        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'))
+        for (var v of L.uci.sections(config_data, "servers")) {
+            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
+        }
 
         s.tab('proxy', _('Proxy Settings'));
 
-        o = s.taboption('proxy', form.Value, 'tproxy_port', _('Transparent Proxy Port'))
+        o = s.taboption('proxy', form.Value, 'tproxy_port_tcp', _('Transparent Proxy Port (TCP)'))
         o.datatype = 'port'
-        o.default = 1081
-
-        o = s.taboption('proxy', form.Value, 'http_port', _('Http Proxy Port'))
+        o.default = 1080
+        
+        o = s.taboption('proxy', form.Value, 'tproxy_port_udp', _('Transparent Proxy Port (UDP)'))
         o.datatype = 'port'
-        o.default = 1082
+        o.default = 1080
 
         o = s.taboption('proxy', form.Value, 'socks_port', _('Socks5 Proxy Port'))
         o.datatype = 'port'
-        o.default = 5000
+        o.default = 1082
+
+        o = s.taboption('proxy', form.Value, 'http_port', _('HTTP Proxy Port'))
+        o.datatype = 'port'
+        o.default = 1083
 
         o = s.taboption('proxy', form.Value, 'dns_port', _('Xray DNS Server Port'))
         o.datatype = 'port'
-        o.default = 5000
+        o.default = 5353
 
         o = s.taboption('proxy', form.Value, 'mark', _('Socket Mark Number'), _('Avoid proxy loopback problems with local (gateway) traffic'))
         o.datatype = 'range(1, 255)'

@@ -38,15 +38,16 @@ create_when_enable() {
     [ "$enable" = 1 ] || return 0
     config_load $NAME
     /usr/bin/transparent-proxy-rules \
-        -l "$(uci_get_by_type general tproxy_port 12345)" \
+        -i "$(uci get firewall.xray.path)" \
         -m "$(uci_get_by_type general mark)" \
+        -t "$(uci_get_by_type general tproxy_port_tcp 12345)" \
+        -u "$(uci_get_by_type general tproxy_port_udp 12345)" \
         -B "$(uci_get_by_type general wan_bp_list)" \
         -b "$(uci_get_by_type general wan_bp_ips)" \
         -W "$(uci_get_by_type general wan_fw_list)" \
         -w "$(uci_get_by_type general wan_fw_ips)" \
         -I "$(uci_get_by_type general lan_ifaces)" \
         -d "$(uci_get_by_type general lan_target)" \
-        -i "$(uci get firewall.xray.path)" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
 }
 

@@ -5,8 +5,11 @@ local json = require "luci.jsonc"
 local proxy_section = ucursor:get_first("xray", "general")
 local proxy = ucursor:get_all("xray", proxy_section)
 
-local server_section = proxy.main_server
-local server = ucursor:get_all("xray", server_section)
+local tcp_server_section = proxy.main_server
+local tcp_server = ucursor:get_all("xray", tcp_server_section)
+
+local udp_server_section = proxy.tproxy_udp_server
+local udp_server = ucursor:get_all("xray", udp_server_section)
 
 local function direct_outbound()
     return {
@@ -21,7 +24,7 @@ local function direct_outbound()
     }
 end
 
-local function stream_tcp_fake_http_request()
+local function stream_tcp_fake_http_request(server)
     if server.tcp_guise == "http" then
         return {
             version = "1.1",
@@ -43,7 +46,7 @@ local function stream_tcp_fake_http_request()
     end
 end
 
-local function stream_tcp_fake_http_response()
+local function stream_tcp_fake_http_response(server)
     if server.tcp_guise == "http" then
         return {
             version = "1.1",
@@ -61,13 +64,13 @@ local function stream_tcp_fake_http_response()
     end
 end
 
-local function stream_tcp()
+local function stream_tcp(server)
     if server.transport == "tcp" then
         return {
             header = {
                 type = server.tcp_guise,
-                request = stream_tcp_fake_http_request(),
-                response = stream_tcp_fake_http_response()
+                request = stream_tcp_fake_http_request(server),
+                response = stream_tcp_fake_http_response(server)
             }
         }
     else
@@ -75,7 +78,7 @@ local function stream_tcp()
     end
 end
 
-local function stream_h2()
+local function stream_h2(server)
     if (server.transport == "h2") then 
         return {
             path = server.h2_path,
@@ -86,7 +89,7 @@ local function stream_h2()
     end  
 end
 
-local function stream_ws()
+local function stream_ws(server)
     if server.transport == "ws" then
         local headers = nil
         if (server.ws_host ~= nil) then
@@ -103,7 +106,7 @@ local function stream_ws()
     end
 end
 
-local function stream_kcp()
+local function stream_kcp(server)
     if server.transport == "mkcp" then
         local mkcp_seed = nil
         if server.mkcp_seed ~= "" then
@@ -127,7 +130,7 @@ local function stream_kcp()
     end
 end
 
-local function stream_quic()
+local function stream_quic(server)
     if server.transport == "quic" then
         return {
             security = server.quic_security,
@@ -141,10 +144,10 @@ local function stream_quic()
     end
 end
 
-local function shadowsocks_outbound()
+local function shadowsocks_outbound(server, tag)
     return {
         protocol = "shadowsocks",
-        tag = "outbound",
+        tag = tag,
         settings = {
             servers = {
                 {
@@ -165,19 +168,19 @@ local function shadowsocks_outbound()
                 serverName = server.shadowsocks_tls_host,
                 allowInsecure = server.shadowsocks_tls_insecure ~= "0"
             } or nil,
-            quicSettings = stream_quic(),
-            tcpSettings = stream_tcp(),
-            kcpSettings = stream_kcp(),
-            wsSettings = stream_ws(),
-            httpSettings = stream_h2()
+            quicSettings = stream_quic(server),
+            tcpSettings = stream_tcp(server),
+            kcpSettings = stream_kcp(server),
+            wsSettings = stream_ws(server),
+            httpSettings = stream_h2(server)
         }
     }
 end
 
-local function vmess_outbound()
+local function vmess_outbound(server, tag)
     return {
         protocol = "vmess",
-        tag = "outbound",
+        tag = tag,
         settings = {
             vnext = {
                 {
@@ -203,23 +206,23 @@ local function vmess_outbound()
                 serverName = server.vmess_tls_host,
                 allowInsecure = server.vmess_tls_insecure ~= "0"
             } or nil,
-            quicSettings = stream_quic(),
-            tcpSettings = stream_tcp(),
-            kcpSettings = stream_kcp(),
-            wsSettings = stream_ws(),
-            httpSettings = stream_h2()
+            quicSettings = stream_quic(server),
+            tcpSettings = stream_tcp(server),
+            kcpSettings = stream_kcp(server),
+            wsSettings = stream_ws(server),
+            httpSettings = stream_h2(server)
         }
     }
 end
 
-local function vless_outbound()
+local function vless_outbound(server, tag)
     local flow = server.vless_flow
     if server.vless_flow == "none" then
         flow = nil
     end
     return {
         protocol = "vless",
-        tag = "outbound",
+        tag = tag,
         settings = {
             vnext = {
                 {
@@ -249,23 +252,23 @@ local function vless_outbound()
                 serverName = server.vless_xtls_host,
                 allowInsecure = server.vless_xtls_insecure ~= "0"
             } or nil,
-            quicSettings = stream_quic(),
-            tcpSettings = stream_tcp(),
-            kcpSettings = stream_kcp(),
-            wsSettings = stream_ws(),
-            httpSettings = stream_h2()
+            quicSettings = stream_quic(server),
+            tcpSettings = stream_tcp(server),
+            kcpSettings = stream_kcp(server),
+            wsSettings = stream_ws(server),
+            httpSettings = stream_h2(server)
         }
     }
 end
 
-local function trojan_outbound()
+local function trojan_outbound(server, tag)
     local flow = server.trojan_flow
     if server.trojan_flow == "none" then
         flow = nil
     end
     return {
         protocol = "trojan",
-        tag = "outbound",
+        tag = tag,
         settings = {
             servers = {
                 {
@@ -290,38 +293,56 @@ local function trojan_outbound()
                 serverName = server.trojan_xtls_host,
                 allowInsecure = server.trojan_xtls_insecure ~= "0"
             } or nil,
-            quicSettings = stream_quic(),
-            tcpSettings = stream_tcp(),
-            kcpSettings = stream_kcp(),
-            wsSettings = stream_ws(),
-            httpSettings = stream_h2()
+            quicSettings = stream_quic(server),
+            tcpSettings = stream_tcp(server),
+            kcpSettings = stream_kcp(server),
+            wsSettings = stream_ws(server),
+            httpSettings = stream_h2(server)
         }
     }
 end
 
-local function server_outbound() 
+local function server_outbound(server, tag) 
     if server.protocol == "vmess" then
-        return vmess_outbound()
+        return vmess_outbound(server, tag)
     end
     if server.protocol == "vless" then 
-        return vless_outbound()
+        return vless_outbound(server, tag)
     end
     if server.protocol == "shadowsocks" then
-        return shadowsocks_outbound()
+        return shadowsocks_outbound(server, tag)
     end
     if server.protocol == "trojan" then
-        return trojan_outbound()
+        return trojan_outbound(server, tag)
     end
     return {}
 end
 
-local function tproxy_inbound()
+local function tproxy_tcp_inbound()
     return {
-        port = proxy.tproxy_port,
+        port = proxy.tproxy_port_tcp,
         protocol = "dokodemo-door",
-        tag = "tproxy_inbound",
+        tag = "tproxy_tcp_inbound",
         settings = {
-            network = "tcp,udp",
+            network = "tcp",
+            followRedirect = true
+        },
+        streamSettings = {
+            sockopt = {
+                tproxy = "tproxy",
+                mark = tonumber(proxy.mark)
+            }
+        }
+    }
+end
+
+local function tproxy_udp_inbound()
+    return {
+        port = proxy.tproxy_port_udp,
+        protocol = "dokodemo-door",
+        tag = "tproxy_udp_inbound",
+        settings = {
+            network = "udp",
             followRedirect = true
         },
         streamSettings = {
@@ -412,7 +433,8 @@ end
 local function inbounds()
     local i = {
         http_inbound(),
-        tproxy_inbound(),
+        tproxy_tcp_inbound(),
+        tproxy_udp_inbound(),
         socks_inbound(),
         dns_server_inbound()
     }
@@ -433,7 +455,8 @@ end
 local xray = {
     inbounds = inbounds(),
     outbounds = {
-        server_outbound(),
+        server_outbound(tcp_server, "tcp_outbound"),
+        server_outbound(udp_server, "udp_outbound"),
         direct_outbound(),
         dns_server_outbound()
     },
@@ -444,20 +467,25 @@ local xray = {
         rules = {
             {
                 type = "field",
-                inboundTag = {"tproxy_inbound", "dns_conf_inbound"},
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
                 outboundTag = "direct",
                 ip = {"geoip:cn"}
             },
             {
                 type = "field",
-                inboundTag = {"tproxy_inbound", "socks_inbound", "dns_conf_inbound"},
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "dns_conf_inbound"},
                 outboundTag = "direct",
                 ip = {"geoip:private"}
             },
             {
                 type = "field",
-                inboundTag = {"socks_inbound", "tproxy_inbound", "dns_conf_inbound"},
-                outboundTag = "outbound"
+                inboundTag = {"socks_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
+                outboundTag = "tcp_outbound"
+            },
+            {
+                type = "field",
+                inboundTag = {"tproxy_udp_inbound"},
+                outboundTag = "udp_outbound"
             },
             {
                 type = "field",
