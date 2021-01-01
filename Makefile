@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=8fc2d3b61fce1d7393910fe08873daef31e139e0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -37,17 +37,12 @@ menu "Xray Configuration"
 	depends on PACKAGE_$(PKG_NAME)
 
 config PACKAGE_XRAY_FETCH_VIA_PROXYCHAINS
-	bool "Fetch release files using proxychains (not recommended)"
+	bool "Fetch data files using proxychains (not recommended)"
 	default n
 
 config PACKAGE_XRAY_INCLUDE_XRAY
 	bool "Include xray"
 	default y
-
-config PACKAGE_XRAY_SOFTFLOAT
-	bool "Use soft-float binaries (mips/mipsle only)"
-	depends on mipsel || mips || mips64el || mips64
-	default n
 
 config PACKAGE_XRAY_INCLUDE_GEOIP
 	bool "Include geoip.dat"
