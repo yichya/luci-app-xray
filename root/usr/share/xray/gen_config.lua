@@ -382,8 +382,8 @@ local function dns_server_inbound()
         protocol = "dokodemo-door",
         tag = "dns_server_inbound",
         settings = {
-            address = "208.67.220.220",
-            port = 443,
+            address = proxy.default_dns,
+            port = 53,
             network = "tcp,udp"
         }
     }
