@@ -5,6 +5,8 @@ STOP=15
 USE_PROCD=1
 NAME=xray
 
+extra_command "gen_config_file" "generate config file and print"
+
 GENERATE_CONF="/usr/share/xray/gen_config.lua"
 
 uci_get_by_name() {

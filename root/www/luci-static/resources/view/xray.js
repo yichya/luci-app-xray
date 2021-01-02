@@ -72,7 +72,7 @@ return view.extend({
         o.datatype = 'ip4addr'
         o.placeholder = "1.1.1.1"
 
-        o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites"))
+        o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
         o.datatype = 'ip4addr'
         o.placeholder = "8.8.8.8"
 
