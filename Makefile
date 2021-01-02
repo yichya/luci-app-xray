@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=8fc2d3b61fce1d7393910fe08873daef31e139e0
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -84,8 +84,8 @@ endef
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 if [[ -z "$${IPKG_INSTROOT}" ]]; then
-	if [[ -f /etc/uci-defaults/luci-xray ]]; then
-		( . /etc/uci-defaults/luci-xray ) && rm -f /etc/uci-defaults/luci-xray
+	if [[ -f /etc/uci-defaults/xray ]]; then
+		( . /etc/uci-defaults/xray ) && rm -f /etc/uci-defaults/xray
 	fi
 	rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
 fi
@@ -102,14 +102,16 @@ define Package/$(PKG_NAME)/install
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_XRAY
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/xray $(1)/usr/bin/xray
 endif
-	$(INSTALL_DIR) $(1)/etc/ssl/certs
-ifdef CONFIG_PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
-	$(INSTALL_DATA) ./root/etc/ssl/certs/origin_ca_ecc_root.pem $(1)/etc/ssl/certs/origin_ca_ecc_root.pem
-endif
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./root/etc/config/xray $(1)/etc/config/xray
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy $(1)/etc/hotplug.d/iface/01-transparent-proxy
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/etc/init.d/xray
+	$(INSTALL_DIR) $(1)/etc/ssl/certs
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
+	$(INSTALL_DATA) ./root/etc/ssl/certs/origin_ca_ecc_root.pem $(1)/etc/ssl/certs/origin_ca_ecc_root.pem
+endif
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./root/etc/uci-defaults/xray $(1)/etc/uci-defaults/xray
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view
