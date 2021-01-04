@@ -99,5 +99,5 @@ stop_service() {
 }
 
 service_triggers() {
-    procd_add_reload_trigger "/etc/config/xray"
+    procd_add_reload_trigger "xray"
 }
