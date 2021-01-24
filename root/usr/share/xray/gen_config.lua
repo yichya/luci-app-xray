@@ -376,6 +376,109 @@ local function socks_inbound()
     }
 end
 
+local function https_trojan_inbound()
+    return {
+        port = 443,
+        protocol = "trojan",
+        tag = "https_inbound",
+        settings = {
+            clients = {
+                {
+                    id = proxy.web_server_password
+                }
+            },
+            fallbacks = {
+                {
+                    dest = proxy.web_server_address
+                }
+            }
+        },
+        streamSettings = {
+            network = "tcp",
+            security = proxy.trojan_tls,
+            tlsSettings = proxy.trojan_tls == "tls" and {
+                alpn = {
+                    "http/1.1"
+                },
+                certificates = {
+                    {
+                        certificateFile = proxy.web_server_cert_file,
+                        keyFile = proxy.web_server_key_file
+                    }
+                }
+            } or nil,
+            xtlsSettings = proxy.trojan_tls == "xtls" and {
+                alpn = {
+                    "http/1.1"
+                },
+                certificates = {
+                    {
+                        certificateFile = proxy.web_server_cert_file,
+                        keyFile = proxy.web_server_key_file
+                    }
+                }
+            } or nil
+        }
+    }
+end
+
+local function https_vless_inbound()
+    return {
+        port = 443,
+        protocol = "vless",
+        tag = "https_inbound",
+        settings = {
+            clients = {
+                {
+                    id = proxy.web_server_password,
+                }
+            },
+            decryption = "none",
+            fallbacks = {
+                {
+                    dest = proxy.web_server_address
+                }
+            }
+        },
+        streamSettings = {
+            network = "tcp",
+            security = proxy.vless_tls,
+            tlsSettings = proxy.vless_tls == "tls" and {
+                alpn = {
+                    "http/1.1"
+                },
+                certificates = {
+                    {
+                        certificateFile = proxy.web_server_cert_file,
+                        keyFile = proxy.web_server_key_file
+                    }
+                }
+            } or nil,
+            xtlsSettings = proxy.vless_tls == "xtls" and {
+                alpn = {
+                    "http/1.1"
+                },
+                certificates = {
+                    {
+                        certificateFile = proxy.web_server_cert_file,
+                        keyFile = proxy.web_server_key_file
+                    }
+                }
+            } or nil
+        }
+    }
+end
+
+local function https_inbound()
+    if proxy.web_server_protocol == "vless" then 
+        return https_vless_inbound()
+    end
+    if proxy.web_server_protocol == "trojan" then
+        return https_trojan_inbound()
+    end
+    return nil
+end
+
 local function dns_server_inbound()
     return {
         port = proxy.dns_port,
@@ -438,6 +541,9 @@ local function inbounds()
         socks_inbound(),
         dns_server_inbound()
     }
+    if proxy.web_server_enable == "1" then
+        table.insert(i, https_inbound())
+    end
     if proxy.xray_api == '1' then
         table.insert(i, {
             listen = "127.0.0.1",
@@ -473,13 +579,13 @@ local xray = {
             },
             {
                 type = "field",
-                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "dns_conf_inbound"},
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "https_inbound", "http_inbound", "dns_conf_inbound"},
                 outboundTag = "direct",
                 ip = {"geoip:private"}
             },
             {
                 type = "field",
-                inboundTag = {"socks_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
+                inboundTag = {"socks_inbound", "https_inbound", "http_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
                 outboundTag = "tcp_outbound"
             },
             {

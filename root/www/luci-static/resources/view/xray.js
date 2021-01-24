@@ -4,6 +4,66 @@
 'require form';
 
 
+function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, client_side) {
+    var o;
+
+    o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls`, _(`[${protocol_name}] Stream Security`))
+    o.depends(depends_field_name, protocol_name)
+    if (client_side) {
+        o.value("none", "None")
+    }
+    o.value("tls", "TLS")
+    if (have_xtls) {
+        o.value("xtls", "XTLS")
+    }
+    o.rmempty = false
+    o.modalonly = true
+
+    if (have_xtls) {
+        o = s.taboption(tab_name, form.ListValue, `${protocol_name}_flow`, _(`[${protocol_name}][xtls] Flow`))
+        o.depends(depends_field_name, protocol_name)
+        o.depends(`${protocol_name}_tls`, "xtls")
+        o.value("none", "none")
+        o.value("xtls-rprx-origin", "xtls-rprx-origin")
+        o.value("xtls-rprx-direct", "xtls-rprx-direct")
+        if (client_side) {
+            o.value("xtls-rprx-splice", "xtls-rprx-splice")
+        }
+        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
+        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
+        if (client_side) {
+            o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
+        }
+        o.rmempty = false
+        o.modalonly = true
+    }
+
+    if (client_side) {
+        o = s.taboption(tab_name, form.Value, `${protocol_name}_tls_host`, _(`[${protocol_name}][tls] Server Name`))
+        o.depends(`${protocol_name}_tls`, "tls")
+        o.rmempty = true
+        o.modalonly = true
+    
+        o = s.taboption(tab_name, form.Flag, `${protocol_name}_tls_insecure`, _(`[${protocol_name}][tls] Allow Insecure`))
+        o.depends(`${protocol_name}_tls`, "tls")
+        o.rmempty = false
+        o.modalonly = true
+    
+        if (have_xtls) {
+            o = s.taboption(tab_name, form.Value, `${protocol_name}_xtls_host`, _(`[${protocol_name}][xtls] Server Name`))
+            o.depends(`${protocol_name}_tls`, "xtls")
+            o.rmempty = true
+            o.modalonly = true
+    
+            o = s.taboption(tab_name, form.Flag, `${protocol_name}_xtls_insecure`, _(`[${protocol_name}][xtls] Allow Insecure`))
+            o.depends(`${protocol_name}_tls`, "xtls")
+            o.rmempty = false
+            o.modalonly = true
+        }
+    }
+}
+
+
 return view.extend({
     load: function () {
         return L.uci.load("xray")
@@ -41,7 +101,7 @@ return view.extend({
         o = s.taboption('proxy', form.Value, 'tproxy_port_tcp', _('Transparent Proxy Port (TCP)'))
         o.datatype = 'port'
         o.default = 1080
-        
+
         o = s.taboption('proxy', form.Value, 'tproxy_port_udp', _('Transparent Proxy Port (UDP)'))
         o.datatype = 'port'
         o.default = 1080
@@ -86,6 +146,27 @@ return view.extend({
         o.datatype = "ip4addr"
         o.rmempty = true
 
+        s.tab('xray_server', _('HTTPS Server'));
+
+        o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Web Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
+        o = s.taboption('xray_server', form.FileUpload, 'web_server_cert_file', _('Certificate File'));
+        o.root_directory = "/etc/luci-uploads/xray"
+        o = s.taboption('xray_server', form.FileUpload, 'web_server_key_file', _('Private Key File'));
+        o.root_directory = "/etc/luci-uploads/xray"
+
+        o = s.taboption('xray_server', form.ListValue, "web_server_protocol", _("Protocol"), _("Only protocols which support fallback are available"));
+        o.value("vless", "VLESS")
+        o.value("trojan", "Trojan")
+        o.rmempty = false
+
+        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "vless", true, false)
+
+        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false)
+
+        o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
+    
+        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Underlying HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
+
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
         s.sortable = true
@@ -104,7 +185,7 @@ return view.extend({
         o.datatype = 'port'
         o.placeholder = '443'
 
-        o = s.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan'))
+        o = s.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
         o.modalonly = true
 
         s.tab('protocol', _('Protocol Settings'));
@@ -116,6 +197,8 @@ return view.extend({
         o.value("shadowsocks", "Shadowsocks")
         o.rmempty = false
 
+        add_flow_and_stream_security_conf(s, "protocol", "protocol", "trojan", true, true)
+
         o = s.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
         o.depends("protocol", "shadowsocks")
         o.value("none", "none")
@@ -125,62 +208,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        o = s.taboption('protocol', form.ListValue, "shadowsocks_tls", _("[shadowsocks] Stream Security"))
-        o.depends("protocol", "shadowsocks")
-        o.value("none", "None")
-        o.value("tls", "TLS")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "shadowsocks_tls_host", _("[shadowsocks][tls] Server Name"))
-        o.depends("shadowsocks_tls", "tls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "shadowsocks_tls_insecure", _("[shadowsocks][tls] Allow Insecure"))
-        o.depends("shadowsocks_tls", "tls")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.ListValue, "trojan_flow", _("[trojan] Flow"))
-        o.depends("protocol", "trojan")
-        o.value("none", "none")
-        o.value("xtls-rprx-origin", "xtls-rprx-origin")
-        o.value("xtls-rprx-direct", "xtls-rprx-direct")
-        o.value("xtls-rprx-splice", "xtls-rprx-splice")
-        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
-        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
-        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.ListValue, "trojan_tls", _("[trojan] Stream Security"))
-        o.depends("protocol", "trojan")
-        o.value("none", "None")
-        o.value("tls", "TLS")
-        o.value("xtls", "XTLS")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "trojan_tls_host", _("[trojan][tls] Server Name"))
-        o.depends("trojan_tls", "tls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "trojan_tls_insecure", _("[trojan][tls] Allow Insecure"))
-        o.depends("trojan_tls", "tls")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "trojan_xtls_host", _("[trojan][xtls] Server Name"))
-        o.depends("trojan_tls", "xtls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "trojan_xtls_insecure", _("[trojan][xtls] Allow Insecure"))
-        o.depends("trojan_tls", "xtls")
-        o.rmempty = false
-        o.modalonly = true
+        add_flow_and_stream_security_conf(s, "protocol", "protocol", "shadowsocks", false, true)
 
         o = s.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
         o.depends("protocol", "vmess")
@@ -202,22 +230,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        o = s.taboption('protocol', form.ListValue, "vmess_tls", _("[vmess] Stream Security"))
-        o.depends("protocol", "vmess")
-        o.value("none", "None")
-        o.value("tls", "TLS")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "vmess_tls_host", _("[vmess][tls] Server Name"))
-        o.depends("vmess_tls", "tls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "vmess_tls_insecure", _("[vmess][tls] Allow Insecure"))
-        o.depends("vmess_tls", "tls")
-        o.rmempty = false
-        o.modalonly = true
+        add_flow_and_stream_security_conf(s, "protocol", "protocol", "vmess", false, true)
 
         o = s.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
         o.depends("protocol", "vless")
@@ -225,45 +238,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        o = s.taboption('protocol', form.ListValue, "vless_flow", _("[vless] Flow"))
-        o.depends("protocol", "vless")
-        o.value("none", "none")
-        o.value("xtls-rprx-origin", "xtls-rprx-origin")
-        o.value("xtls-rprx-direct", "xtls-rprx-direct")
-        o.value("xtls-rprx-splice", "xtls-rprx-splice")
-        o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
-        o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
-        o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.ListValue, "vless_tls", _("[vless] Stream Security"))
-        o.depends("protocol", "vless")
-        o.value("none", "None")
-        o.value("tls", "TLS")
-        o.value("xtls", "XTLS")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "vless_tls_host", _("[vless][tls] Server Name"))
-        o.depends("vless_tls", "tls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "vless_tls_insecure", _("[vless][tls] Allow Insecure"))
-        o.depends("vless_tls", "tls")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Value, "vless_xtls_host", _("[vless][xtls] Server Name"))
-        o.depends("vless_tls", "xtls")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.Flag, "vless_xtls_insecure", _("[vless][xtls] Allow Insecure"))
-        o.depends("vless_tls", "xtls")
-        o.rmempty = false
-        o.modalonly = true
+        add_flow_and_stream_security_conf(s, "protocol", "protocol", "vless", true, true)
 
         s.tab('transport', _('Transport Settings'));
 
