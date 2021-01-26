@@ -9,6 +9,7 @@
 * 2020-12-04 feature: add xtls-rprx-splice to flow
 * 2020-12-26 feature: allow to determine whether to use proxychains during build; trojan xtls flow settings
 * 2021-01-01 feature: build xray from source; various fixes about tproxy and logging
+* 2021-01-25 feature: xray act as HTTPS server
 
 ## Todo
 
