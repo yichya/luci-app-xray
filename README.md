@@ -20,6 +20,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-01-25 feature: xray act as HTTPS server
 * 2021-01-29 fix: add ipset as dependency to fix transparent proxy problems; remove useless and faulty extra_command in init.d script
 * 2021-01-29 feature: decouple with xray original binary and data files. Use any xray-core provider package like [openwrt-xray](https://github.com/yichya/openwrt-xray) or [packages#14598](https://github.com/openwrt/packages/pull/14598) (if that got merged).
+* 2021-01-30 feature: select GeoIP set for direct connection. This is considered a **BREAKING** change because if unspecified, all IP addresses is forwarded through Xray.
 
 ## Todo
 

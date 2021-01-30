@@ -137,6 +137,11 @@ return view.extend({
         o.placeholder = "8.8.8.8"
 
         s.tab('access_control', _('Transparent Proxy Rules'));
+        
+        o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts."))
+        o.value("cn", "cn")
+        o.value("telegram", "telegram")
+        o.datatype = "string"
 
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
         o.datatype = "ip4addr"
@@ -166,6 +171,7 @@ return view.extend({
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
     
         o = s.taboption('xray_server', form.Value, 'web_server_address', _('Underlying HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
+        o.datatype = 'hostport'
 
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
