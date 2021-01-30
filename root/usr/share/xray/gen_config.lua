@@ -558,6 +558,46 @@ local function inbounds()
     return i
 end
 
+local function rules()
+    rules = {
+        {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "https_inbound", "http_inbound", "dns_conf_inbound"},
+            outboundTag = "direct",
+            ip = {"geoip:private"}
+        },
+        {
+            type = "field",
+            inboundTag = {"socks_inbound", "https_inbound", "http_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
+            outboundTag = "tcp_outbound"
+        },
+        {
+            type = "field",
+            inboundTag = {"tproxy_udp_inbound"},
+            outboundTag = "udp_outbound"
+        },
+        {
+            type = "field",
+            inboundTag = {"dns_server_inbound"},
+            outboundTag = "dns_server_outbound"
+        },
+        {
+            type = "field",
+            inboundTag = {"api"},
+            outboundTag = "api"
+        }
+    }
+    if proxy.geoip_direct_code ~= nil then
+        table.insert(rules, 1, {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+            outboundTag = "direct",
+            ip = {"geoip:" .. proxy.geoip_direct_code}
+        })
+    end
+    return rules
+end
+
 local xray = {
     inbounds = inbounds(),
     outbounds = {
@@ -570,40 +610,7 @@ local xray = {
     api = api_conf(),
     routing = {
         domainStrategy = "AsIs",
-        rules = {
-            {
-                type = "field",
-                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
-                outboundTag = "direct",
-                ip = {"geoip:cn"}
-            },
-            {
-                type = "field",
-                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "https_inbound", "http_inbound", "dns_conf_inbound"},
-                outboundTag = "direct",
-                ip = {"geoip:private"}
-            },
-            {
-                type = "field",
-                inboundTag = {"socks_inbound", "https_inbound", "http_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
-                outboundTag = "tcp_outbound"
-            },
-            {
-                type = "field",
-                inboundTag = {"tproxy_udp_inbound"},
-                outboundTag = "udp_outbound"
-            },
-            {
-                type = "field",
-                inboundTag = {"dns_server_inbound"},
-                outboundTag = "dns_server_outbound"
-            },
-            {
-                type = "field",
-                inboundTag = {"api"},
-                outboundTag = "api"
-            }
-        }
+        rules = rules()
     }
 }
 
