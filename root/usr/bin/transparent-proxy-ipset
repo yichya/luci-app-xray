@@ -1,0 +1,148 @@
+#!/bin/sh
+#
+# Copyright (C) 2014-2017 Jian Chang <aa65535@live.com>
+# Copyright (C) 2017 Ian Li <OpenSource@ianli.xyz>
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
+
+usage() {
+    cat <<-EOF
+		Usage: transparent-proxy-ipset [options]
+
+		Valid options are:
+
+			-B <ip_list_file>       a file whose content is bypassed ip list
+			-b <wan_ips>            wan ip of will be bypassed
+			-W <ip_list_file>       a file whose content is forwarded ip list
+			-w <wan_ips>            wan ip of will be forwarded
+			-d <target>             the default target of lan access control
+			-a <lan_hosts>          mac addr of access control, need a prefix to define proxy type
+			-f                      flush the rules
+			-h                      show this help message and exit
+	EOF
+    exit $1
+}
+
+logger_level() {
+    # 1.alert 2.crit 3.err 4.warn 5.notice 6.info 7.debug
+    logger -st transparent-proxy-ipset[$$] -p$1 $2
+}
+
+flush_rules() {
+    logger_level 6 "flush_ipset_rules"
+        if command -v ip >/dev/null; then
+        ip rule del fwmark 251 lookup 251 
+        ip rule del fwmark 252 lookup 252
+        ip route del local default dev lo table 252
+        ip route del local default dev lo table 252
+    fi
+    for setname in $(ipset -n list | grep "tp_spec"); do
+        ipset destroy $setname 
+    done
+    return 0
+}
+
+gen_lan_host_ipset_entry() {
+    logger_level 6 "gen_lan_host_ipset_entry"
+    for host in $LAN_HOSTS; do
+        case "${host:0:1}" in
+            n|N)
+                echo add tp_spec_src_ac ${host:2}
+                ;;
+            b|B)
+                echo add tp_spec_src_bp ${host:2}
+                ;;
+            g|G)
+                echo add tp_spec_src_fw ${host:2}
+                ;;
+        esac
+    done
+}
+
+gen_special_purpose_ip() {
+    cat <<-EOF | grep -E "^([0-9]{1,3}\.){3}[0-9]{1,3}"
+		0.0.0.0/8
+		10.0.0.0/8
+		100.64.0.0/10
+		127.0.0.0/8
+		169.254.0.0/16
+		172.16.0.0/12
+		192.0.0.0/24
+		192.0.2.0/24
+		192.31.196.0/24
+		192.52.193.0/24
+		192.88.99.0/24
+		192.168.0.0/16
+		192.175.48.0/24
+		198.18.0.0/15
+		198.51.100.0/24
+		203.0.113.0/24
+		224.0.0.0/4
+		240.0.0.0/4
+		255.255.255.255
+	EOF
+}
+
+ipset_init() {
+    logger_level 6 "ipset_init"
+    ip rule add fwmark 251 lookup 251
+    ip rule add fwmark 252 lookup 252
+    ip route add local default dev lo table 251
+    ip route add local default dev lo table 252
+    ipset -! restore <<-EOF || return 1
+		create tp_spec_src_ac hash:mac hashsize 64
+		create tp_spec_src_bp hash:mac hashsize 64
+		create tp_spec_src_fw hash:mac hashsize 64
+		create tp_spec_dst_sp hash:net hashsize 64
+		create tp_spec_dst_bp hash:net hashsize 64
+		create tp_spec_dst_fw hash:net hashsize 64
+		create tp_spec_def_gw hash:net hashsize 64
+		$(gen_lan_host_ipset_entry)
+		$(gen_special_purpose_ip | sed -e "s/^/add tp_spec_dst_sp /")
+		$(sed -e "s/^/add tp_spec_dst_bp /" ${WAN_BP_LIST:=/dev/null} )
+		$(for ip in $WAN_BP_IP; do echo "add tp_spec_dst_bp $ip"; done)
+		$(sed -e "s/^/add tp_spec_dst_fw /" ${WAN_FW_LIST:=/dev/null} )
+		$(for ip in $WAN_FW_IP; do echo "add tp_spec_dst_fw $ip"; done)
+	EOF
+    DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
+    logger_level 6 "default gateway check $DEFAULT_GATEWAY"
+    [ -n "$DEFAULT_GATEWAY" ] && ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
+    return 0
+}
+
+while getopts "B:b:W:w:d:a:fh" arg; do
+    case "$arg" in
+        B)
+            WAN_BP_LIST=$OPTARG
+            ;;
+        b)
+            WAN_BP_IP=$OPTARG
+            ;;
+        W)
+            WAN_FW_LIST=$OPTARG
+            ;;
+        w)
+            WAN_FW_IP=$OPTARG
+            ;;
+        d)
+            LAN_TARGET=$OPTARG
+            ;;
+        a)
+            LAN_HOSTS=$OPTARG
+            ;;
+        f)
+            flush_rules
+            exit 0
+            ;;
+        h)
+            usage 0
+            ;;
+    esac
+done
+
+flush_rules && ipset_init
+RET=$?
+[ "$RET" = 0 ] || logger_level 3 "Start failed!"
+exit $RET
