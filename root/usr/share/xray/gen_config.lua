@@ -315,7 +315,7 @@ local function server_outbound(server, tag)
     if server.protocol == "trojan" then
         return trojan_outbound(server, tag)
     end
-    return {}
+    error("unknown outbound server protocol")
 end
 
 local function tproxy_tcp_inbound()
