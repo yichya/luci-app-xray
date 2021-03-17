@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.0.3
+PKG_VERSION:=1.0.4
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -43,7 +43,7 @@ if [[ -z "$${IPKG_INSTROOT}" ]]; then
 	if [[ -f /etc/uci-defaults/xray ]]; then
 		( . /etc/uci-defaults/xray ) && rm -f /etc/uci-defaults/xray
 	fi
-	rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
+	rm -rf /tmp/luci-indexcache* /tmp/luci-modulecache
 fi
 exit 0
 endef

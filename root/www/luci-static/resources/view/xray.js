@@ -43,18 +43,18 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         o.depends(`${protocol_name}_tls`, "tls")
         o.rmempty = true
         o.modalonly = true
-    
+
         o = s.taboption(tab_name, form.Flag, `${protocol_name}_tls_insecure`, _(`[${protocol_name}][tls] Allow Insecure`))
         o.depends(`${protocol_name}_tls`, "tls")
         o.rmempty = false
         o.modalonly = true
-    
+
         if (have_xtls) {
             o = s.taboption(tab_name, form.Value, `${protocol_name}_xtls_host`, _(`[${protocol_name}][xtls] Server Name`))
             o.depends(`${protocol_name}_tls`, "xtls")
             o.rmempty = true
             o.modalonly = true
-    
+
             o = s.taboption(tab_name, form.Flag, `${protocol_name}_xtls_insecure`, _(`[${protocol_name}][xtls] Allow Insecure`))
             o.depends(`${protocol_name}_tls`, "xtls")
             o.rmempty = false
@@ -137,7 +137,7 @@ return view.extend({
         o.placeholder = "8.8.8.8"
 
         s.tab('access_control', _('Transparent Proxy Rules'));
-        
+
         o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts."))
         o.value("cn", "cn")
         o.value("telegram", "telegram")
@@ -169,9 +169,14 @@ return view.extend({
         add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false)
 
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
-    
+
         o = s.taboption('xray_server', form.Value, 'web_server_address', _('Underlying HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
         o.datatype = 'hostport'
+
+        s.tab('custom_options', _('Custom Options'))
+        o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
+        o.monospace = true
+        o.rows = 10
 
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
