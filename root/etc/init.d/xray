@@ -71,7 +71,9 @@ gen_config_file() {
     while [ ! -s /var/etc/xray/config.json ] ; do
         /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
     done
-    uci_get_by_type general custom_config > /var/etc/xray/config_custom.json 2>/dev/null
+    rm /var/etc/xray/config_custom.json
+    custom_config=$(uci_get_by_type general custom_config 2>/dev/null)
+    [ ! "${#custom_config}" == "0" ] && echo ${custom_config} > /var/etc/xray/config_custom.json
 }
 
 start_service() {
