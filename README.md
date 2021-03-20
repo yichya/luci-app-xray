@@ -19,8 +19,11 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-01-01 feature: build xray from source; various fixes about tproxy and logging
 * 2021-01-25 feature: xray act as HTTPS server
 * 2021-01-29 fix: add ipset as dependency to fix transparent proxy problems; remove useless and faulty extra_command in init.d script
-* 2021-01-29 feature: decouple with xray original binary and data files. Use any xray-core provider package like [openwrt-xray](https://github.com/yichya/openwrt-xray) or [packages#14598](https://github.com/openwrt/packages/pull/14598) (if that got merged).
+* 2021-01-29 feature: decouple with xray original binary and data files. Use [openwrt-xray](https://github.com/yichya/openwrt-xray) instead.
 * 2021-01-30 feature: select GeoIP set for direct connection. This is considered a **BREAKING** change because if unspecified, all IP addresses is forwarded through Xray.
+* 2020-03-17 feature: support custom configuration files by using Xray integrated [Multiple configuration files support](https://xtls.github.io/config/multiple_config/). Check `/var/etc/xray/config.json` for tags of generated inbounds and outbounds.
+* 2021-03-20 fix: no longer claim compatibility with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core) because of naming conflict of configuration file and init script. Again, use
+[openwrt-xray](https://github.com/yichya/openwrt-xray) instead.
 
 ## Todo
 
