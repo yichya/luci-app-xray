@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=1.0.4
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -16,7 +16,8 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray
-	DEPENDS:=+xray-core +dnsmasq +ipset +iptables +iptables-mod-tproxy +ca-bundle
+	DEPENDS:=+openwrt-xray +dnsmasq +ipset +iptables +iptables-mod-tproxy +ca-bundle
+	CONFLICTS:=xray-core
 endef
 
 define Package/$(PKG_NAME)/description
