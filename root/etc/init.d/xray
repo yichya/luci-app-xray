@@ -68,10 +68,10 @@ start_xray() {
 
 gen_config_file() {
     mkdir -p /var/etc/xray
+    rm /var/etc/xray/*
     while [ ! -s /var/etc/xray/config.json ] ; do
         /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
     done
-    rm /var/etc/xray/config_custom.json
     custom_config=$(uci_get_by_type general custom_config 2>/dev/null)
     [ ! "${#custom_config}" == "0" ] && echo ${custom_config} > /var/etc/xray/config_custom.json
 }
