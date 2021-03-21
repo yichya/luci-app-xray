@@ -11,6 +11,8 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     o.depends(depends_field_name, protocol_name)
     if (client_side) {
         o.value("none", "None")
+    } else {
+        o.depends("web_server_enable", "1")
     }
     o.value("tls", "TLS")
     if (have_xtls) {
@@ -25,14 +27,14 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         o.depends(`${protocol_name}_tls`, "xtls")
         o.value("none", "none")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
-        o.value("xtls-rprx-direct", "xtls-rprx-direct")
-        if (client_side) {
-            o.value("xtls-rprx-splice", "xtls-rprx-splice")
-        }
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
+        o.value("xtls-rprx-direct", "xtls-rprx-direct")
         o.value("xtls-rprx-direct-udp443", "xtls-rprx-direct-udp443")
         if (client_side) {
+            o.value("xtls-rprx-splice", "xtls-rprx-splice")
             o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
+        } else {
+            o.depends("web_server_enable", "1")
         }
         o.rmempty = false
         o.modalonly = true
@@ -156,22 +158,28 @@ return view.extend({
         o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Web Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
         o = s.taboption('xray_server', form.FileUpload, 'web_server_cert_file', _('Certificate File'));
         o.root_directory = "/etc/luci-uploads/xray"
+        o.depends("web_server_enable", "1")
+
         o = s.taboption('xray_server', form.FileUpload, 'web_server_key_file', _('Private Key File'));
         o.root_directory = "/etc/luci-uploads/xray"
+        o.depends("web_server_enable", "1")
 
         o = s.taboption('xray_server', form.ListValue, "web_server_protocol", _("Protocol"), _("Only protocols which support fallback are available"));
         o.value("vless", "VLESS")
         o.value("trojan", "Trojan")
         o.rmempty = false
+        o.depends("web_server_enable", "1")
 
         add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "vless", true, false)
 
         add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false)
 
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
+        o.depends("web_server_enable", "1")
 
         o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
         o.datatype = 'hostport'
+        o.depends("web_server_enable", "1")
 
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
@@ -385,7 +393,7 @@ return view.extend({
         o.depends("transport", "ws")
         o.rmempty = true
         o.modalonly = true
-        
+
         s = m.section(form.GridSection, 'fallback', _('Xray Fallback'))
 
         s.sortable = true
