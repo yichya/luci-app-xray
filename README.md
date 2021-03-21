@@ -16,19 +16,20 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2020-11-15 fix: vless flow settings & compatible with busybox ip command
 * 2020-12-04 feature: add xtls-rprx-splice to flow
 * 2020-12-26 feature: allow to determine whether to use proxychains during build; trojan xtls flow settings
-* 2021-01-01 feature: build xray from source; various fixes about tproxy and logging
-* 2021-01-25 feature: xray act as HTTPS server
+* 2021-01-01 feature: build Xray from source; various fixes about tproxy and logging
+* 2021-01-25 feature: Xray act as HTTPS server
 * 2021-01-29 fix: add ipset as dependency to fix transparent proxy problems; remove useless and faulty extra_command in init.d script
-* 2021-01-29 feature: decouple with xray original binary and data files. Use [openwrt-xray](https://github.com/yichya/openwrt-xray) instead.
+* 2021-01-29 feature: decouple with Xray original binary and data files. Use [openwrt-xray](https://github.com/yichya/openwrt-xray) instead.
 * 2021-01-30 feature: select GeoIP set for direct connection. This is considered a **BREAKING** change because if unspecified, all IP addresses is forwarded through Xray.
 * 2020-03-17 feature: support custom configuration files by using Xray integrated [Multiple configuration files support](https://xtls.github.io/config/multiple_config/). Check `/var/etc/xray/config.json` for tags of generated inbounds and outbounds.
 * 2021-03-20 fix: no longer claim compatibility with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core) because of naming conflict of configuration file and init script. Again, use
 [openwrt-xray](https://github.com/yichya/openwrt-xray) instead.
+* 2021-03-21 feature: detailed fallback config for Xray HTTPS server
 
 ## Todo
 
 * [x] LuCI ACL Settings
 * [x] migrate to xray-core
-* [ ] better server role configurations
+* [x] better server role configurations
 * [ ] Xray Running Status Check
 * [ ] transparent proxy access control for LAN

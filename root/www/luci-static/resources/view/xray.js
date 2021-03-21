@@ -170,13 +170,14 @@ return view.extend({
 
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
 
-        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Underlying HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
+        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
         o.datatype = 'hostport'
 
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
         o.monospace = true
         o.rows = 10
+        o.cols = 80
 
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
@@ -384,6 +385,31 @@ return view.extend({
         o.depends("transport", "ws")
         o.rmempty = true
         o.modalonly = true
+        
+        s = m.section(form.GridSection, 'fallback', _('Xray Fallback'))
+
+        s.sortable = true
+        s.anonymous = true
+        s.addremove = true
+
+        s.tab('general', _('General Settings'));
+
+        o = s.taboption('general', form.Value, "name", _("SNI"))
+        o.rmempty = true
+
+        o = s.taboption('general', form.Value, "alpn", _("ALPN"))
+        o.rmempty = true
+
+        o = s.taboption('general', form.Value, "path", _("Path"))
+        o.rmempty = true
+
+        o = s.taboption('general', form.Value, "xver", _("Xver"))
+        o.datatype = "uinteger"
+        o.rmempty = true
+
+        o = s.taboption('general', form.Value, "dest", _("Destination Address"))
+        o.datatype = 'hostport'
+        o.rmempty = true
 
         return m.render();
     }

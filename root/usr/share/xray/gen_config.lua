@@ -376,6 +376,25 @@ local function socks_inbound()
     }
 end
 
+local function fallbacks()
+    local f = {}
+    ucursor:foreach("xray", "fallback", function(s)
+        if s.dest ~= nil then
+            table.insert(f, {
+                dest = s.dest,
+                alpn = s.alpn,
+                name = s.name,
+                xver = s.xver,
+                path = s.path
+            })
+        end
+    end)
+    table.insert(f, {
+        dest = proxy.web_server_address
+    })
+    return f
+end
+
 local function https_trojan_inbound()
     return {
         port = 443,
@@ -387,11 +406,7 @@ local function https_trojan_inbound()
                     id = proxy.web_server_password
                 }
             },
-            fallbacks = {
-                {
-                    dest = proxy.web_server_address
-                }
-            }
+            fallbacks = fallbacks()
         },
         streamSettings = {
             network = "tcp",
@@ -434,11 +449,7 @@ local function https_vless_inbound()
                 }
             },
             decryption = "none",
-            fallbacks = {
-                {
-                    dest = proxy.web_server_address
-                }
-            }
+            fallbacks = fallbacks()
         },
         streamSettings = {
             network = "tcp",
