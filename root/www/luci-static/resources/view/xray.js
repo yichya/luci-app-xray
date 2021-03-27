@@ -3,7 +3,6 @@
 'require uci';
 'require form';
 
-
 function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, client_side) {
     var o;
 
@@ -65,13 +64,35 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     }
 }
 
+function check_resource_files(load_result) {
+    let geoip_existence = false;
+    let geosite_existence = false;
+    for (const f of load_result) {
+        if (f.name == "geoip.dat") {
+            geoip_existence = true
+        }
+        if (f.name == "geosite.dat") {
+            geosite_existence = true
+        }
+    }
+    return {
+        geoip_existence: geoip_existence,
+        geosite_existence: geosite_existence
+    }
+}
 
 return view.extend({
     load: function () {
-        return L.uci.load("xray")
+        return Promise.all([
+            L.uci.load("xray"),
+            L.uci.fs.list("/usr/share/xray")
+        ])
     },
 
-    render: function (config_data) {
+    render: function (load_result) {
+        const config_data = load_result[0];
+        const { geoip_existence, geosite_existence } = check_resource_files(load_result[1]);
+
         var m, s, o;
         m = new form.Map('xray', [_('Xray')]);
 
@@ -126,21 +147,31 @@ return view.extend({
 
         s.tab('dns', _('DNS Settings'));
 
-        o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving geosite:cn sites"))
-        o.datatype = 'ip4addr'
-        o.placeholder = "114.114.114.114"
+        if (geosite_existence) {
+            o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving geosite:cn sites"))
+            o.datatype = 'ip4addr'
+            o.placeholder = "114.114.114.114"
 
-        o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving geosite:geolocation-!cn sites"))
-        o.datatype = 'ip4addr'
-        o.placeholder = "1.1.1.1"
+            o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving geosite:geolocation-!cn sites"))
+            o.datatype = 'ip4addr'
+            o.placeholder = "1.1.1.1"
 
-        o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
+            o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
+        } else {
+            o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("Resource file /usr/share/xray/geosite.dat not exist. <br/>All DNS requests will be forwarded to this DNS server. <br/> Compile your firmware again with data files to use GeoSite rules, or<br/><a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+        }
         o.datatype = 'ip4addr'
         o.placeholder = "8.8.8.8"
 
+
         s.tab('access_control', _('Transparent Proxy Rules'));
 
-        o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts."))
+        if (geoip_existence) {
+            o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts."))
+        } else {
+            o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Resource file /usr/share/xray/geoip.dat not exist. All network traffic will be forwarded. <br/> Compile your firmware again with data files to use this feature, or<br/><a href=\"https://github.com/v2fly/geoip\">download one</a> (maybe disable transparent proxy first) and upload it to your router."))
+            o.readonly = true
+        }
         o.value("cn", "cn")
         o.value("telegram", "telegram")
         o.datatype = "string"
@@ -155,7 +186,7 @@ return view.extend({
 
         s.tab('xray_server', _('HTTPS Server'));
 
-        o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Web Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
+        o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
         o = s.taboption('xray_server', form.FileUpload, 'web_server_cert_file', _('Certificate File'));
         o.root_directory = "/etc/luci-uploads/xray"
         o.depends("web_server_enable", "1")
@@ -185,7 +216,6 @@ return view.extend({
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
         o.monospace = true
         o.rows = 10
-        o.cols = 80
 
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
