@@ -1,6 +1,7 @@
 #!/usr/bin/lua
 local ucursor = require "luci.model.uci"
 local json = require "luci.jsonc"
+local nixiofs = require "nixio.fs"
 
 local proxy_section = ucursor:get_first("xray", "general")
 local proxy = ucursor:get_all("xray", proxy_section)
@@ -10,6 +11,21 @@ local tcp_server = ucursor:get_all("xray", tcp_server_section)
 
 local udp_server_section = proxy.tproxy_udp_server
 local udp_server = ucursor:get_all("xray", udp_server_section)
+
+local geoip_existence = false
+local geosite_existence = false
+
+local xray_data_file_iterator = nixiofs.dir("/usr/share/xray")
+
+repeat 
+    local fn = xray_data_file_iterator()
+    if fn == "geoip.dat" then
+        geoip_existence = true
+    end
+    if fn == "geosite.dat" then
+        geosite_existence = true
+    end
+until fn == nil
 
 local function direct_outbound()
     return {
@@ -511,22 +527,31 @@ local function dns_server_outbound()
 end
 
 local function dns_conf()
-    return {
-        servers = {
-            {
-                address = proxy.secure_dns,
-                port = 53,
-                domains = {"geosite:geolocation-!cn"}
+    if geosite_existence then
+        return {
+            servers = {
+                {
+                    address = proxy.secure_dns,
+                    port = 53,
+                    domains = {"geosite:geolocation-!cn"}
+                },
+                {
+                    address = proxy.fast_dns,
+                    port = 53,
+                    domains = {"geosite:cn"}
+                },
+                proxy.default_dns
             },
-            {
-                address = proxy.fast_dns,
-                port = 53,
-                domains = {"geosite:cn"}
+            tag = "dns_conf_inbound"
+        }
+    else
+        return {
+            servers = {
+                proxy.default_dns
             },
-            proxy.default_dns
-        },
-        tag = "dns_conf_inbound"
-    }
+            tag = "dns_conf_inbound"
+        }
+    end
 end
 
 local function api_conf()
@@ -598,13 +623,15 @@ local function rules()
             outboundTag = "api"
         }
     }
-    if proxy.geoip_direct_code ~= nil then
-        table.insert(rules, 1, {
-            type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
-            outboundTag = "direct",
-            ip = {"geoip:" .. proxy.geoip_direct_code}
-        })
+    if geoip_existence then 
+        if proxy.geoip_direct_code ~= nil then
+            table.insert(rules, 1, {
+                type = "field",
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+                outboundTag = "direct",
+                ip = {"geoip:" .. proxy.geoip_direct_code}
+            })
+        end
     end
     return rules
 end
