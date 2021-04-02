@@ -160,6 +160,21 @@ local function stream_quic(server)
     end
 end
 
+local function tls_settings(server, protocol)
+    return {
+        serverName = server[protocol .. "_tls_host"],
+        allowInsecure = server[protocol .. "_tls_insecure"] ~= "0",
+        fingerprint = server[protocol .. "_tls_fingerprint"] or "",
+    }
+end
+
+local function xtls_settings(server, protocol)
+    return {
+        serverName = server[protocol .. "_xtls_host"],
+        allowInsecure = server[protocol .. "_xtls_insecure"] ~= "0",
+    }
+end
+
 local function shadowsocks_outbound(server, tag)
     return {
         protocol = "shadowsocks",
@@ -180,10 +195,7 @@ local function shadowsocks_outbound(server, tag)
                 mark = tonumber(proxy.mark)
             },
             security = server.shadowsocks_tls,
-            tlsSettings = server.shadowsocks_tls == "tls" and {
-                serverName = server.shadowsocks_tls_host,
-                allowInsecure = server.shadowsocks_tls_insecure ~= "0"
-            } or nil,
+            tlsSettings = server.shadowsocks_tls == "tls" and tls_settings(server, "shadowsocks") or nil,
             quicSettings = stream_quic(server),
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
@@ -218,10 +230,7 @@ local function vmess_outbound(server, tag)
                 mark = tonumber(proxy.mark)
             },
             security = server.vmess_tls,
-            tlsSettings = server.vmess_tls == "tls" and {
-                serverName = server.vmess_tls_host,
-                allowInsecure = server.vmess_tls_insecure ~= "0"
-            } or nil,
+            tlsSettings = server.vmess_tls == "tls" and tls_settings(server, "vmess") or nil,
             quicSettings = stream_quic(server),
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
@@ -260,14 +269,8 @@ local function vless_outbound(server, tag)
                 mark = tonumber(proxy.mark)
             },
             security = server.vless_tls,
-            tlsSettings = server.vless_tls == "tls" and {
-                serverName = server.vless_tls_host,
-                allowInsecure = server.vless_tls_insecure ~= "0"
-            } or nil,
-            xtlsSettings = server.vless_tls == "xtls" and {
-                serverName = server.vless_xtls_host,
-                allowInsecure = server.vless_xtls_insecure ~= "0"
-            } or nil,
+            tlsSettings = server.vless_tls == "tls" and tls_settings(server, "vless") or nil,
+            xtlsSettings = server.vless_tls == "xtls" and xtls_settings(server, "vless") or nil,
             quicSettings = stream_quic(server),
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
@@ -301,14 +304,8 @@ local function trojan_outbound(server, tag)
                 mark = tonumber(proxy.mark)
             },
             security = server.trojan_tls,
-            tlsSettings = server.trojan_tls == "tls" and {
-                serverName = server.trojan_tls_host,
-                allowInsecure = server.trojan_tls_insecure ~= "0"
-            } or nil,
-            xtlsSettings = server.trojan_tls == "xtls" and {
-                serverName = server.trojan_xtls_host,
-                allowInsecure = server.trojan_xtls_insecure ~= "0"
-            } or nil,
+            tlsSettings = server.trojan_tls == "tls" and tls_settings(server, "trojan") or nil,
+            xtlsSettings = server.trojan_tls == "xtls" and xtls_settings(server, "trojan") or nil,
             quicSettings = stream_quic(server),
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
