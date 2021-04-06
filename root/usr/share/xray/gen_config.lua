@@ -524,31 +524,41 @@ local function dns_server_outbound()
 end
 
 local function dns_conf()
-    if geosite_existence then
-        return {
-            servers = {
-                {
-                    address = proxy.secure_dns,
-                    port = 53,
-                    domains = {"geosite:geolocation-!cn"}
-                },
-                {
-                    address = proxy.fast_dns,
-                    port = 53,
-                    domains = {"geosite:cn"}
-                },
-                proxy.default_dns
-            },
-            tag = "dns_conf_inbound"
-        }
-    else
-        return {
-            servers = {
-                proxy.default_dns
-            },
-            tag = "dns_conf_inbound"
-        }
+    local fast_domain_rules = {
+        tcp_server.server,
+        udp_server.server
+    }
+    if proxy.bypassed_domain_rules ~= nil then
+        for _, x in ipairs(proxy.bypassed_domain_rules) do
+            table.insert(fast_domain_rules, x)
+        end
     end
+
+    local servers = {
+        {
+            address = proxy.fast_dns,
+            port = 53,
+            domains = fast_domain_rules,
+        },
+        proxy.default_dns
+    }
+
+    if proxy.forwarded_domain_rules ~= nil then
+        local secure_domain_rules = {}
+        for _, x in ipairs(proxy.forwarded_domain_rules) do
+            table.insert(secure_domain_rules, x)
+        end
+        table.insert(servers, 2, {
+            address = proxy.secure_dns,
+            port = 53,
+            domains = secure_domain_rules,
+        })
+    end
+
+    return {
+        servers = servers,
+        tag = "dns_conf_inbound"
+    }
 end
 
 local function api_conf()
@@ -650,4 +660,3 @@ local xray = {
 }
 
 print(json.stringify(xray, true))
-
