@@ -157,22 +157,31 @@ return view.extend({
 
         s.tab('dns', _('DNS Settings'));
 
+        o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving outbound domains and following bypassed domains"))
+        o.datatype = 'ip4addr'
+        o.placeholder = "114.114.114.114"
+
         if (geosite_existence) {
-            o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving geosite:cn sites"))
-            o.datatype = 'ip4addr'
-            o.placeholder = "114.114.114.114"
-
-            o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving geosite:geolocation-!cn sites"))
-            o.datatype = 'ip4addr'
-            o.placeholder = "1.1.1.1"
-
-            o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
+            o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _("Specify rules like 'geosite:cn' or 'domain:bilibili.com'. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
         } else {
-            o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("Resource file /usr/share/xray/geosite.dat not exist. <br/>All DNS requests will be forwarded to this DNS server. <br/> Compile your firmware again with data files to use GeoSite rules, or<br/><a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+            o = s.taboption('dns', form.DynamicList, 'bypassed_domain_rules', _('Bypassed domain rules'), _("Specify rules like 'domain:bilibili.com' or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
         }
+        o.rmempty = true
+
+        o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
+        o.datatype = 'ip4addr'
+        o.placeholder = "114.114.114.114"
+
+        if (geosite_existence) {
+            o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _("Specify rules like 'geosite:geolocation-!cn' or 'domain:youtube.com'. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
+        } else {
+            o = s.taboption('dns', form.DynamicList, 'forwarded_domain_rules', _('Forwarded domain rules'), _("Specify rules like 'domain:youtube.com' or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+        }
+        o.rmempty = true
+
+        o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
         o.datatype = 'ip4addr'
         o.placeholder = "8.8.8.8"
-
 
         s.tab('access_control', _('Transparent Proxy Rules'));
 
