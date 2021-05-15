@@ -28,6 +28,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-03-27 feature: check data files before using them. If data files don't exist, Xray will run in 'full' mode (all outgoing network traffic will be forwarded through Xray). Make sure you have a working server in this case or you have to disable Xray temporarily (SSH into your router and run `service xray stop`) for debugging. You can download data files from [Releases · XTLS/Xray-core](https://github.com/XTLS/xray-core/releases) or [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) and upload them to `/usr/share/xray` on your router, or just compile your firmware with data files included (recommended in most cases).
 * 2021-04-02 feature: utls fingerprint (currently not available for xtls and [will be supported in Xray-core v1.5.0](https://github.com/XTLS/Xray-core/pull/451))
 * 2021-04-06 feature: customize DNS bypass rules. This is considered a **BREAKING** change because if unspecified, all DNS requests is forwarded through Xray.
+* 2021-05-15 feature: add gRPC Transport settings; make init script infinite retry optional
 
 ## Todo
 

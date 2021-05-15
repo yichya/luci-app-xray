@@ -317,6 +317,7 @@ return view.extend({
         o.value("ws", "WebSocket")
         o.value("h2", "HTTP/2")
         o.value("quic", "QUIC")
+        o.value("grpc", "gRPC")
         o.rmempty = false
 
         o = s.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
@@ -430,6 +431,16 @@ return view.extend({
 
         o = s.taboption('transport', form.Value, "h2_path", _("[http2] Path"))
         o.depends("transport", "h2")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = s.taboption('transport', form.Value, "grpc_service_name", _("[grpc] Service Name"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = s.taboption('transport', form.Flag, "grpc_multi_mode", _("[grpc] Multi Mode"))
+        o.depends("transport", "grpc")
         o.rmempty = true
         o.modalonly = true
 
