@@ -105,6 +105,17 @@ local function stream_h2(server)
     end
 end
 
+local function stream_grpc(server)
+    if (server.transport == "grpc") then
+        return {
+            serviceName = server.grpc_service_name,
+            multiMode = server.grpc_multi_mode == "1"
+        }
+    else
+        return nil
+    end
+end
+
 local function stream_ws(server)
     if server.transport == "ws" then
         local headers = nil
@@ -200,6 +211,7 @@ local function shadowsocks_outbound(server, tag)
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
             wsSettings = stream_ws(server),
+            grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         }
     }
@@ -235,6 +247,7 @@ local function vmess_outbound(server, tag)
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
             wsSettings = stream_ws(server),
+            grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         }
     }
@@ -275,6 +288,7 @@ local function vless_outbound(server, tag)
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
             wsSettings = stream_ws(server),
+            grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         }
     }
@@ -310,6 +324,7 @@ local function trojan_outbound(server, tag)
             tcpSettings = stream_tcp(server),
             kcpSettings = stream_kcp(server),
             wsSettings = stream_ws(server),
+            grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         }
     }

@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.0.8
-PKG_RELEASE:=3
+PKG_VERSION:=1.0.9
+PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -30,6 +30,10 @@ menu "luci-app-xray Configuration"
 
 config PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 	bool "Include Cloudflare Origin Root CA"
+	default n
+
+config PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
+	bool "Retry infinitely on Xray startup (may solve some startup problems)"
 	default n
 
 endmenu
@@ -76,6 +80,9 @@ endif
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/luci-app-xray.json $(1)/usr/share/rpcd/acl.d/luci-app-xray.json
 	$(INSTALL_DIR) $(1)/usr/share/xray
+ifdef CONFIG_PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
+	$(INSTALL_DATA) ./root/usr/share/xray/infinite_retry $(1)/usr/share/xray/infinite_retry
+endif
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua
 endef

@@ -69,9 +69,15 @@ start_xray() {
 gen_config_file() {
     mkdir -p /var/etc/xray
     rm /var/etc/xray/*
-    while [ ! -s /var/etc/xray/config.json ] ; do
+    if [ -s /usr/share/xray/infinite_retry ] ; then
+        while [ ! -s /var/etc/xray/config.json ] ; do
+            logger -st transparent-proxy-ipset[$$] -p4 "(Re)generationg Xray configuration files..."
+            /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
+        done
+    else
+        logger -st transparent-proxy-ipset[$$] -p4 "Generating Xray configuration files..."
         /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
-    done
+    fi
     custom_config=$(uci_get_by_type general custom_config 2>/dev/null)
     [ ! "${#custom_config}" == "0" ] && echo ${custom_config} > /var/etc/xray/config_custom.json
 }
