@@ -31,7 +31,7 @@ logger_level() {
 }
 
 flush_rules() {
-    logger_level 6 "flush_ipset_rules"
+    logger_level 6 "flush_ipset_rules (ignore any errors from RTNETLINK)"
         if command -v ip >/dev/null; then
         ip rule del fwmark 251 lookup 251 
         ip rule del fwmark 252 lookup 252
@@ -86,7 +86,7 @@ gen_special_purpose_ip() {
 }
 
 ipset_init() {
-    logger_level 6 "ipset_init"
+    logger_level 6 "ipset_init (ignore any errors from RTNETLINK)"
     ip rule add fwmark 251 lookup 251
     ip rule add fwmark 252 lookup 252
     ip route add local default dev lo table 251

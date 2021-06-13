@@ -7,23 +7,27 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     var o;
 
     o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls`, _(`[${protocol_name}] Stream Security`))
-    o.depends(depends_field_name, protocol_name)
+    let odep = {}
+    odep[depends_field_name] = protocol_name
     if (client_side) {
+        o.depends(depends_field_name, protocol_name)
         o.value("none", "None")
     } else {
-        o.depends("web_server_enable", "1")
+        odep["web_server_enable"] = "1"
     }
     o.value("tls", "TLS")
     if (have_xtls) {
         o.value("xtls", "XTLS")
     }
+    o.depends(odep)
     o.rmempty = false
     o.modalonly = true
 
     if (have_xtls) {
         o = s.taboption(tab_name, form.ListValue, `${protocol_name}_flow`, _(`[${protocol_name}][xtls] Flow`))
-        o.depends(depends_field_name, protocol_name)
-        o.depends(`${protocol_name}_tls`, "xtls")
+        let odep = {}
+        odep[depends_field_name] = protocol_name
+        odep[`${protocol_name}_tls`] = "xtls"
         o.value("none", "none")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
@@ -33,8 +37,9 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
             o.value("xtls-rprx-splice", "xtls-rprx-splice")
             o.value("xtls-rprx-splice-udp443", "xtls-rprx-splice-udp443")
         } else {
-            o.depends("web_server_enable", "1")
+            odep["web_server_enable"] = "1"
         }
+        o.depends(odep)
         o.rmempty = false
         o.modalonly = true
     }
