@@ -660,6 +660,15 @@ local function rules()
             })
         end
     end
+
+    if proxy.custom_routes ~= nil then
+        local custom_routes = json.parse(proxy.custom_routes)
+        if custom_routes ~= nil then
+            for x, rule in ipairs(custom_routes) do
+                table.insert(rules, x, rule)
+            end
+        end
+    end
     return rules
 end
 
@@ -674,7 +683,7 @@ local xray = {
     dns = dns_conf(),
     api = api_conf(),
     routing = {
-        domainStrategy = "AsIs",
+        domainStrategy = proxy.routing_domain_strategy,
         rules = rules()
     }
 }
