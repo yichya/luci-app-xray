@@ -128,6 +128,9 @@ return view.extend({
 
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
 
+        o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable sniffing for transparent proxy'))
+        o.depends("transparent_proxy_enable", "1")
+
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
         for (var v of L.uci.sections(config_data, "servers")) {
