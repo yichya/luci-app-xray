@@ -128,6 +128,9 @@ return view.extend({
 
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
 
+        o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable sniffing for transparent proxy'))
+        o.depends("transparent_proxy_enable", "1")
+
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
         for (var v of L.uci.sections(config_data, "servers")) {
@@ -200,6 +203,13 @@ return view.extend({
         o.value("telegram", "telegram")
         o.datatype = "string"
 
+        o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
+        o.value("AsIs", "AsIs")
+        o.value("IPIfNonMatch", "IPIfNonMatch")
+        o.value("IPOnDemand", "IPOnDemand")
+        o.default = "AsIs"
+        o.rmempty = false
+
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
         o.datatype = "ip4addr"
         o.rmempty = false
@@ -238,6 +248,10 @@ return view.extend({
 
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
+        o.monospace = true
+        o.rows = 10
+
+        o = s.taboption('custom_options', form.TextValue, 'custom_routes', _('Custom Routes'))
         o.monospace = true
         o.rows = 10
 
