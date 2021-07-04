@@ -30,10 +30,12 @@ local rules = [[-A OUTPUT -j TP_SPEC_WAN_DG
 -A TP_SPEC_WAN_DG -m set --match-set tp_spec_dst_bp dst -j RETURN
 -A TP_SPEC_WAN_DG -m set --match-set tp_spec_def_gw dst -j RETURN
 -A TP_SPEC_WAN_DG -m mark --mark 0x%x -j RETURN
--A TP_SPEC_WAN_DG -p tcp -j MARK --set-xmark 0xfc/0xffffffff
--A TP_SPEC_WAN_DG -p udp -j MARK --set-xmark 0xfc/0xffffffff
+-A TP_SPEC_WAN_DG -p tcp -m mark --mark 0xfb/0xffffffff -j CONNMARK --restore-mark
+-A TP_SPEC_WAN_DG -p udp -m mark --mark 0xfb/0xffffffff -j CONNMARK --restore-mark
 -A TP_SPEC_WAN_FW -p tcp -j TPROXY --on-port %d --on-ip 0.0.0.0 --tproxy-mark 0xfb/0xffffffff
 -A TP_SPEC_WAN_FW -p udp -j TPROXY --on-port %d --on-ip 0.0.0.0 --tproxy-mark 0xfb/0xffffffff
+-A TP_SPEC_WAN_FW -p tcp -m mark --mark 0xfb/0xffffffff -j CONNMARK --save-mark
+-A TP_SPEC_WAN_FW -p udp -m mark --mark 0xfb/0xffffffff -j CONNMARK --save-mark
 COMMIT
 *filter
 COMMIT
