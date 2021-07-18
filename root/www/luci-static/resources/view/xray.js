@@ -128,7 +128,7 @@ return view.extend({
 
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
 
-        o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable sniffing for transparent proxy'))
+        o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'))
         o.depends("transparent_proxy_enable", "1")
 
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
@@ -170,9 +170,9 @@ return view.extend({
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
-            o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _("Specify rules like 'geosite:cn' or 'domain:bilibili.com'. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
+            o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _("Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
         } else {
-            o = s.taboption('dns', form.DynamicList, 'bypassed_domain_rules', _('Bypassed domain rules'), _("Specify rules like 'domain:bilibili.com' or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+            o = s.taboption('dns', form.DynamicList, 'bypassed_domain_rules', _('Bypassed domain rules'), _("Specify rules like <code>domain:bilibili.com</code> or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
         }
         o.rmempty = true
 
@@ -181,9 +181,9 @@ return view.extend({
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
-            o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _("Specify rules like 'geosite:geolocation-!cn' or 'domain:youtube.com'. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
+            o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _("Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
         } else {
-            o = s.taboption('dns', form.DynamicList, 'forwarded_domain_rules', _('Forwarded domain rules'), _("Specify rules like 'domain:youtube.com' or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+            o = s.taboption('dns', form.DynamicList, 'forwarded_domain_rules', _('Forwarded domain rules'), _("Specify rules like <code>domain:youtube.com</code> or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
         }
         o.rmempty = true
 
@@ -210,7 +210,7 @@ return view.extend({
         o.default = "AsIs"
         o.rmempty = false
 
-        o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Won't redirect for these IPs. Make sure that your remote proxy server IP added here."))
+        o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Requests to these IPs won't be forwarded through Xray."))
         o.datatype = "ip4addr"
         o.rmempty = false
 
