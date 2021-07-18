@@ -20,6 +20,8 @@ config general
 	option xray_api '1'
 	option main_server 'cfg024a8f'
 	option tproxy_udp_server 'cfg034a8f'
+	option tproxy_sniffing '1'
+	option routing_domain_strategy 'AsIs'
 
 config servers
 	option security 'auto'
