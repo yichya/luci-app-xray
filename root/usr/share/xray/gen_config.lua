@@ -674,7 +674,7 @@ local xray = {
     dns = dns_conf(),
     api = api_conf(),
     routing = {
-        domainStrategy = proxy.routing_domain_strategy,
+        domainStrategy = proxy.routing_domain_strategy or "AsIs",
         rules = rules()
     }
 }
