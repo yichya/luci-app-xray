@@ -251,10 +251,6 @@ return view.extend({
         o.monospace = true
         o.rows = 10
 
-        o = s.taboption('custom_options', form.TextValue, 'custom_routes', _('Custom Routes'))
-        o.monospace = true
-        o.rows = 10
-
         s = m.section(form.GridSection, 'servers', _('Xray Servers'))
 
         s.sortable = true
