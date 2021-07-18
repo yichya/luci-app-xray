@@ -539,6 +539,11 @@ end
 local function dns_server_outbound()
     return {
         protocol = "dns",
+        streamSettings = {
+            sockopt = {
+                mark = tonumber(proxy.mark)
+            }
+        },
         tag = "dns_server_outbound"
     }
 end
