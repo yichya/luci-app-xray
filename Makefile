@@ -16,7 +16,7 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray
-	DEPENDS:=+luci-base +openwrt-xray +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle
+	DEPENDS:=+luci-base +luci-compat +openwrt-xray +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle
 	CONFLICTS:=xray-core
 endef
 
