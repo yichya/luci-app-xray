@@ -96,6 +96,22 @@ function check_resource_files(load_result) {
     }
 }
 
+function check_dns_format(_, dns) {
+    if (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/.test(dns)) {
+        // IPv4 Address
+        return true;
+    }
+    if (/https(\+local)?:\/\/[-\w\d@:%._\+~#=]{1,256}\.[\w\d()]{1,6}\b([-\w\d()@:%_\+.~#?&\/=]*)/.test(dns)) {
+        // DoH Server Address
+        return true;
+    }
+
+    if (dns === "localhost") {
+        return true;
+    }
+    return "Invalid DNS address";
+}
+
 return view.extend({
     load: function () {
         return Promise.all([
@@ -166,7 +182,7 @@ return view.extend({
         s.tab('dns', _('DNS Settings'));
 
         o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving outbound domains and following bypassed domains"))
-        o.datatype = 'ip4addr'
+        o.validate = check_dns_format
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
@@ -177,7 +193,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
-        o.datatype = 'ip4addr'
+        o.validate = check_dns_format
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
@@ -188,7 +204,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
-        o.datatype = 'ip4addr'
+        o.validate = check_dns_format
         o.placeholder = "8.8.8.8"
 
         s.tab('access_control', _('Transparent Proxy Rules'));
