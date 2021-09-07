@@ -29,6 +29,8 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-04-02 feature: utls fingerprint (currently not available for xtls and [will be supported in Xray-core v1.5.0](https://github.com/XTLS/Xray-core/pull/451))
 * 2021-04-06 feature: customize DNS bypass rules. This is considered a **BREAKING** change because if unspecified, all DNS requests is forwarded through Xray.
 * 2021-05-15 feature: add gRPC Transport settings; make init script infinite retry optional
+* 2021-07-03 fix: write upstream hostname to dnsmasq configurations to avoid infinite loop while resolving upstream hostname
+* 2021-08-31 feature: Accept more DNS server formats
 
 ## Todo
 
