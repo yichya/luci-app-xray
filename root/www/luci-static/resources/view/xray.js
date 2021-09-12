@@ -182,7 +182,7 @@ return view.extend({
         s.tab('dns', _('DNS Settings'));
 
         o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving outbound domains and following bypassed domains"))
-        o.validate = check_dns_format
+        o.datatype = 'ip4addr'
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
@@ -204,7 +204,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
-        o.validate = check_dns_format
+        o.datatype = 'ip4addr'
         o.placeholder = "8.8.8.8"
 
         s.tab('access_control', _('Transparent Proxy Rules'));
