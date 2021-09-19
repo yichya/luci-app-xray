@@ -80,9 +80,10 @@ flush_firewall() {
 
 setup_dnsmasq() {
     echo "# Generated dnsmasq configurations by luci-app-xray" > /tmp/dnsmasq.d/xray.conf
+    echo "strict-order" >> /tmp/dnsmasq.d/xray.conf
     echo "server=/$(uci_get_by_name $(uci_get_by_type general main_server) server)/$(uci_get_by_type general fast_dns)" >> /tmp/dnsmasq.d/xray.conf
     echo "server=/$(uci_get_by_name $(uci_get_by_type general tproxy_udp_server) server)/$(uci_get_by_type general fast_dns)" >> /tmp/dnsmasq.d/xray.conf
-    echo "server=/#/127.0.0.1#$(uci_get_by_type general dns_port)" >> /tmp/dnsmasq.d/xray.conf
+    echo "server=127.0.0.1#$(uci_get_by_type general dns_port)" >> /tmp/dnsmasq.d/xray.conf
     logger -st xray[$$] -p4 $(cat /tmp/dnsmasq.d/xray.conf)
     /etc/init.d/dnsmasq restart > /dev/null 2>&1
 }
