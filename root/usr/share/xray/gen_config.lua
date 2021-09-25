@@ -436,7 +436,7 @@ local function https_trojan_inbound()
         settings = {
             clients = {
                 {
-                    id = proxy.web_server_password
+                    password = proxy.web_server_password
                 }
             },
             fallbacks = fallbacks()
