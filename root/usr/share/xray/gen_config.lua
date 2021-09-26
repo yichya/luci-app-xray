@@ -17,7 +17,7 @@ local geosite_existence = false
 
 local xray_data_file_iterator = nixiofs.dir("/usr/share/xray")
 
-repeat 
+repeat
     local fn = xray_data_file_iterator()
     if fn == "geoip.dat" then
         geoip_existence = true
@@ -436,7 +436,8 @@ local function https_trojan_inbound()
         settings = {
             clients = {
                 {
-                    password = proxy.web_server_password
+                    password = proxy.web_server_password,
+                    flow = proxy.trojan_tls == "xtls" and proxy.trojan_flow or nil
                 }
             },
             fallbacks = fallbacks()
@@ -479,6 +480,7 @@ local function https_vless_inbound()
             clients = {
                 {
                     id = proxy.web_server_password,
+                    flow = proxy.vless_tls == "xtls" and proxy.vless_flow or nil
                 }
             },
             decryption = "none",
@@ -655,7 +657,7 @@ local function rules()
             outboundTag = "api"
         }
     }
-    if geoip_existence then 
+    if geoip_existence then
         if proxy.geoip_direct_code ~= nil then
             table.insert(rules, 1, {
                 type = "field",
