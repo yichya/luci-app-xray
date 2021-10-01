@@ -108,7 +108,7 @@ ipset_init() {
 	EOF
     DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
     logger_level 6 "default gateway check $DEFAULT_GATEWAY"
-    [ -n "$DEFAULT_GATEWAY" ] && ipset add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
+    [ -n "$DEFAULT_GATEWAY" ] && ipset add tp_spec_def_gw $(ip route | grep "via $DEFAULT_GATEWAY" | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
     return 0
 }
 
