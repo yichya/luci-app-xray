@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=1.0.14
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -64,7 +64,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_CONF) ./root/etc/config/xray $(1)/etc/config/xray
 	$(INSTALL_DIR) $(1)/etc/luci-uploads/xray
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
-	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy $(1)/etc/hotplug.d/iface/01-transparent-proxy
+	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy-ipset $(1)/etc/hotplug.d/iface/01-transparent-proxy-ipset
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/etc/init.d/xray
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
