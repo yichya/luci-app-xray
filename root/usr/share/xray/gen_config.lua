@@ -557,7 +557,13 @@ local function dns_conf()
     }
     if proxy.bypassed_domain_rules ~= nil then
         for _, x in ipairs(proxy.bypassed_domain_rules) do
-            table.insert(fast_domain_rules, x)
+            if x:sub(1, 8) == "geosite:" then
+                if geosite_existence then
+                    table.insert(fast_domain_rules, x)
+                end
+            else
+                table.insert(fast_domain_rules, x)
+            end
         end
     end
 
@@ -573,7 +579,13 @@ local function dns_conf()
     if proxy.forwarded_domain_rules ~= nil then
         local secure_domain_rules = {}
         for _, x in ipairs(proxy.forwarded_domain_rules) do
-            table.insert(secure_domain_rules, x)
+            if x:sub(1, 8) == "geosite:" then
+                if geosite_existence then
+                    table.insert(secure_domain_rules, x)
+                end
+            else
+                table.insert(secure_domain_rules, x)
+            end
         end
         table.insert(servers, 2, {
             address = proxy.secure_dns,
@@ -632,13 +644,7 @@ local function rules()
     rules = {
         {
             type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "socks_inbound", "https_inbound", "http_inbound", "dns_conf_inbound"},
-            outboundTag = "direct",
-            ip = {"geoip:private"}
-        },
-        {
-            type = "field",
-            inboundTag = {"socks_inbound", "https_inbound", "http_inbound", "tproxy_tcp_inbound", "dns_conf_inbound"},
+            inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
             outboundTag = "tcp_outbound"
         },
         {
@@ -666,6 +672,12 @@ local function rules()
                 ip = {"geoip:" .. proxy.geoip_direct_code}
             })
         end
+        table.insert(rules, 1, {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
+            outboundTag = "direct",
+            ip = {"geoip:private"}
+        })
     end
     return rules
 end
