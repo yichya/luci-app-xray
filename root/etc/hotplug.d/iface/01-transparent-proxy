@@ -1,8 +1,0 @@
-#!/bin/sh
-ipset create tp_spec_def_gw hash:net hashsize 64
-DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
-logger -st transparent-proxy-rules[$$] -p6 "default gateway check (hotplug.d/iface) $DEFAULT_GATEWAY"
-[ -n "$DEFAULT_GATEWAY" ] && ipset restore <<-EOF
-	flush tp_spec_def_gw
-	add tp_spec_def_gw $(ip route | grep $DEFAULT_GATEWAY | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
-EOF

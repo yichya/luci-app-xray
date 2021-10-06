@@ -33,13 +33,13 @@ logger_level() {
 flush_rules() {
     logger_level 6 "flush_ipset_rules (ignore any errors from RTNETLINK)"
     if command -v ip >/dev/null; then
-        ip rule del fwmark 251 lookup 251 
+        ip rule del fwmark 251 lookup 251
         ip rule del fwmark 252 lookup 252
         ip route del local default dev lo table 252
         ip route del local default dev lo table 252
     fi
     for setname in $(ipset -n list | grep "tp_spec"); do
-        ipset destroy $setname 
+        ipset -! destroy $setname
     done
     return 0
 }
@@ -106,9 +106,6 @@ ipset_init() {
 		$(sed -e "s/^/add tp_spec_dst_fw /" ${WAN_FW_LIST:=/dev/null} )
 		$(for ip in $WAN_FW_IP; do echo "add tp_spec_dst_fw $ip"; done)
 	EOF
-    DEFAULT_GATEWAY=$(ip route | grep default | grep -Eoe "via (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
-    logger_level 6 "default gateway check $DEFAULT_GATEWAY"
-    [ -n "$DEFAULT_GATEWAY" ] && ipset add tp_spec_def_gw $(ip route | grep "via $DEFAULT_GATEWAY" | grep -Eoe "src (\d+.\d+.\d+.\d+)" | awk '{print $NF}')
     return 0
 }
 
@@ -145,4 +142,5 @@ done
 flush_rules && ipset_init
 RET=$?
 [ "$RET" = 0 ] || logger_level 3 "Start failed!"
+. /etc/hotplug.d/iface/01-transparent-proxy-ipset
 exit $RET
