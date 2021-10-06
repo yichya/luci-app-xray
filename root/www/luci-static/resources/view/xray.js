@@ -81,18 +81,24 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
 
 function check_resource_files(load_result) {
     let geoip_existence = false;
+    let geoip_size = 0;
     let geosite_existence = false;
+    let geosite_size = 0;
     for (const f of load_result) {
         if (f.name == "geoip.dat") {
-            geoip_existence = true
+            geoip_existence = true;
+            geoip_size = f.size;
         }
         if (f.name == "geosite.dat") {
-            geosite_existence = true
+            geosite_existence = true;
+            geosite_size = f.size;
         }
     }
     return {
         geoip_existence: geoip_existence,
-        geosite_existence: geosite_existence
+        geoip_size: geoip_size,
+        geosite_existence: geosite_existence,
+        geosite_size: geosite_size,
     }
 }
 
@@ -122,10 +128,16 @@ return view.extend({
 
     render: function (load_result) {
         const config_data = load_result[0];
-        const { geoip_existence, geosite_existence } = check_resource_files(load_result[1]);
+        const { geoip_existence, geoip_size, geosite_existence, geosite_size } = check_resource_files(load_result[1]);
+        let asset_file_status = `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.`
+        if (geoip_existence) {
+            if (geosite_existence) {
+                asset_file_status = `Asset files check: geoip.dat ${geoip_size} bytes; geosite.dat ${geosite_size} bytes. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.`
+            }
+        }
 
         var m, s, o;
-        m = new form.Map('xray', [_('Xray')]);
+        m = new form.Map('xray', _('Xray'), asset_file_status);
 
         s = m.section(form.TypedSection, 'general', 'General Settings',);
         s.addremove = false;
