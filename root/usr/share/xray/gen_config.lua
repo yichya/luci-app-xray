@@ -525,17 +525,29 @@ local function https_inbound()
     return nil
 end
 
-local function dns_server_inbound()
-    return {
-        port = proxy.dns_port,
-        protocol = "dokodemo-door",
-        tag = "dns_server_inbound",
-        settings = {
-            address = proxy.default_dns,
-            port = 53,
-            network = "tcp,udp"
-        }
-    }
+local function dns_server_inbounds()
+    local result = {}
+    for i = proxy.dns_port, proxy.dns_port + (proxy.dns_count or 0), 1 do
+        table.insert(result, {
+            port = i,
+            protocol = "dokodemo-door",
+            tag = string.format("dns_server_inbound_%d", i),
+            settings = {
+                address = proxy.default_dns,
+                port = 53,
+                network = "tcp,udp"
+            }
+        })
+    end
+    return result
+end
+
+local function dns_server_tags()
+    local result = {}
+    for i = proxy.dns_port, proxy.dns_port + (proxy.dns_count or 0), 1 do
+        table.insert(result, string.format("dns_server_inbound_%d", i))
+    end
+    return result
 end
 
 local function dns_server_outbound()
@@ -621,8 +633,10 @@ local function inbounds()
         tproxy_tcp_inbound(),
         tproxy_udp_inbound(),
         socks_inbound(),
-        dns_server_inbound()
     }
+    for _, v in ipairs(dns_server_inbounds()) do
+        table.insert(i, v)
+    end
     if proxy.web_server_enable == "1" then
         table.insert(i, https_inbound())
     end
@@ -654,7 +668,7 @@ local function rules()
         },
         {
             type = "field",
-            inboundTag = {"dns_server_inbound"},
+            inboundTag = dns_server_tags(),
             outboundTag = "dns_server_outbound"
         },
         {

@@ -36,6 +36,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-09-26 fix: several issues related to HTTPS server
 * 2021-10-01 fix: parsing default gateway in some cases
 * 2021-10-06 feature: show information about asset files in LuCI; fix Xray startup when asset files are unavailable
+* 2021-10-08 feature: extra DNS Server Port to reduce possibility of temporary DNS lookup failures
 
 ## Todo
 
