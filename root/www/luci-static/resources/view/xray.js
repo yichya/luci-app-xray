@@ -102,22 +102,6 @@ function check_resource_files(load_result) {
     }
 }
 
-function check_dns_format(_, dns) {
-    if (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/.test(dns)) {
-        // IPv4 Address
-        return true;
-    }
-    if (/https(\+local)?:\/\/[-\w\d@:%._\+~#=]{1,256}\.[\w\d()]{1,6}\b([-\w\d()@:%_\+.~#?&\/=]*)/.test(dns)) {
-        // DoH Server Address
-        return true;
-    }
-
-    if (dns === "localhost") {
-        return true;
-    }
-    return "Invalid DNS address";
-}
-
 return view.extend({
     load: function () {
         return Promise.all([
@@ -209,7 +193,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
-        o.validate = check_dns_format
+        o.datatype = 'ip4addr'
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
