@@ -29,6 +29,13 @@ get_lan_hosts() {
     uci_bool_by_name $1 enable && echo "$(uci_get_by_name $1 type),$(uci_get_by_name $1 macaddr)"
 }
 
+dns_resolve() {
+    if ! echo "$1" | grep -E '^\d+\.\d+\.\d+\.\d+$'; then
+        domain="$(echo "$1" | sed -E 's@https://([^/]+)/.*@\1@')"
+        nslookup "$domain" | grep 'Address 1' | sed -E 's@Address 1: (\d+\.\d+\.\d+\.\d+)@\1@'
+    fi
+}
+
 start_xray() {
     logger -st xray[$$] -p4 "Starting Xray from $1"
     procd_open_instance
@@ -64,9 +71,9 @@ gen_config_file() {
 setup_firewall() {
     /usr/bin/transparent-proxy-ipset \
         -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns)" \
+        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns | dns_resolve)" \
         -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns)" \
+        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns | dns_resolve)" \
         -d "$(uci_get_by_type general lan_target)" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
@@ -88,9 +95,9 @@ setup_dnsmasq() {
 
     echo "# Generated dnsmasq configurations by luci-app-xray" > /tmp/dnsmasq.d/xray.conf
     echo "strict-order" >> /tmp/dnsmasq.d/xray.conf
-    echo "server=/${main_server}/${fast_dns}" >> /tmp/dnsmasq.d/xray.conf
+    echo "server=/${main_server}/$(dns_resolve ${fast_dns})" >> /tmp/dnsmasq.d/xray.conf
     if [ ! "${main_server}" == "${tproxy_udp_server}" ] ; then
-        echo "server=/${tproxy_udp_server}/${fast_dns}" >> /tmp/dnsmasq.d/xray.conf
+        echo "server=/${tproxy_udp_server}/$(dns_resolve ${fast_dns})" >> /tmp/dnsmasq.d/xray.conf
     fi
 
     echo "server=/#/127.0.0.1#${dns_port}" >> /tmp/dnsmasq.d/xray.conf
