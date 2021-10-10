@@ -31,7 +31,7 @@ get_lan_hosts() {
 
 dns_resolve() {
     if ! echo "$1" | grep -E '^\d+\.\d+\.\d+\.\d+$'; then
-        domain="$(echo "$1" | sed -E 's@https://([^/]+)/.*@\1@')"
+        domain="$(echo "$1" | sed -E 's@https(\+local)?://([^/]+)/.*@\2@')"
         nslookup "$domain" | grep 'Address 1' | sed -E 's@Address 1: (\d+\.\d+\.\d+\.\d+)@\1@'
     fi
 }
