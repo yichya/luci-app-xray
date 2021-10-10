@@ -186,9 +186,9 @@ return view.extend({
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
-            o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _("Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
+            o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _('Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
         } else {
-            o = s.taboption('dns', form.DynamicList, 'bypassed_domain_rules', _('Bypassed domain rules'), _("Specify rules like <code>domain:bilibili.com</code> or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+            o = s.taboption('dns', form.DynamicList, 'bypassed_domain_rules', _('Bypassed domain rules'), _('Specify rules like <code>domain:bilibili.com</code> or see <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href="https://github.com/v2fly/domain-list-community">download one</a> and upload it to your router.'))
         }
         o.rmempty = true
 
@@ -197,9 +197,9 @@ return view.extend({
         o.placeholder = "114.114.114.114"
 
         if (geosite_existence) {
-            o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _("Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details."))
+            o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _('Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
         } else {
-            o = s.taboption('dns', form.DynamicList, 'forwarded_domain_rules', _('Forwarded domain rules'), _("Specify rules like <code>domain:youtube.com</code> or see <a href=\"https://xtls.github.io/config/base/dns/\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."))
+            o = s.taboption('dns', form.DynamicList, 'forwarded_domain_rules', _('Forwarded domain rules'), _('Specify rules like <code>domain:youtube.com</code> or see <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href="https://github.com/v2fly/domain-list-community">download one</a> and upload it to your router.'))
         }
         o.rmempty = true
 
@@ -263,7 +263,7 @@ return view.extend({
         o.depends("web_server_enable", "1")
 
         s.tab('custom_options', _('Custom Options'))
-        o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'))
+        o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'), _('Check <code>/var/etc/xray/config.json</code> for tags of generated inbounds and outbounds. See <a href="https://xtls.github.io/config/features/multiple.html">here</a> for help'))
         o.monospace = true
         o.rows = 10
 
