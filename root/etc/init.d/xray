@@ -32,7 +32,14 @@ get_lan_hosts() {
 dns_resolve() {
     if ! echo "$1" | grep -E '^\d+\.\d+\.\d+\.\d+$'; then
         domain="$(echo "$1" | sed -E 's@https(\+local)?://([^/]+)/.*@\2@')"
-        nslookup "$domain" | grep 'Address 1' | sed -E 's@Address 1: (\d+\.\d+\.\d+\.\d+)@\1@'
+        nslookup "$domain" | sed -nE 's@Address 1: (\d+\.\d+\.\d+\.\d+)@\1@p'
+    fi
+}
+
+dns_resolve_all() {
+    if ! echo "$1" | grep -E '^\d+\.\d+\.\d+\.\d+$'; then
+        domain="$(echo "$1" | sed -E 's@https(\+local)?://([^/]+)/.*@\2@')"
+        nslookup "$domain" | sed -nE 's@Address \d: (\d+\.\d+\.\d+\.\d+)@\1@p'
     fi
 }
 
@@ -71,9 +78,9 @@ gen_config_file() {
 setup_firewall() {
     /usr/bin/transparent-proxy-ipset \
         -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns | dns_resolve)" \
+        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns | dns_resolve_all)" \
         -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns | dns_resolve)" \
+        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns | dns_resolve_all)" \
         -d "$(uci_get_by_type general lan_target)" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
