@@ -35,7 +35,7 @@ flush_rules() {
     if command -v ip >/dev/null; then
         ip rule del fwmark 251 lookup 251
         ip rule del fwmark 252 lookup 252
-        ip route del local default dev lo table 252
+        ip route del local default dev lo table 251
         ip route del local default dev lo table 252
     fi
     for setname in $(ipset -n list | grep "tp_spec"); do
