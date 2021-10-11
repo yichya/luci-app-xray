@@ -78,9 +78,9 @@ gen_config_file() {
 setup_firewall() {
     /usr/bin/transparent-proxy-ipset \
         -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns | dns_resolve_all)" \
+        -b "$(uci_get_by_type general wan_bp_ips) $(dns_resolve_all $(uci_get_by_type general fast_dns))" \
         -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns | dns_resolve_all)" \
+        -w "$(uci_get_by_type general wan_fw_ips) $(dns_resolve_all $(uci_get_by_type general secure_dns))" \
         -d "$(uci_get_by_type general lan_target)" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
