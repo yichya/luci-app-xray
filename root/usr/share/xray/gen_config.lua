@@ -670,12 +670,6 @@ local function rules()
     local result = {
         {
             type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound", "http_inbound"},
-            outboundTag = "direct",
-            domain = fast_domain_rules()
-        },
-        {
-            type = "field",
             inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
             outboundTag = "tcp_outbound"
         },
@@ -711,18 +705,26 @@ local function rules()
             ip = {"geoip:private"}
         })
     end
-    if secure_domain_rules() ~= nil then
+    if proxy.tproxy_sniffing == "1" then
+        if secure_domain_rules() ~= nil then
+            table.insert(result, 1, {
+                type = "field",
+                inboundTag = {"tproxy_udp_inbound"},
+                outboundTag = "udp_outbound",
+                domain = secure_domain_rules(),
+            })
+            table.insert(result, 1, {
+                type = "field",
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+                outboundTag = "tcp_outbound",
+                domain = secure_domain_rules(),
+            })
+        end
         table.insert(result, 1, {
             type = "field",
-            inboundTag = {"tproxy_udp_inbound"},
-            outboundTag = "udp_outbound",
-            domain = secure_domain_rules(),
-        })
-        table.insert(result, 1, {
-            type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
-            outboundTag = "tcp_outbound",
-            domain = secure_domain_rules(),
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound", "http_inbound"},
+            outboundTag = "direct",
+            domain = fast_domain_rules()
         })
     end
     return result
