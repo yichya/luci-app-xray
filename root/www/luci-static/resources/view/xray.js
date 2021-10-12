@@ -226,6 +226,13 @@ return view.extend({
         o.default = "AsIs"
         o.rmempty = false
 
+        if (geosite_existence) {
+            o = s.taboption('access_control', form.DynamicList, "routing_bp_domain_rules", _("Bypassed Domains"), _('Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
+        } else {
+            o = s.taboption('access_control', form.DynamicList, "routing_bp_domain_rules", _("Bypassed Domains"), _('Specify rules like <code>domain:bilibili.com</code> or see <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href="https://github.com/v2fly/domain-list-community">download one</a> and upload it to your router.'))
+        }
+        o.rmempty = true
+
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Requests to these IPs won't be forwarded through Xray."))
         o.datatype = "ip4addr"
         o.rmempty = false

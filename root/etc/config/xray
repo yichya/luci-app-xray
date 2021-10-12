@@ -23,6 +23,7 @@ config general
 	option tproxy_udp_server 'cfg034a8f'
 	option tproxy_sniffing '1'
 	option routing_domain_strategy 'AsIs'
+	list routing_bp_domain_rules 'geosite:cn'
 
 config servers
 	option security 'auto'

@@ -693,6 +693,24 @@ local function rules()
             ip = {"geoip:private"}
         })
     end
+    if proxy.routing_bp_domain_rules ~= nil then
+        local secure_domain_rules = {}
+        for _, x in ipairs(proxy.routing_bp_domain_rules) do
+            if x:sub(1, 8) == "geosite:" then
+                if geosite_existence then
+                    table.insert(secure_domain_rules, x)
+                end
+            else
+                table.insert(secure_domain_rules, x)
+            end
+        end
+        table.insert(rules, 1, {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+            outboundTag = "direct",
+            domain = secure_domain_rules
+        })
+    end
     return rules
 end
 
