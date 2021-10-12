@@ -562,47 +562,59 @@ local function dns_server_outbound()
     }
 end
 
-local function dns_conf()
-    local fast_domain_rules = {
+local function fast_domain_rules()
+    local result = {
         tcp_server.server,
-        udp_server.server
     }
+    if tcp_server.server ~= udp_server.server then
+        table.insert(result, udp_server.server)
+    end
     if proxy.bypassed_domain_rules ~= nil then
         for _, x in ipairs(proxy.bypassed_domain_rules) do
             if x:sub(1, 8) == "geosite:" then
                 if geosite_existence then
-                    table.insert(fast_domain_rules, x)
+                    table.insert(result, x)
                 end
             else
-                table.insert(fast_domain_rules, x)
+                table.insert(result, x)
             end
         end
     end
+    return result
+end
 
+local function secure_domain_rules()
+    if proxy.forwarded_domain_rules == nil then
+        return nil
+    end
+
+    local result = {}
+    for _, x in ipairs(proxy.forwarded_domain_rules) do
+        if x:sub(1, 8) == "geosite:" then
+            if geosite_existence then
+                table.insert(result, x)
+            end
+        else
+            table.insert(result, x)
+        end
+    end
+    return result
+end
+
+local function dns_conf()
     local servers = {
         {
             address = proxy.fast_dns,
             port = 53,
-            domains = fast_domain_rules,
+            domains = fast_domain_rules(),
         },
         proxy.default_dns
     }
-
-    if proxy.forwarded_domain_rules ~= nil then
-        local secure_domain_rules = {}
-        for _, x in ipairs(proxy.forwarded_domain_rules) do
-            if x:sub(1, 8) == "geosite:" then
-                if geosite_existence then
-                    table.insert(secure_domain_rules, x)
-                end
-            else
-                table.insert(secure_domain_rules, x)
-            end
-        end
+    if secure_domain_rules() ~= nil then
         table.insert(servers, 2, {
             address = proxy.secure_dns,
             port = 53,
-            domains = secure_domain_rules,
+            domains = secure_domain_rules(),
         })
     end
 
@@ -655,7 +667,13 @@ local function inbounds()
 end
 
 local function rules()
-    rules = {
+    local result = {
+        {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound", "http_inbound"},
+            outboundTag = "direct",
+            domain = fast_domain_rules()
+        },
         {
             type = "field",
             inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
@@ -679,21 +697,35 @@ local function rules()
     }
     if geoip_existence then
         if proxy.geoip_direct_code ~= nil then
-            table.insert(rules, 1, {
+            table.insert(result, 1, {
                 type = "field",
                 inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
                 outboundTag = "direct",
                 ip = {"geoip:" .. proxy.geoip_direct_code}
             })
         end
-        table.insert(rules, 1, {
+        table.insert(result, 1, {
             type = "field",
             inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
             outboundTag = "direct",
             ip = {"geoip:private"}
         })
     end
-    return rules
+    if secure_domain_rules() ~= nil then
+        table.insert(result, 1, {
+            type = "field",
+            inboundTag = {"tproxy_udp_inbound"},
+            outboundTag = "udp_outbound",
+            domain = secure_domain_rules(),
+        })
+        table.insert(result, 1, {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+            outboundTag = "tcp_outbound",
+            domain = secure_domain_rules(),
+        })
+    end
+    return result
 end
 
 local xray = {
