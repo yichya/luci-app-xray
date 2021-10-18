@@ -203,7 +203,8 @@ local function shadowsocks_outbound(server, tag)
         streamSettings = {
             network = server.transport,
             sockopt = {
-                mark = tonumber(proxy.mark)
+                mark = tonumber(proxy.mark),
+                domainStrategy = "UseIP"
             },
             security = server.shadowsocks_tls,
             tlsSettings = server.shadowsocks_tls == "tls" and tls_settings(server, "shadowsocks") or nil,
@@ -239,7 +240,8 @@ local function vmess_outbound(server, tag)
         streamSettings = {
             network = server.transport,
             sockopt = {
-                mark = tonumber(proxy.mark)
+                mark = tonumber(proxy.mark),
+                domainStrategy = "UseIP"
             },
             security = server.vmess_tls,
             tlsSettings = server.vmess_tls == "tls" and tls_settings(server, "vmess") or nil,
@@ -279,7 +281,8 @@ local function vless_outbound(server, tag)
         streamSettings = {
             network = server.transport,
             sockopt = {
-                mark = tonumber(proxy.mark)
+                mark = tonumber(proxy.mark),
+                domainStrategy = "UseIP"
             },
             security = server.vless_tls,
             tlsSettings = server.vless_tls == "tls" and tls_settings(server, "vless") or nil,
@@ -315,7 +318,8 @@ local function trojan_outbound(server, tag)
         streamSettings = {
             network = server.transport,
             sockopt = {
-                mark = tonumber(proxy.mark)
+                mark = tonumber(proxy.mark),
+                domainStrategy = "UseIP"
             },
             security = server.trojan_tls,
             tlsSettings = server.trojan_tls == "tls" and tls_settings(server, "trojan") or nil,
@@ -562,34 +566,23 @@ local function dns_server_outbound()
     }
 end
 
-local function fast_domain_rules()
+local function upstream_domain_names()
     local result = {
         tcp_server.server,
     }
     if tcp_server.server ~= udp_server.server then
         table.insert(result, udp_server.server)
     end
-    if proxy.bypassed_domain_rules ~= nil then
-        for _, x in ipairs(proxy.bypassed_domain_rules) do
-            if x:sub(1, 8) == "geosite:" then
-                if geosite_existence then
-                    table.insert(result, x)
-                end
-            else
-                table.insert(result, x)
-            end
-        end
-    end
     return result
 end
 
-local function secure_domain_rules()
-    if proxy.forwarded_domain_rules == nil then
+local function domain_rules(k)
+    if proxy[k] == nil then
         return nil
     end
 
     local result = {}
-    for _, x in ipairs(proxy.forwarded_domain_rules) do
+    for _, x in ipairs(proxy[k]) do
         if x:sub(1, 8) == "geosite:" then
             if geosite_existence then
                 table.insert(result, x)
@@ -601,15 +594,32 @@ local function secure_domain_rules()
     return result
 end
 
+local function secure_domain_rules()
+    return domain_rules("forwarded_domain_rules")
+end
+
+local function fast_domain_rules()
+    return domain_rules("bypassed_domain_rules")
+end
+
 local function dns_conf()
     local servers = {
         {
             address = proxy.fast_dns,
             port = 53,
-            domains = fast_domain_rules(),
+            domains = upstream_domain_names(),
         },
         proxy.default_dns
     }
+
+    if fast_domain_rules() ~= nil then
+        table.insert(servers, 2, {
+            address = proxy.fast_dns,
+            port = 53,
+            domains = fast_domain_rules(),
+        })
+    end
+
     if secure_domain_rules() ~= nil then
         table.insert(servers, 2, {
             address = proxy.secure_dns,
