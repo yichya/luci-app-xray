@@ -82,17 +82,11 @@ flush_firewall() {
 setup_dnsmasq() {
     local main_server=$(uci_get_by_name $(uci_get_by_type general main_server) server)
     local tproxy_udp_server=$(uci_get_by_name $(uci_get_by_type general tproxy_udp_server) server)
-    local fast_dns=$(uci_get_by_type general fast_dns)
     local dns_port=$(uci_get_by_type general dns_port)
     local dns_count=$(uci_get_by_type general dns_count 0)
 
     echo "# Generated dnsmasq configurations by luci-app-xray" > /tmp/dnsmasq.d/xray.conf
     echo "strict-order" >> /tmp/dnsmasq.d/xray.conf
-    echo "server=/${main_server}/${fast_dns}" >> /tmp/dnsmasq.d/xray.conf
-    if [ ! "${main_server}" == "${tproxy_udp_server}" ] ; then
-        echo "server=/${tproxy_udp_server}/${fast_dns}" >> /tmp/dnsmasq.d/xray.conf
-    fi
-
     echo "server=/#/127.0.0.1#${dns_port}" >> /tmp/dnsmasq.d/xray.conf
     local cur_port
     for cur_port in $(seq ${dns_port} $(expr ${dns_port} + ${dns_count})); do
