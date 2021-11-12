@@ -120,10 +120,10 @@ return view.extend({
             }
         }
 
-        var m, s, o;
+        var m, s, o, ss;
         m = new form.Map('xray', _('Xray'), asset_file_status);
 
-        s = m.section(form.TypedSection, 'general', 'General Settings',);
+        s = m.section(form.TypedSection, 'general');
         s.addremove = false;
         s.anonymous = true;
 
@@ -136,9 +136,9 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
-        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'))
+        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
 
-        o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'))
+        o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'), _('This enables DNS query forwarding and TProxy for both TCP and UDP connections.'))
 
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
         o.depends("transparent_proxy_enable", "1")
@@ -148,6 +148,224 @@ return view.extend({
         for (var v of L.uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
+        
+        o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
+        ss = o.subsection
+        ss.sortable = true
+        ss.anonymous = true
+        ss.addremove = true
+
+        ss.tab('general', _('General Settings'));
+
+        o = ss.taboption('general', form.Value, "alias", _("Alias (optional)"))
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Value, 'server', _('Server Hostname'))
+        o.datatype = 'host'
+
+        o = ss.taboption('general', form.Value, 'server_port', _('Server Port'))
+        o.datatype = 'port'
+        o.placeholder = '443'
+
+        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
+        o.modalonly = true
+
+        ss.tab('protocol', _('Protocol Settings'));
+
+        o = ss.taboption('protocol', form.ListValue, "protocol", _("Protocol"))
+        o.value("vmess", "VMess")
+        o.value("vless", "VLESS")
+        o.value("trojan", "Trojan")
+        o.value("shadowsocks", "Shadowsocks")
+        o.rmempty = false
+
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "trojan", true, true)
+
+        o = ss.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
+        o.depends("protocol", "shadowsocks")
+        o.value("none", "none")
+        o.value("aes-256-gcm", "aes-256-gcm")
+        o.value("aes-128-gcm", "aes-128-gcm")
+        o.value("chacha20-poly1305", "chacha20-poly1305")
+        o.rmempty = false
+        o.modalonly = true
+
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "shadowsocks", false, true)
+
+        o = ss.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
+        o.depends("protocol", "vmess")
+        o.value("none", "none")
+        o.value("auto", "auto")
+        o.value("aes-128-gcm", "aes-128-gcm")
+        o.value("chacha20-poly1305", "chacha20-poly1305")
+        o.rmempty = false
+        o.modalonly = true
+
+        o = ss.taboption('protocol', form.ListValue, "vmess_alter_id", _("[vmess] AlterId"))
+        o.depends("protocol", "vmess")
+        o.value(0, "0 (this enables VMessAEAD)")
+        o.value(1, "1")
+        o.value(4, "4")
+        o.value(16, "16")
+        o.value(64, "64")
+        o.value(256, "256")
+        o.rmempty = false
+        o.modalonly = true
+
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vmess", false, true)
+
+        o = ss.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
+        o.depends("protocol", "vless")
+        o.value("none", "none")
+        o.rmempty = false
+        o.modalonly = true
+
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vless", true, true)
+
+        ss.tab('transport', _('Transport Settings'));
+
+        o = ss.taboption('transport', form.ListValue, 'transport', _('Transport'))
+        o.value("tcp", "TCP")
+        o.value("mkcp", "mKCP")
+        o.value("ws", "WebSocket")
+        o.value("h2", "HTTP/2")
+        o.value("quic", "QUIC")
+        o.value("grpc", "gRPC")
+        o.rmempty = false
+
+        o = ss.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
+        o.depends("transport", "tcp")
+        o.value("none", _("None"))
+        o.value("http", "HTTP")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.DynamicList, "http_host", _("[tcp][fake_http] Host"))
+        o.depends("tcp_guise", "http")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.DynamicList, "http_path", _("[tcp][fake_http] Path"))
+        o.depends("tcp_guise", "http")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.ListValue, "mkcp_guise", _("[mkcp] Fake Header Type"))
+        o.depends("transport", "mkcp")
+        o.value("none", _("None"))
+        o.value("srtp", _("VideoCall (SRTP)"))
+        o.value("utp", _("BitTorrent (uTP)"))
+        o.value("wechat-video", _("WechatVideo"))
+        o.value("dtls", "DTLS 1.2")
+        o.value("wireguard", "WireGuard")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_mtu", _("[mkcp] Maximum Transmission Unit"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 1350
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_tti", _("[mkcp] Transmission Time Interval"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 50
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_uplink_capacity", _("[mkcp] Uplink Capacity"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 5
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_downlink_capacity", _("[mkcp] Downlink Capacity"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 20
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_read_buffer_size", _("[mkcp] Read Buffer Size"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 2
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_write_buffer_size", _("[mkcp] Write Buffer Size"))
+        o.datatype = "uinteger"
+        o.depends("transport", "mkcp")
+        o.default = 2
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Flag, "mkcp_congestion", _("[mkcp] Congestion Control"))
+        o.depends("transport", "mkcp")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "mkcp_seed", _("[mkcp] Seed"))
+        o.depends("transport", "mkcp")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.ListValue, "quic_security", _("[quic] Security"))
+        o.depends("transport", "quic")
+        o.value("none", "none")
+        o.value("aes-128-gcm", "aes-128-gcm")
+        o.value("chacha20-poly1305", "chacha20-poly1305")
+        o.rmempty = false
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "quic_key", _("[quic] Key"))
+        o.depends("transport", "quic")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.ListValue, "quic_guise", _("[quic] Fake Header Type"))
+        o.depends("transport", "quic")
+        o.value("none", _("None"))
+        o.value("srtp", _("VideoCall (SRTP)"))
+        o.value("utp", _("BitTorrent (uTP)"))
+        o.value("wechat-video", _("WechatVideo"))
+        o.value("dtls", "DTLS 1.2")
+        o.value("wireguard", "WireGuard")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.DynamicList, "h2_host", _("[http2] Host"))
+        o.depends("transport", "h2")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "h2_path", _("[http2] Path"))
+        o.depends("transport", "h2")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "grpc_service_name", _("[grpc] Service Name"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Flag, "grpc_multi_mode", _("[grpc] Multi Mode"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "ws_host", _("[websocket] Host"))
+        o.depends("transport", "ws")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "ws_path", _("[websocket] Path"))
+        o.depends("transport", "ws")
+        o.rmempty = true
+        o.modalonly = true
 
         s.tab('proxy', _('Proxy Settings'));
 
@@ -262,253 +480,35 @@ return view.extend({
         o.datatype = 'hostport'
         o.depends("web_server_enable", "1")
 
+        o = s.taboption('xray_server', form.SectionValue, "xray_server_fallback", form.GridSection, 'fallback', _('Fallback Servers'))
+        ss = o.subsection;
+        ss.sortable = true
+        ss.anonymous = true
+        ss.addremove = true
+
+        ss.tab('general', _('General Settings'));
+
+        o = ss.taboption('general', form.Value, "name", _("SNI"))
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Value, "alpn", _("ALPN"))
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Value, "path", _("Path"))
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Value, "xver", _("Xver"))
+        o.datatype = "uinteger"
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Value, "dest", _("Destination Address"))
+        o.datatype = 'hostport'
+        o.rmempty = true
+
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'), _('Check <code>/var/etc/xray/config.json</code> for tags of generated inbounds and outbounds. See <a href="https://xtls.github.io/config/features/multiple.html">here</a> for help'))
         o.monospace = true
         o.rows = 10
-
-        s = m.section(form.GridSection, 'servers', _('Xray Servers'))
-
-        s.sortable = true
-        s.anonymous = true
-        s.addremove = true
-
-        s.tab('general', _('General Settings'));
-
-        o = s.taboption('general', form.Value, "alias", _("Alias (optional)"))
-        o.rmempty = true
-
-        o = s.taboption('general', form.Value, 'server', _('Server Hostname'))
-        o.datatype = 'host'
-
-        o = s.taboption('general', form.Value, 'server_port', _('Server Port'))
-        o.datatype = 'port'
-        o.placeholder = '443'
-
-        o = s.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
-        o.modalonly = true
-
-        s.tab('protocol', _('Protocol Settings'));
-
-        o = s.taboption('protocol', form.ListValue, "protocol", _("Protocol"))
-        o.value("vmess", "VMess")
-        o.value("vless", "VLESS")
-        o.value("trojan", "Trojan")
-        o.value("shadowsocks", "Shadowsocks")
-        o.rmempty = false
-
-        add_flow_and_stream_security_conf(s, "protocol", "protocol", "trojan", true, true)
-
-        o = s.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
-        o.depends("protocol", "shadowsocks")
-        o.value("none", "none")
-        o.value("aes-256-gcm", "aes-256-gcm")
-        o.value("aes-128-gcm", "aes-128-gcm")
-        o.value("chacha20-poly1305", "chacha20-poly1305")
-        o.rmempty = false
-        o.modalonly = true
-
-        add_flow_and_stream_security_conf(s, "protocol", "protocol", "shadowsocks", false, true)
-
-        o = s.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
-        o.depends("protocol", "vmess")
-        o.value("none", "none")
-        o.value("auto", "auto")
-        o.value("aes-128-gcm", "aes-128-gcm")
-        o.value("chacha20-poly1305", "chacha20-poly1305")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('protocol', form.ListValue, "vmess_alter_id", _("[vmess] AlterId"))
-        o.depends("protocol", "vmess")
-        o.value(0, "0 (this enables VMessAEAD)")
-        o.value(1, "1")
-        o.value(4, "4")
-        o.value(16, "16")
-        o.value(64, "64")
-        o.value(256, "256")
-        o.rmempty = false
-        o.modalonly = true
-
-        add_flow_and_stream_security_conf(s, "protocol", "protocol", "vmess", false, true)
-
-        o = s.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
-        o.depends("protocol", "vless")
-        o.value("none", "none")
-        o.rmempty = false
-        o.modalonly = true
-
-        add_flow_and_stream_security_conf(s, "protocol", "protocol", "vless", true, true)
-
-        s.tab('transport', _('Transport Settings'));
-
-        o = s.taboption('transport', form.ListValue, 'transport', _('Transport'))
-        o.value("tcp", "TCP")
-        o.value("mkcp", "mKCP")
-        o.value("ws", "WebSocket")
-        o.value("h2", "HTTP/2")
-        o.value("quic", "QUIC")
-        o.value("grpc", "gRPC")
-        o.rmempty = false
-
-        o = s.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
-        o.depends("transport", "tcp")
-        o.value("none", _("None"))
-        o.value("http", "HTTP")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.DynamicList, "http_host", _("[tcp][fake_http] Host"))
-        o.depends("tcp_guise", "http")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.DynamicList, "http_path", _("[tcp][fake_http] Path"))
-        o.depends("tcp_guise", "http")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.ListValue, "mkcp_guise", _("[mkcp] Fake Header Type"))
-        o.depends("transport", "mkcp")
-        o.value("none", _("None"))
-        o.value("srtp", _("VideoCall (SRTP)"))
-        o.value("utp", _("BitTorrent (uTP)"))
-        o.value("wechat-video", _("WechatVideo"))
-        o.value("dtls", "DTLS 1.2")
-        o.value("wireguard", "WireGuard")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_mtu", _("[mkcp] Maximum Transmission Unit"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 1350
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_tti", _("[mkcp] Transmission Time Interval"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 50
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_uplink_capacity", _("[mkcp] Uplink Capacity"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 5
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_downlink_capacity", _("[mkcp] Downlink Capacity"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 20
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_read_buffer_size", _("[mkcp] Read Buffer Size"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 2
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_write_buffer_size", _("[mkcp] Write Buffer Size"))
-        o.datatype = "uinteger"
-        o.depends("transport", "mkcp")
-        o.default = 2
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Flag, "mkcp_congestion", _("[mkcp] Congestion Control"))
-        o.depends("transport", "mkcp")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "mkcp_seed", _("[mkcp] Seed"))
-        o.depends("transport", "mkcp")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.ListValue, "quic_security", _("[quic] Security"))
-        o.depends("transport", "quic")
-        o.value("none", "none")
-        o.value("aes-128-gcm", "aes-128-gcm")
-        o.value("chacha20-poly1305", "chacha20-poly1305")
-        o.rmempty = false
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "quic_key", _("[quic] Key"))
-        o.depends("transport", "quic")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.ListValue, "quic_guise", _("[quic] Fake Header Type"))
-        o.depends("transport", "quic")
-        o.value("none", _("None"))
-        o.value("srtp", _("VideoCall (SRTP)"))
-        o.value("utp", _("BitTorrent (uTP)"))
-        o.value("wechat-video", _("WechatVideo"))
-        o.value("dtls", "DTLS 1.2")
-        o.value("wireguard", "WireGuard")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.DynamicList, "h2_host", _("[http2] Host"))
-        o.depends("transport", "h2")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "h2_path", _("[http2] Path"))
-        o.depends("transport", "h2")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "grpc_service_name", _("[grpc] Service Name"))
-        o.depends("transport", "grpc")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Flag, "grpc_multi_mode", _("[grpc] Multi Mode"))
-        o.depends("transport", "grpc")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "ws_host", _("[websocket] Host"))
-        o.depends("transport", "ws")
-        o.rmempty = true
-        o.modalonly = true
-
-        o = s.taboption('transport', form.Value, "ws_path", _("[websocket] Path"))
-        o.depends("transport", "ws")
-        o.rmempty = true
-        o.modalonly = true
-
-        s = m.section(form.GridSection, 'fallback', _('Xray Fallback'))
-
-        s.sortable = true
-        s.anonymous = true
-        s.addremove = true
-
-        s.tab('general', _('General Settings'));
-
-        o = s.taboption('general', form.Value, "name", _("SNI"))
-        o.rmempty = true
-
-        o = s.taboption('general', form.Value, "alpn", _("ALPN"))
-        o.rmempty = true
-
-        o = s.taboption('general', form.Value, "path", _("Path"))
-        o.rmempty = true
-
-        o = s.taboption('general', form.Value, "xver", _("Xver"))
-        o.datatype = "uinteger"
-        o.rmempty = true
-
-        o = s.taboption('general', form.Value, "dest", _("Destination Address"))
-        o.datatype = 'hostport'
-        o.rmempty = true
 
         return m.render();
     }
