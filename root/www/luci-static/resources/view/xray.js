@@ -2,6 +2,7 @@
 'require view';
 'require uci';
 'require form';
+'require network';
 
 function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, client_side) {
     var o;
@@ -106,7 +107,8 @@ return view.extend({
     load: function () {
         return Promise.all([
             L.uci.load("xray"),
-            L.uci.fs.list("/usr/share/xray")
+            L.uci.fs.list("/usr/share/xray"),
+            L.network.getHostHints()
         ])
     },
 
@@ -167,7 +169,7 @@ return view.extend({
         o.datatype = 'port'
         o.placeholder = '443'
 
-        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
+        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.modalonly = true
 
         ss.tab('protocol', _('Protocol Settings'));
@@ -452,6 +454,26 @@ return view.extend({
         o.datatype = "ip4addr"
         o.rmempty = true
 
+        o = s.taboption('access_control', form.SectionValue, "access_control_lan_hosts", form.GridSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
+
+        ss = o.subsection;
+        ss.sortable = true
+        ss.anonymous = true
+        ss.addremove = true
+
+        ss.tab('general', _('General Settings'));
+
+        o = ss.taboption('general', form.Value, "macaddr", _("MAC Address"))
+        for (let f in load_result[2].hosts) {
+            o.value(f, `${f} (${load_result[2].hosts[f].name || load_result[2].hosts[f].ipaddrs[0]})`)
+        }
+
+        o.datatype = "macaddr"
+        o.rmempty = true
+
+        o = ss.taboption('general', form.Flag, "bypassed", _("Bypass Transparent Proxy"))
+        o.rmempty = true
+
         s.tab('xray_server', _('HTTPS Server'));
 
         o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
@@ -473,14 +495,16 @@ return view.extend({
 
         add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false)
 
-        o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports Xray UUID Mapping)'))
+        o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.depends("web_server_enable", "1")
 
-        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'), _('Support for multiple fallbacks (path, SNI) is under development'))
+        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'))
         o.datatype = 'hostport'
         o.depends("web_server_enable", "1")
 
         o = s.taboption('xray_server', form.SectionValue, "xray_server_fallback", form.GridSection, 'fallback', _('Fallback Servers'))
+        o.depends("web_server_enable", "1")
+
         ss = o.subsection;
         ss.sortable = true
         ss.anonymous = true
