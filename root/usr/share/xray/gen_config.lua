@@ -31,13 +31,43 @@ local function direct_outbound()
     return {
         protocol = "freedom",
         tag = "direct",
-        settings = {keep = ""},
         streamSettings = {
             sockopt = {
                 mark = tonumber(proxy.mark)
             }
         }
     }
+end
+
+local function manual_tproxy_outbounds()
+    local result = {}
+    local i = 0
+    ucursor:foreach("xray", "manual_tproxy", function(v)
+        i = i + 1
+        table.insert(result, {
+            protocol = "freedom",
+            tag = string.format("manual_tproxy_outbound_tcp_%d", i),
+            settings = {
+                redirect = string.format("%s:%d", v.dest_addr, v.dest_port),
+                domainStrategy = "UseIP"
+            },
+            proxySettings = v.force_forward == "1" and {
+                tag = "tcp_outbound"
+            } or nil
+        })
+        table.insert(result, {
+            protocol = "freedom",
+            tag = string.format("manual_tproxy_outbound_udp_%d", i),
+            settings = {
+                redirect = string.format("%s:%d", v.dest_addr, v.dest_port),
+                domainStrategy = "UseIP"
+            },
+            proxySettings = v.force_forward == "1" and {
+                tag = "udp_outbound"
+            } or nil
+        })
+    end)
+    return result
 end
 
 local function stream_tcp_fake_http_request(server)
@@ -676,6 +706,31 @@ local function inbounds()
     return i
 end
 
+local function manual_tproxy_rules()
+    local result = {}
+    local i = 0
+    ucursor:foreach("xray", "manual_tproxy", function(v)
+        i = i + 1
+        table.insert(result, {
+            type = "field",
+            inboundTag = {"tproxy_tcp_inbound", "socks_inbound", "https_inbound", "http_inbound"},
+            ip = {v.source_addr},
+            port = v.source_port,
+            network = "tcp",
+            outboundTag = string.format("manual_tproxy_outbound_tcp_%d", i)
+        })
+        table.insert(result, {
+            type = "field",
+            inboundTag = {"tproxy_udp_inbound"},
+            ip = {v.source_addr},
+            port = v.source_port,
+            network = "udp",
+            outboundTag = string.format("manual_tproxy_outbound_udp_%d", i)
+        })
+    end)
+    return result
+end
+
 local function rules()
     local result = {
         {
@@ -737,17 +792,28 @@ local function rules()
             domain = fast_domain_rules()
         })
     end
+    for _, v in ipairs(manual_tproxy_rules()) do
+        table.insert(result, 1, v)
+    end
+    return result
+end
+
+local function outbounds()
+    local result = {
+        server_outbound(tcp_server, "tcp_outbound"),
+        server_outbound(udp_server, "udp_outbound"),
+        direct_outbound(),
+        dns_server_outbound()
+    }
+    for _, v in ipairs(manual_tproxy_outbounds()) do
+        table.insert(result, v)
+    end
     return result
 end
 
 local xray = {
     inbounds = inbounds(),
-    outbounds = {
-        server_outbound(tcp_server, "tcp_outbound"),
-        server_outbound(udp_server, "udp_outbound"),
-        direct_outbound(),
-        dns_server_outbound()
-    },
+    outbounds = outbounds(),
     dns = dns_conf(),
     api = api_conf(),
     routing = {

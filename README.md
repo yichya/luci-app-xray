@@ -37,6 +37,11 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-10-01 fix: parsing default gateway in some cases
 * 2021-10-06 feature: show information about asset files in LuCI; fix Xray startup when asset files are unavailable
 * 2021-10-08 feature: extra DNS Server Port to reduce possibility of temporary DNS lookup failures
+* 2021-10-09 fix: temporarily revert DNS over HTTPS related changes to avoid dnsmasq and iptables errors
+* 2021-10-12 fix: domain based routing if sniffing is enabled
+* 2021-10-19 feat: change upstream DNS resolve method to directly using Xray internal DNS server
+* 2021-11-14 feat: LAN access control for transparent proxy. Devices can be set to not being transparently proxied per MAC address.
+* 2021-11-15 feat: manual transparent proxy. A use case is accessing IPv6 only websites without any IPv6 address (for example, `192.0.2.1:443 -> tracker.byr.pt:443` and add hosts item `192.0.2.1 byr.pt`)
 
 ## Todo
 

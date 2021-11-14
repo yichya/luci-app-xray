@@ -150,7 +150,7 @@ return view.extend({
         for (var v of L.uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
-        
+
         o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
         ss = o.subsection
         ss.sortable = true
@@ -461,9 +461,7 @@ return view.extend({
         ss.anonymous = true
         ss.addremove = true
 
-        ss.tab('general', _('General Settings'));
-
-        o = ss.taboption('general', form.Value, "macaddr", _("MAC Address"))
+        o = ss.option(form.Value, "macaddr", _("MAC Address"))
         for (let f in load_result[2].hosts) {
             o.value(f, `${f} (${load_result[2].hosts[f].name || load_result[2].hosts[f].ipaddrs[0]})`)
         }
@@ -471,8 +469,33 @@ return view.extend({
         o.datatype = "macaddr"
         o.rmempty = true
 
-        o = ss.taboption('general', form.Flag, "bypassed", _("Bypass Transparent Proxy"))
+        o = ss.option(form.Flag, "bypassed", _("Bypass Transparent Proxy"))
         o.rmempty = true
+
+        o = s.taboption('access_control', form.SectionValue, "access_control_manual_tproxy", form.GridSection, 'manual_tproxy', _('Manual Transparent Proxy'), _('Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href="https://github.com/v2ray/v2ray-core/issues/2233">FakeDNS</a> for details.'))
+
+        ss = o.subsection;
+        ss.sortable = true
+        ss.anonymous = true
+        ss.addremove = true
+
+        o = ss.option(form.Value, "source_addr", _("Source Address"))
+        o.datatype = "ipaddr"
+        o.rmempty = true
+
+        o = ss.option(form.Value, "source_port", _("Source Port"))
+        o.rmempty = true
+
+        o = ss.option(form.Value, "dest_addr", _("Destination Address"))
+        o.datatype = "host"
+        o.rmempty = true
+
+        o = ss.option(form.Value, "dest_port", _("Destination Port"))
+        o.datatype = "port"
+        o.rmempty = true
+
+        o = ss.option(form.Flag, 'force_forward', _('Force Forward'), _('This destination must be forwarded through Xray. (This option might be removed later.)'))
+        o.modalonly = true
 
         s.tab('xray_server', _('HTTPS Server'));
 
@@ -510,22 +533,20 @@ return view.extend({
         ss.anonymous = true
         ss.addremove = true
 
-        ss.tab('general', _('General Settings'));
-
-        o = ss.taboption('general', form.Value, "name", _("SNI"))
+        o = ss.option(form.Value, "name", _("SNI"))
         o.rmempty = true
 
-        o = ss.taboption('general', form.Value, "alpn", _("ALPN"))
+        o = ss.option(form.Value, "alpn", _("ALPN"))
         o.rmempty = true
 
-        o = ss.taboption('general', form.Value, "path", _("Path"))
+        o = ss.option(form.Value, "path", _("Path"))
         o.rmempty = true
 
-        o = ss.taboption('general', form.Value, "xver", _("Xver"))
+        o = ss.option(form.Value, "xver", _("Xver"))
         o.datatype = "uinteger"
         o.rmempty = true
 
-        o = ss.taboption('general', form.Value, "dest", _("Destination Address"))
+        o = ss.option(form.Value, "dest", _("Destination Address"))
         o.datatype = 'hostport'
         o.rmempty = true
 
