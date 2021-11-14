@@ -17,7 +17,6 @@ usage() {
 			-b <wan_ips>            wan ip of will be bypassed
 			-W <ip_list_file>       a file whose content is forwarded ip list
 			-w <wan_ips>            wan ip of will be forwarded
-			-d <target>             the default target of lan access control
 			-a <lan_hosts>          mac addr of access control, need a prefix to define proxy type
 			-f                      flush the rules
 			-h                      show this help message and exit
@@ -46,7 +45,7 @@ flush_rules() {
 
 gen_lan_host_ipset_entry() {
     logger_level 6 "gen_lan_host_ipset_entry"
-    for host in $LAN_HOSTS; do
+    for host in "${LAN_HOSTS}"; do
         case "${host:0:1}" in
             n|N)
                 echo add tp_spec_src_ac ${host:2}
@@ -109,7 +108,7 @@ ipset_init() {
     return 0
 }
 
-while getopts "B:b:W:w:d:a:fh" arg; do
+while getopts "B:b:W:w:a:fh" arg; do
     case "$arg" in
         B)
             WAN_BP_LIST=$OPTARG
@@ -122,9 +121,6 @@ while getopts "B:b:W:w:d:a:fh" arg; do
             ;;
         w)
             WAN_FW_IP=$OPTARG
-            ;;
-        d)
-            LAN_TARGET=$OPTARG
             ;;
         a)
             LAN_HOSTS=$OPTARG
