@@ -3,6 +3,7 @@
 'require uci';
 'require form';
 'require network';
+'require tools.widgets as widgets';
 
 function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, client_side) {
     var o;
@@ -394,6 +395,9 @@ return view.extend({
         o = s.taboption('proxy', form.Value, 'dns_count', _('Extra DNS Server Ports'), _('Listen for DNS Requests on multiple ports (all of which serves as dnsmasq upstream servers).<br/>For example if Xray DNS Server Port is 5353 and use 3 extra ports, 5353 - 5356 will be used for DNS requests.<br/>Increasing this value may help reduce the possibility of temporary DNS lookup failures.'))
         o.datatype = 'range(0, 100)'
         o.default = 0
+
+        o = s.taboption('proxy', widgets.DeviceSelect, 'lan_ifaces', _("LAN Interface"))
+        o.noaliases = true
 
         o = s.taboption('proxy', form.Value, 'mark', _('Socket Mark Number'), _('Avoid proxy loopback problems with local (gateway) traffic'))
         o.datatype = 'range(1, 255)'
