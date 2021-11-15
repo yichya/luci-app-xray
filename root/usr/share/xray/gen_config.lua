@@ -716,7 +716,6 @@ local function manual_tproxy_rules()
             inboundTag = {"tproxy_tcp_inbound", "socks_inbound", "https_inbound", "http_inbound"},
             ip = {v.source_addr},
             port = v.source_port,
-            network = "tcp",
             outboundTag = string.format("manual_tproxy_outbound_tcp_%d", i)
         })
         table.insert(result, {
@@ -724,7 +723,6 @@ local function manual_tproxy_rules()
             inboundTag = {"tproxy_udp_inbound"},
             ip = {v.source_addr},
             port = v.source_port,
-            network = "udp",
             outboundTag = string.format("manual_tproxy_outbound_udp_%d", i)
         })
     end)
