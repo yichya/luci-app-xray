@@ -48,6 +48,6 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * [x] LuCI ACL Settings
 * [x] migrate to xray-core
 * [x] better server role configurations
+* [x] transparent proxy access control for LAN
 * [ ] try to be compatible with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core)
 * [ ] Xray Running Status Check
-* [ ] transparent proxy access control for LAN
