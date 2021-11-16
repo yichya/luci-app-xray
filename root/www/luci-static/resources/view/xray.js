@@ -396,12 +396,30 @@ return view.extend({
         o.datatype = 'range(0, 100)'
         o.default = 0
 
-        o = s.taboption('proxy', widgets.DeviceSelect, 'lan_ifaces', _("LAN Interface"))
-        o.noaliases = true
-
         o = s.taboption('proxy', form.Value, 'mark', _('Socket Mark Number'), _('Avoid proxy loopback problems with local (gateway) traffic'))
         o.datatype = 'range(1, 255)'
         o.default = 255
+
+        o = s.taboption('proxy', widgets.DeviceSelect, 'lan_ifaces', _("LAN Interface"))
+        o.noaliases = true
+
+        o = s.taboption('proxy', form.SectionValue, "access_control_lan_hosts", form.GridSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
+
+        ss = o.subsection;
+        ss.sortable = true
+        ss.anonymous = true
+        ss.addremove = true
+
+        o = ss.option(form.Value, "macaddr", _("MAC Address"))
+        for (let f in load_result[2].hosts) {
+            o.value(f, `${f} (${load_result[2].hosts[f].name || load_result[2].hosts[f].ipaddrs[0]})`)
+        }
+
+        o.datatype = "macaddr"
+        o.rmempty = true
+
+        o = ss.option(form.Flag, "bypassed", _("Bypass Transparent Proxy"))
+        o.rmempty = true
 
         s.tab('dns', _('DNS Settings'));
 
@@ -456,24 +474,6 @@ return view.extend({
 
         o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
-        o.rmempty = true
-
-        o = s.taboption('access_control', form.SectionValue, "access_control_lan_hosts", form.GridSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
-
-        ss = o.subsection;
-        ss.sortable = true
-        ss.anonymous = true
-        ss.addremove = true
-
-        o = ss.option(form.Value, "macaddr", _("MAC Address"))
-        for (let f in load_result[2].hosts) {
-            o.value(f, `${f} (${load_result[2].hosts[f].name || load_result[2].hosts[f].ipaddrs[0]})`)
-        }
-
-        o.datatype = "macaddr"
-        o.rmempty = true
-
-        o = ss.option(form.Flag, "bypassed", _("Bypass Transparent Proxy"))
         o.rmempty = true
 
         o = s.taboption('access_control', form.SectionValue, "access_control_manual_tproxy", form.GridSection, 'manual_tproxy', _('Manual Transparent Proxy'), _('Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href="https://github.com/v2ray/v2ray-core/issues/2233">FakeDNS</a> for details.'))
