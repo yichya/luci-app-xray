@@ -6,10 +6,10 @@ local nixiofs = require "nixio.fs"
 local proxy_section = ucursor:get_first("xray", "general")
 local proxy = ucursor:get_all("xray", proxy_section)
 
-local tcp_server_section = proxy.main_server
+local tcp_server_section = arg[1] == nil and proxy.main_server or arg[1]
 local tcp_server = ucursor:get_all("xray", tcp_server_section)
 
-local udp_server_section = proxy.tproxy_udp_server
+local udp_server_section = arg[2] == nil and proxy.tproxy_udp_server or arg[2]
 local udp_server = ucursor:get_all("xray", udp_server_section)
 
 local geoip_existence = false
@@ -202,18 +202,38 @@ local function stream_quic(server)
 end
 
 local function tls_settings(server, protocol)
-    return {
+    local result = {
         serverName = server[protocol .. "_tls_host"],
         allowInsecure = server[protocol .. "_tls_insecure"] ~= "0",
         fingerprint = server[protocol .. "_tls_fingerprint"] or "",
     }
+
+    if server[protocol .. "_tls_alpn"] ~= nil then
+        local alpn = {}
+        for _, x in ipairs(server[protocol .. "_tls_alpn"]) do
+            table.insert(alpn, x)
+        end
+        result["alpn"] = alpn
+    end
+
+    return result
 end
 
 local function xtls_settings(server, protocol)
-    return {
+    local result = {
         serverName = server[protocol .. "_xtls_host"],
         allowInsecure = server[protocol .. "_xtls_insecure"] ~= "0",
     }
+
+    if server[protocol .. "_xtls_alpn"] ~= nil then
+        local alpn = {}
+        for _, x in ipairs(server[protocol .. "_xtls_alpn"]) do
+            table.insert(alpn, x)
+        end
+        result["alpn"] = alpn
+    end
+
+    return result
 end
 
 local function shadowsocks_outbound(server, tag)

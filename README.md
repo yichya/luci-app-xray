@@ -42,6 +42,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-10-19 feat: change upstream DNS resolve method to directly using Xray internal DNS server
 * 2021-11-14 feat: LAN access control for transparent proxy. Devices can be set to not being transparently proxied per MAC address.
 * 2021-11-15 feat: manual transparent proxy. A use case is accessing IPv6 only websites without any IPv6 address (for example, `192.0.2.1:443 -> tracker.byr.pt:443` and add hosts item `192.0.2.1 byr.pt`)
+* 2021-11-20 feat: alpn settings for outbound
 
 ## Todo
 
