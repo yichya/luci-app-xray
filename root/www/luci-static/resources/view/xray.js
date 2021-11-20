@@ -67,6 +67,13 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         o.rmempty = true
         o.modalonly = true
 
+        o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_tls_alpn`, _(`[${protocol_name}][tls] ALPN`))
+        o.depends(`${protocol_name}_tls`, "tls")
+        o.value("h2", "h2")
+        o.value("http/1.1", "http/1.1")
+        o.rmempty = false
+        o.modalonly = true
+
         if (have_xtls) {
             o = s.taboption(tab_name, form.Value, `${protocol_name}_xtls_host`, _(`[${protocol_name}][xtls] Server Name`))
             o.depends(`${protocol_name}_tls`, "xtls")
@@ -75,6 +82,13 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
 
             o = s.taboption(tab_name, form.Flag, `${protocol_name}_xtls_insecure`, _(`[${protocol_name}][xtls] Allow Insecure`))
             o.depends(`${protocol_name}_tls`, "xtls")
+            o.rmempty = false
+            o.modalonly = true
+
+            o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_xtls_alpn`, _(`[${protocol_name}][xtls] ALPN`))
+            o.depends(`${protocol_name}_tls`, "xtls")
+            o.value("h2", "h2")
+            o.value("http/1.1", "http/1.1")
             o.rmempty = false
             o.modalonly = true
         }
@@ -135,6 +149,7 @@ return view.extend({
         o = s.taboption('general', form.Value, 'xray_bin', _('Xray Executable Path'))
 
         o = s.taboption('general', form.ListValue, 'main_server', _('Main Server'))
+        o.datatype = "uciname"
         for (var v of L.uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
@@ -525,11 +540,11 @@ return view.extend({
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.depends("web_server_enable", "1")
 
-        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'))
+        o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'), _("Only HTTP/1.1 supported here. For HTTP/2 upstream, use Fallback Servers below"))
         o.datatype = 'hostport'
         o.depends("web_server_enable", "1")
 
-        o = s.taboption('xray_server', form.SectionValue, "xray_server_fallback", form.GridSection, 'fallback', _('Fallback Servers'))
+        o = s.taboption('xray_server', form.SectionValue, "xray_server_fallback", form.GridSection, 'fallback', _('Fallback Servers'), _("Specify upstream servers here."))
         o.depends("web_server_enable", "1")
 
         ss = o.subsection;
