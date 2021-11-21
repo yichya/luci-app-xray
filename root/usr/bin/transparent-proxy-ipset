@@ -123,6 +123,6 @@ done
 
 flush_rules && ipset_init
 RET=$?
-[ "$RET" = 0 ] || logger_level 3 "Start failed!"
+[ "$RET" == "0" ] || logger_level 3 "Start failed!"
 . /etc/hotplug.d/iface/01-transparent-proxy-ipset
 exit $RET

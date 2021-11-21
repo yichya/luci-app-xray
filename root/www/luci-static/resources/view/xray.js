@@ -2,6 +2,7 @@
 'require view';
 'require uci';
 'require form';
+'require fs';
 'require network';
 'require tools.widgets as widgets';
 
@@ -121,9 +122,9 @@ function check_resource_files(load_result) {
 return view.extend({
     load: function () {
         return Promise.all([
-            L.uci.load("xray"),
-            L.uci.fs.list("/usr/share/xray"),
-            L.network.getHostHints()
+            uci.load("xray"),
+            fs.list("/usr/share/xray"),
+            network.getHostHints()
         ])
     },
 
@@ -150,7 +151,7 @@ return view.extend({
 
         o = s.taboption('general', form.ListValue, 'main_server', _('Main Server'))
         o.datatype = "uciname"
-        for (var v of L.uci.sections(config_data, "servers")) {
+        for (var v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
@@ -163,7 +164,7 @@ return view.extend({
 
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
-        for (var v of L.uci.sections(config_data, "servers")) {
+        for (var v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
@@ -417,6 +418,8 @@ return view.extend({
 
         o = s.taboption('proxy', widgets.DeviceSelect, 'lan_ifaces', _("LAN Interface"))
         o.noaliases = true
+        o.rmempty = false
+        o.nocreate = true
 
         o = s.taboption('proxy', form.SectionValue, "access_control_lan_hosts", form.GridSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
 
@@ -451,7 +454,7 @@ return view.extend({
 
         o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
         o.datatype = 'ip4addr'
-        o.placeholder = "114.114.114.114"
+        o.placeholder = "1.1.1.1"
 
         if (geosite_existence) {
             o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _('Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
