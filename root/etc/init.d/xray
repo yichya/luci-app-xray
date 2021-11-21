@@ -51,13 +51,13 @@ gen_config_file() {
     if [ -s /usr/share/xray/infinite_retry ] ; then
         while [ ! -s /var/etc/xray/config.json ] ; do
             logger -st xray[$$] -p4 "(Re)generationg Xray configuration files..."
-            /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
+            /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json
         done
     else
         logger -st xray[$$] -p4 "Generating Xray configuration files..."
-        /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json 2>/dev/null
+        /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json
     fi
-    local custom_config=$(uci_get_by_type general custom_config 2>/dev/null)
+    local custom_config=$(uci_get_by_type general custom_config)
     [ ! "${#custom_config}" == "0" ] && echo ${custom_config} > /var/etc/xray/config_custom.json
 }
 
@@ -69,12 +69,20 @@ setup_firewall() {
         -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns)" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
+    ip rule add fwmark 251 lookup 251
+    ip rule add fwmark 252 lookup 252
+    ip route add local default dev lo table 251
+    ip route add local default dev lo table 252
     /etc/init.d/firewall restart > /dev/null 2>&1
 }
 
 flush_firewall() {
     /usr/bin/lua ${FIREWALL_INCLUDE} flush > $(uci get firewall.xray.path)
     /etc/init.d/firewall restart > /dev/null 2>&1
+    ip rule del fwmark 251 lookup 251
+    ip rule del fwmark 252 lookup 252
+    ip route del local default dev lo table 251
+    ip route del local default dev lo table 252
     /usr/bin/transparent-proxy-ipset -f
 }
 

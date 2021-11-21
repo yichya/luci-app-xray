@@ -5,7 +5,7 @@ config general
 	option tproxy_port_udp '1081'
 	option socks_port '1082'
 	option http_port '1083'
-	option dns_port '5353'
+	option dns_port '5300'
 	option dns_count '3'
 	option fast_dns '114.114.114.114'
 	option secure_dns '8.8.8.8'
