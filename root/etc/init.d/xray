@@ -134,6 +134,11 @@ stop_service() {
     flush_when_disable
 }
 
+reload_service() {
+    stop
+    start
+}
+
 service_triggers() {
     procd_add_reload_trigger "xray"
 }
