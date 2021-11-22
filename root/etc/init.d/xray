@@ -50,7 +50,7 @@ gen_config_file() {
     rm /var/etc/xray/*
     if [ -s /usr/share/xray/infinite_retry ] ; then
         while [ ! -s /var/etc/xray/config.json ] ; do
-            logger -st xray[$$] -p4 "(Re)generationg Xray configuration files..."
+            logger -st xray[$$] -p4 "(Re)generating Xray configuration files..."
             /usr/bin/lua ${GENERATE_CONF} > /var/etc/xray/config.json
         done
     else
@@ -87,8 +87,6 @@ flush_firewall() {
 }
 
 setup_dnsmasq() {
-    local main_server=$(uci_get_by_name $(uci_get_by_type general main_server) server)
-    local tproxy_udp_server=$(uci_get_by_name $(uci_get_by_type general tproxy_udp_server) server)
     local dns_port=$(uci_get_by_type general dns_port)
     local dns_count=$(uci_get_by_type general dns_count 0)
 
