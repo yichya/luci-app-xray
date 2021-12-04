@@ -587,8 +587,8 @@ local function dns_server_inbounds()
             protocol = "dokodemo-door",
             tag = string.format("dns_server_inbound_%d", i),
             settings = {
-                address = proxy.default_dns,
-                port = 53,
+                address = string.split(proxy.default_dns, ':')[1],
+                port = tonumber(string.split(proxy.default_dns, ':')[2]),
                 network = "tcp,udp"
             }
         })
@@ -655,26 +655,25 @@ end
 local function dns_conf()
     local servers = {
         {
-            address = proxy.fast_dns,
-            port = 53,
-            domains = upstream_domain_names(),
-        },
-        proxy.default_dns
+            address = string.split(proxy.fast_dns, ':')[1],
+            port = tonumber(string.split(proxy.fast_dns, ':')[2]),
+            domains = upstream_domain_names()
+        }
     }
 
     if fast_domain_rules() ~= nil then
         table.insert(servers, 2, {
-            address = proxy.fast_dns,
-            port = 53,
-            domains = fast_domain_rules(),
+            address = string.split(proxy.fast_dns, ':')[1],
+            port = tonumber(string.split(proxy.fast_dns, ':')[2]),
+            domains = fast_domain_rules()
         })
     end
 
     if secure_domain_rules() ~= nil then
         table.insert(servers, 2, {
-            address = proxy.secure_dns,
-            port = 53,
-            domains = secure_domain_rules(),
+            address = string.split(proxy.secure_dns, ':')[1],
+            port = tonumber(string.split(proxy.secure_dns, ':')[2]),
+            domains = secure_domain_rules()
         })
     end
 
