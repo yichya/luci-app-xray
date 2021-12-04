@@ -1,4 +1,5 @@
 #!/usr/bin/lua
+
 local ucursor = require "luci.model.uci"
 local json = require "luci.jsonc"
 local nixiofs = require "nixio.fs"
@@ -78,10 +79,8 @@ local function stream_tcp_fake_http_request(server)
             path = server.http_path,
             headers = {
                 Host = server.http_host,
-                User_Agent = {
-                    "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36",
-                    "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"
-                },
+                User_Agent = {"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36",
+                              "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"},
                 Accept_Encoding = {"gzip, deflate"},
                 Connection = {"keep-alive"},
                 Pragma = "no-cache"
@@ -205,7 +204,7 @@ local function tls_settings(server, protocol)
     local result = {
         serverName = server[protocol .. "_tls_host"],
         allowInsecure = server[protocol .. "_tls_insecure"] ~= "0",
-        fingerprint = server[protocol .. "_tls_fingerprint"] or "",
+        fingerprint = server[protocol .. "_tls_fingerprint"] or ""
     }
 
     if server[protocol .. "_tls_alpn"] ~= nil then
@@ -222,7 +221,7 @@ end
 local function xtls_settings(server, protocol)
     local result = {
         serverName = server[protocol .. "_xtls_host"],
-        allowInsecure = server[protocol .. "_xtls_insecure"] ~= "0",
+        allowInsecure = server[protocol .. "_xtls_insecure"] ~= "0"
     }
 
     if server[protocol .. "_xtls_alpn"] ~= nil then
@@ -241,14 +240,12 @@ local function shadowsocks_outbound(server, tag)
         protocol = "shadowsocks",
         tag = tag,
         settings = {
-            servers = {
-                {
-                    address = server.server,
-                    port = tonumber(server.server_port),
-                    password = server.password,
-                    method = server.shadowsocks_security
-                }
-            }
+            servers = {{
+                address = server.server,
+                port = tonumber(server.server_port),
+                password = server.password,
+                method = server.shadowsocks_security
+            }}
         },
         streamSettings = {
             network = server.transport,
@@ -273,19 +270,15 @@ local function vmess_outbound(server, tag)
         protocol = "vmess",
         tag = tag,
         settings = {
-            vnext = {
-                {
-                    address = server.server,
-                    port = tonumber(server.server_port),
-                    users = {
-                        {
-                            id = server.password,
-                            alterId = tonumber(server.alter_id),
-                            security = server.vmess_security
-                        }
-                    }
-                }
-            }
+            vnext = {{
+                address = server.server,
+                port = tonumber(server.server_port),
+                users = {{
+                    id = server.password,
+                    alterId = tonumber(server.alter_id),
+                    security = server.vmess_security
+                }}
+            }}
         },
         streamSettings = {
             network = server.transport,
@@ -314,19 +307,15 @@ local function vless_outbound(server, tag)
         protocol = "vless",
         tag = tag,
         settings = {
-            vnext = {
-                {
-                    address = server.server,
-                    port = tonumber(server.server_port),
-                    users = {
-                        {
-                            id = server.password,
-                            flow = flow,
-                            encryption = server.vless_encryption
-                        }
-                    }
-                }
-            }
+            vnext = {{
+                address = server.server,
+                port = tonumber(server.server_port),
+                users = {{
+                    id = server.password,
+                    flow = flow,
+                    encryption = server.vless_encryption
+                }}
+            }}
         },
         streamSettings = {
             network = server.transport,
@@ -356,14 +345,12 @@ local function trojan_outbound(server, tag)
         protocol = "trojan",
         tag = tag,
         settings = {
-            servers = {
-                {
-                    address = server.server,
-                    port = tonumber(server.server_port),
-                    password = server.password,
-                    flow = flow,
-                }
-            }
+            servers = {{
+                address = server.server,
+                port = tonumber(server.server_port),
+                password = server.password,
+                flow = flow
+            }}
         },
         streamSettings = {
             network = server.transport,
@@ -488,38 +475,28 @@ local function https_trojan_inbound()
         protocol = "trojan",
         tag = "https_inbound",
         settings = {
-            clients = {
-                {
-                    password = proxy.web_server_password,
-                    flow = proxy.trojan_tls == "xtls" and proxy.trojan_flow or nil
-                }
-            },
+            clients = {{
+                password = proxy.web_server_password,
+                flow = proxy.trojan_tls == "xtls" and proxy.trojan_flow or nil
+            }},
             fallbacks = fallbacks()
         },
         streamSettings = {
             network = "tcp",
             security = proxy.trojan_tls,
             tlsSettings = proxy.trojan_tls == "tls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
+                alpn = {"http/1.1"},
+                certificates = {{
+                    certificateFile = proxy.web_server_cert_file,
+                    keyFile = proxy.web_server_key_file
+                }}
             } or nil,
             xtlsSettings = proxy.trojan_tls == "xtls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
+                alpn = {"http/1.1"},
+                certificates = {{
+                    certificateFile = proxy.web_server_cert_file,
+                    keyFile = proxy.web_server_key_file
+                }}
             } or nil
         }
     }
@@ -531,12 +508,10 @@ local function https_vless_inbound()
         protocol = "vless",
         tag = "https_inbound",
         settings = {
-            clients = {
-                {
-                    id = proxy.web_server_password,
-                    flow = proxy.vless_tls == "xtls" and proxy.vless_flow or nil
-                }
-            },
+            clients = {{
+                id = proxy.web_server_password,
+                flow = proxy.vless_tls == "xtls" and proxy.vless_flow or nil
+            }},
             decryption = "none",
             fallbacks = fallbacks()
         },
@@ -544,26 +519,18 @@ local function https_vless_inbound()
             network = "tcp",
             security = proxy.vless_tls,
             tlsSettings = proxy.vless_tls == "tls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
+                alpn = {"http/1.1"},
+                certificates = {{
+                    certificateFile = proxy.web_server_cert_file,
+                    keyFile = proxy.web_server_key_file
+                }}
             } or nil,
             xtlsSettings = proxy.vless_tls == "xtls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
+                alpn = {"http/1.1"},
+                certificates = {{
+                    certificateFile = proxy.web_server_cert_file,
+                    keyFile = proxy.web_server_key_file
+                }}
             } or nil
         }
     }
@@ -587,8 +554,8 @@ local function dns_server_inbounds()
             protocol = "dokodemo-door",
             tag = string.format("dns_server_inbound_%d", i),
             settings = {
-                address = proxy.default_dns,
-                port = 53,
+                address = string.split(proxy.default_dns, ':')[1],
+                port = tonumber(string.split(proxy.default_dns, ':')[2]),
                 network = "tcp,udp"
             }
         })
@@ -617,9 +584,7 @@ local function dns_server_outbound()
 end
 
 local function upstream_domain_names()
-    local result = {
-        tcp_server.server,
-    }
+    local result = {tcp_server.server}
     if tcp_server.server ~= udp_server.server then
         table.insert(result, udp_server.server)
     end
@@ -653,28 +618,25 @@ local function fast_domain_rules()
 end
 
 local function dns_conf()
-    local servers = {
-        {
-            address = proxy.fast_dns,
-            port = 53,
-            domains = upstream_domain_names(),
-        },
-        proxy.default_dns
-    }
+    local servers = {{
+        address = string.split(proxy.fast_dns, ':')[1],
+        port = tonumber(string.split(proxy.fast_dns, ':')[2]),
+        domains = upstream_domain_names()
+    }}
 
     if fast_domain_rules() ~= nil then
         table.insert(servers, 2, {
-            address = proxy.fast_dns,
-            port = 53,
-            domains = fast_domain_rules(),
+            address = string.split(proxy.fast_dns, ':')[1],
+            port = tonumber(string.split(proxy.fast_dns, ':')[2]),
+            domains = fast_domain_rules()
         })
     end
 
     if secure_domain_rules() ~= nil then
         table.insert(servers, 2, {
-            address = proxy.secure_dns,
-            port = 53,
-            domains = secure_domain_rules(),
+            address = string.split(proxy.secure_dns, ':')[1],
+            port = tonumber(string.split(proxy.secure_dns, ':')[2]),
+            domains = secure_domain_rules()
         })
     end
 
@@ -688,11 +650,7 @@ local function api_conf()
     if proxy.xray_api == '1' then
         return {
             tag = "api",
-            services = {
-                "HandlerService",
-                "LoggerService",
-                "StatsService"
-            }
+            services = {"HandlerService", "LoggerService", "StatsService"}
         }
     else
         return nil
@@ -700,12 +658,7 @@ local function api_conf()
 end
 
 local function inbounds()
-    local i = {
-        http_inbound(),
-        tproxy_tcp_inbound(),
-        tproxy_udp_inbound(),
-        socks_inbound(),
-    }
+    local i = {http_inbound(), tproxy_tcp_inbound(), tproxy_udp_inbound(), socks_inbound()}
     for _, v in ipairs(dns_server_inbounds()) do
         table.insert(i, v)
     end
@@ -750,28 +703,23 @@ local function manual_tproxy_rules()
 end
 
 local function rules()
-    local result = {
-        {
-            type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
-            outboundTag = "tcp_outbound"
-        },
-        {
-            type = "field",
-            inboundTag = {"tproxy_udp_inbound"},
-            outboundTag = "udp_outbound"
-        },
-        {
-            type = "field",
-            inboundTag = dns_server_tags(),
-            outboundTag = "dns_server_outbound"
-        },
-        {
-            type = "field",
-            inboundTag = {"api"},
-            outboundTag = "api"
-        }
-    }
+    local result = {{
+        type = "field",
+        inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
+        outboundTag = "tcp_outbound"
+    }, {
+        type = "field",
+        inboundTag = {"tproxy_udp_inbound"},
+        outboundTag = "udp_outbound"
+    }, {
+        type = "field",
+        inboundTag = dns_server_tags(),
+        outboundTag = "dns_server_outbound"
+    }, {
+        type = "field",
+        inboundTag = {"api"},
+        outboundTag = "api"
+    }}
     if geoip_existence then
         if proxy.geoip_direct_code ~= nil then
             table.insert(result, 1, {
@@ -783,7 +731,8 @@ local function rules()
         end
         table.insert(result, 1, {
             type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "socks_inbound", "https_inbound", "http_inbound"},
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "socks_inbound",
+                          "https_inbound", "http_inbound"},
             outboundTag = "direct",
             ip = {"geoip:private"}
         })
@@ -794,18 +743,19 @@ local function rules()
                 type = "field",
                 inboundTag = {"tproxy_udp_inbound"},
                 outboundTag = "udp_outbound",
-                domain = secure_domain_rules(),
+                domain = secure_domain_rules()
             })
             table.insert(result, 1, {
                 type = "field",
                 inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
                 outboundTag = "tcp_outbound",
-                domain = secure_domain_rules(),
+                domain = secure_domain_rules()
             })
         end
         table.insert(result, 1, {
             type = "field",
-            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound", "http_inbound"},
+            inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound",
+                          "http_inbound"},
             outboundTag = "direct",
             domain = fast_domain_rules()
         })
@@ -817,12 +767,8 @@ local function rules()
 end
 
 local function outbounds()
-    local result = {
-        server_outbound(tcp_server, "tcp_outbound"),
-        server_outbound(udp_server, "udp_outbound"),
-        direct_outbound(),
-        dns_server_outbound()
-    }
+    local result = {server_outbound(tcp_server, "tcp_outbound"), server_outbound(udp_server, "udp_outbound"),
+                    direct_outbound(), dns_server_outbound()}
     for _, v in ipairs(manual_tproxy_outbounds()) do
         table.insert(result, v)
     end
