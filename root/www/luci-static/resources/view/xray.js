@@ -429,12 +429,12 @@ return view.extend({
         ss.addremove = true
 
         o = ss.option(form.Value, "macaddr", _("MAC Address"))
-        for (let f in load_result[2].hosts) {
-            o.value(f, `${f} (${load_result[2].hosts[f].name || load_result[2].hosts[f].ipaddrs[0]})`)
-        }
+        L.sortedKeys(load_result[2].hosts).forEach(function(mac) {
+            o.value(mac, E([], [mac, ' (', E('strong', [load_result[2].hosts[mac].name || L.toArray(load_result[2].hosts[mac].ipaddrs || load_result[2].hosts[mac].ipv4)[0] || L.toArray(load_result[2].hosts[mac].ip6addrs || load_result[2].hosts[mac].ipv6)[0] || '?']), ')']));
+        });
 
         o.datatype = "macaddr"
-        o.rmempty = true
+        o.rmempty = false
 
         o = ss.option(form.Flag, "bypassed", _("Bypass Transparent Proxy"))
         o.rmempty = true
