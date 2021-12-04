@@ -657,7 +657,7 @@ local function dns_conf()
         {
             address = string.split(proxy.fast_dns, ':')[1],
             port = tonumber(string.split(proxy.fast_dns, ':')[2]),
-            domains = upstream_domain_names()
+            domains = upstream_domain_names(),
         }
     }
 
@@ -665,7 +665,7 @@ local function dns_conf()
         table.insert(servers, 2, {
             address = string.split(proxy.fast_dns, ':')[1],
             port = tonumber(string.split(proxy.fast_dns, ':')[2]),
-            domains = fast_domain_rules()
+            domains = fast_domain_rules(),
         })
     end
 
@@ -673,7 +673,7 @@ local function dns_conf()
         table.insert(servers, 2, {
             address = string.split(proxy.secure_dns, ':')[1],
             port = tonumber(string.split(proxy.secure_dns, ':')[2]),
-            domains = secure_domain_rules()
+            domains = secure_domain_rules(),
         })
     end
 
