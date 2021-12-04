@@ -119,6 +119,8 @@ function check_resource_files(load_result) {
     }
 }
 
+
+
 return view.extend({
     load: function () {
         return Promise.all([
@@ -429,7 +431,7 @@ return view.extend({
         ss.addremove = true
 
         o = ss.option(form.Value, "macaddr", _("MAC Address"))
-        L.sortedKeys(load_result[2].hosts).forEach(function(mac) {
+        L.sortedKeys(load_result[2].hosts).forEach(function (mac) {
             o.value(mac, E([], [mac, ' (', E('strong', [load_result[2].hosts[mac].name || L.toArray(load_result[2].hosts[mac].ipaddrs || load_result[2].hosts[mac].ipv4)[0] || L.toArray(load_result[2].hosts[mac].ip6addrs || load_result[2].hosts[mac].ipv6)[0] || '?']), ')']));
         });
 
@@ -442,8 +444,8 @@ return view.extend({
         s.tab('dns', _('DNS Settings'));
 
         o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving outbound domains and following bypassed domains"))
-        o.datatype = 'ip4addr'
-        o.placeholder = "114.114.114.114"
+        o.datatype = 'string'
+        o.placeholder = "114.114.114.114:53"
 
         if (geosite_existence) {
             o = s.taboption('dns', form.DynamicList, "bypassed_domain_rules", _('Bypassed domain rules'), _('Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
@@ -453,8 +455,8 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
-        o.datatype = 'ip4addr'
-        o.placeholder = "1.1.1.1"
+        o.datatype = 'string'
+        o.placeholder = "1.1.1.1:53"
 
         if (geosite_existence) {
             o = s.taboption('dns', form.DynamicList, "forwarded_domain_rules", _('Forwarded domain rules'), _('Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href="https://xtls.github.io/config/dns.html#dnsobject">documentation</a> for details.'))
@@ -464,8 +466,9 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
-        o.datatype = 'ip4addr'
-        o.placeholder = "8.8.8.8"
+        o.datatype = 'string'
+        o.placeholder = "8.8.8.8:53"
+        o.rmempty = true
 
         s.tab('access_control', _('Transparent Proxy Rules'));
 
@@ -476,7 +479,6 @@ return view.extend({
             o.readonly = true
         }
         o.value("cn", "cn")
-        o.value("telegram", "telegram")
         o.datatype = "string"
 
         o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
