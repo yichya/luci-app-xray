@@ -64,9 +64,9 @@ gen_config_file() {
 setup_firewall() {
     /usr/bin/transparent-proxy-ipset \
         -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns)" \
+        -b "$(uci_get_by_type general wan_bp_ips) $($(uci_get_by_type general fast_dns) ｜ awk -F ':' '{print $1}')" \
         -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns)" \
+        -w "$(uci_get_by_type general wan_fw_ips) $($(uci_get_by_type general secure_dns) ｜ awk -F ':' '{print $1}')" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
     ip rule add fwmark 251 lookup 251
