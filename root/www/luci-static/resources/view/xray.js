@@ -476,7 +476,6 @@ return view.extend({
             o.readonly = true
         }
         o.value("cn", "cn")
-        o.value("telegram", "telegram")
         o.datatype = "string"
 
         o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
@@ -488,7 +487,7 @@ return view.extend({
 
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Requests to these IPs won't be forwarded through Xray."))
         o.datatype = "ip4addr"
-        o.rmempty = false
+        o.rmempty = true
 
         o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
