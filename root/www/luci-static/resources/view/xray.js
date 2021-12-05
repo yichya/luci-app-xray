@@ -487,7 +487,7 @@ return view.extend({
 
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Requests to these IPs won't be forwarded through Xray."))
         o.datatype = "ip4addr"
-        o.rmempty = true
+        o.rmempty = false
 
         o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
