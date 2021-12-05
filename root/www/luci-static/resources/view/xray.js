@@ -442,7 +442,7 @@ return view.extend({
         s.tab('dns', _('DNS Settings'));
 
         o = s.taboption('dns', form.Value, 'fast_dns', _('Fast DNS'), _("DNS for resolving outbound domains and following bypassed domains"))
-        o.datatype = 'string'
+        o.datatype = 'ip4addrport'
         o.placeholder = "114.114.114.114:53"
 
         if (geosite_existence) {
@@ -453,7 +453,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'secure_dns', _('Secure DNS'), _("DNS for resolving known polluted domains (specify forwarded domain rules here)"))
-        o.datatype = 'string'
+        o.datatype = 'ip4addrport'
         o.placeholder = "1.1.1.1:53"
 
         if (geosite_existence) {
@@ -464,7 +464,7 @@ return view.extend({
         o.rmempty = true
 
         o = s.taboption('dns', form.Value, 'default_dns', _('Default DNS'), _("DNS for resolving other sites (and Dokodemo outbound)"))
-        o.datatype = 'string'
+        o.datatype = 'ip4addrport'
         o.placeholder = "8.8.8.8:53"
 
         s.tab('access_control', _('Transparent Proxy Rules'));
@@ -476,6 +476,7 @@ return view.extend({
             o.readonly = true
         }
         o.value("cn", "cn")
+        o.value("telegram", "telegram")
         o.datatype = "string"
 
         o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
