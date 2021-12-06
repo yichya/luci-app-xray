@@ -97,7 +97,7 @@ setup_dnsmasq() {
     #echo "server=/#/127.0.0.1#${dns_port}" >> /tmp/dnsmasq.d/xray.conf
     local cur_port
     for cur_port in $(seq ${dns_port} $(expr ${dns_port} + ${dns_count})); do
-        echo "server=127.0.0.1#${cur_port}" >> /tmp/dnsmasq.d/xray.conf
+        echo "server=/#/127.0.0.1#${cur_port}" >> /tmp/dnsmasq.d/xray.conf
     done
 
     logger -st xray[$$] -p4 $(cat /tmp/dnsmasq.d/xray.conf)
