@@ -94,7 +94,7 @@ setup_dnsmasq() {
 
     echo "# Generated dnsmasq configurations by luci-app-xray" > /tmp/dnsmasq.d/xray.conf
     echo "strict-order" >> /tmp/dnsmasq.d/xray.conf
-    echo "server=/#/127.0.0.1#${dns_port}" >> /tmp/dnsmasq.d/xray.conf
+    #echo "server=/#/127.0.0.1#${dns_port}" >> /tmp/dnsmasq.d/xray.conf
     local cur_port
     for cur_port in $(seq ${dns_port} $(expr ${dns_port} + ${dns_count})); do
         echo "server=127.0.0.1#${cur_port}" >> /tmp/dnsmasq.d/xray.conf
