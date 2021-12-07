@@ -16,6 +16,8 @@ COMMIT
 -I PREROUTING 1 -m mark --mark 0xfc -j TP_SPEC_WAN_AC]]
 local lan = "-I PREROUTING 1 -i %s -j TP_SPEC_LAN_DG"
 local rules = [[-A OUTPUT -j TP_SPEC_WAN_DG
+-A TP_SPEC_LAN_AC -p udp --dport 443 -j DROP
+-A TP_SPEC_LAN_AC -p udp --dport 80 -j DROP
 -A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_bp src -j RETURN
 -A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_fw src -j TP_SPEC_WAN_FW
 -A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_ac src -j TP_SPEC_WAN_AC
