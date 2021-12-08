@@ -110,7 +110,6 @@ flush_dnsmasq() {
 }
 
 create_when_enable() {
-    [ "$(uci_get_by_type general transparent_proxy_enable)" == "1" ] || return 0
     logger -st xray[$$] -p4 "Setting dnsmasq and firewall for transparent proxy..."
     setup_dnsmasq
     setup_firewall
@@ -123,6 +122,7 @@ flush_when_disable() {
 }
 
 start_service() {
+    [ "$(uci_get_by_type general transparent_proxy_enable)" == "1" ] || return 1
     config_load $NAME
     mkdir -p /var/run /var/etc
     local xray_bin=$(uci_get_by_type general xray_bin)

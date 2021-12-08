@@ -149,24 +149,25 @@ return view.extend({
 
         o = s.taboption('general', form.Value, 'xray_bin', _('Xray Executable Path'))
 
-        o = s.taboption('general', form.ListValue, 'main_server', _('Main Server'))
+        o = s.taboption('general', form.ListValue, 'main_server', _('Main Server (TCP Server)'))
         o.datatype = "uciname"
         for (var v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
-
-        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
+        o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('UDP Server'))
+        o.value("sameasmainserver", "[Same as Main Server]")
+        for (var v of uci.sections(config_data, "servers")) {
+            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
+        }
 
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'), _('This enables DNS query forwarding and TProxy for both TCP and UDP connections.'))
 
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
         o.depends("transparent_proxy_enable", "1")
 
-        o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
+        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
         o.depends("transparent_proxy_enable", "1")
-        for (var v of uci.sections(config_data, "servers")) {
-            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
-        }
+
 
         o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
         ss = o.subsection
