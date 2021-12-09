@@ -377,6 +377,16 @@ return view.extend({
         o.rmempty = true
         o.modalonly = true
 
+        o = ss.taboption('transport', form.Flag, "health_check", _("[grpc] Health Check"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Flag, "permit_without_stream", _("[grpc][Health Check] Permit Without Stream"))
+        o.depends("health_check", "1")
+        o.rmempty = true
+        o.modalonly = true
+
         o = ss.taboption('transport', form.Value, "ws_host", _("[websocket] Host"))
         o.depends("transport", "ws")
         o.rmempty = true
