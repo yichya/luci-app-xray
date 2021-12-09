@@ -14,7 +14,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     odep[depends_field_name] = protocol_name
     if (client_side) {
         o.depends(depends_field_name, protocol_name)
-        o.value("none", "none")
+        o.value("none", "None")
     } else {
         odep["web_server_enable"] = "1"
     }
@@ -31,7 +31,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         let odep = {}
         odep[depends_field_name] = protocol_name
         odep[`${protocol_name}_tls`] = "xtls"
-        o.value("none", "none")
+        o.value("none", "None")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
         o.value("xtls-rprx-direct", "xtls-rprx-direct")
@@ -203,7 +203,7 @@ return view.extend({
 
         o = ss.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
         o.depends("protocol", "shadowsocks")
-        o.value("none", "none")
+        o.value("none", "None")
         o.value("aes-256-gcm", "aes-256-gcm")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
@@ -214,7 +214,7 @@ return view.extend({
 
         o = ss.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
         o.depends("protocol", "vmess")
-        o.value("none", "none")
+        o.value("none", "None")
         o.value("auto", "auto")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
@@ -236,7 +236,7 @@ return view.extend({
 
         o = ss.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
         o.depends("protocol", "vless")
-        o.value("none", "none")
+        o.value("none", "None")
         o.rmempty = false
         o.modalonly = true
 
@@ -255,7 +255,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
         o.depends("transport", "tcp")
-        o.value("none", _("none"))
+        o.value("none", _("None"))
         o.value("http", "HTTP")
         o.rmempty = true
         o.modalonly = true
@@ -272,7 +272,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "mkcp_guise", _("[mkcp] Fake Header Type"))
         o.depends("transport", "mkcp")
-        o.value("none", _("none"))
+        o.value("none", _("None"))
         o.value("srtp", _("VideoCall (SRTP)"))
         o.value("utp", _("BitTorrent (uTP)"))
         o.value("wechat-video", _("WechatVideo"))
@@ -335,7 +335,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "quic_security", _("[quic] Security"))
         o.depends("transport", "quic")
-        o.value("none", "none")
+        o.value("none", "None")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
         o.rmempty = false
@@ -348,7 +348,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "quic_guise", _("[quic] Fake Header Type"))
         o.depends("transport", "quic")
-        o.value("none", _("none"))
+        o.value("none", _("None"))
         o.value("srtp", _("VideoCall (SRTP)"))
         o.value("utp", _("BitTorrent (uTP)"))
         o.value("wechat-video", _("WechatVideo"))
