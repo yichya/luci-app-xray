@@ -14,7 +14,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     odep[depends_field_name] = protocol_name
     if (client_side) {
         o.depends(depends_field_name, protocol_name)
-        o.value("none", "None")
+        o.value("none", "none")
     } else {
         odep["web_server_enable"] = "1"
     }
@@ -255,7 +255,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
         o.depends("transport", "tcp")
-        o.value("none", _("None"))
+        o.value("none", _("none"))
         o.value("http", "HTTP")
         o.rmempty = true
         o.modalonly = true
@@ -272,7 +272,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "mkcp_guise", _("[mkcp] Fake Header Type"))
         o.depends("transport", "mkcp")
-        o.value("none", _("None"))
+        o.value("none", _("none"))
         o.value("srtp", _("VideoCall (SRTP)"))
         o.value("utp", _("BitTorrent (uTP)"))
         o.value("wechat-video", _("WechatVideo"))
@@ -348,7 +348,7 @@ return view.extend({
 
         o = ss.taboption('transport', form.ListValue, "quic_guise", _("[quic] Fake Header Type"))
         o.depends("transport", "quic")
-        o.value("none", _("None"))
+        o.value("none", _("none"))
         o.value("srtp", _("VideoCall (SRTP)"))
         o.value("utp", _("BitTorrent (uTP)"))
         o.value("wechat-video", _("WechatVideo"))
