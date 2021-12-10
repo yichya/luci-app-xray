@@ -9,12 +9,12 @@
 function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, client_side) {
     var o;
 
-    o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls`, _(`[${protocol_name}] Stream Security`))
+    o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls`, _(`Stream Security`))
     let odep = {}
     odep[depends_field_name] = protocol_name
     if (client_side) {
         o.depends(depends_field_name, protocol_name)
-        o.value("none", "None")
+        o.value("none", "none")
     } else {
         odep["web_server_enable"] = "1"
     }
@@ -27,11 +27,11 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     o.modalonly = true
 
     if (have_xtls) {
-        o = s.taboption(tab_name, form.ListValue, `${protocol_name}_flow`, _(`[${protocol_name}][xtls] Flow`))
+        o = s.taboption(tab_name, form.ListValue, `${protocol_name}_flow`, _(`Flow`))
         let odep = {}
         odep[depends_field_name] = protocol_name
         odep[`${protocol_name}_tls`] = "xtls"
-        o.value("none", "None")
+        o.value("none", "none")
         o.value("xtls-rprx-origin", "xtls-rprx-origin")
         o.value("xtls-rprx-origin-udp443", "xtls-rprx-origin-udp443")
         o.value("xtls-rprx-direct", "xtls-rprx-direct")
@@ -48,17 +48,17 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     }
 
     if (client_side) {
-        o = s.taboption(tab_name, form.Value, `${protocol_name}_tls_host`, _(`[${protocol_name}][tls] Server Name`))
+        o = s.taboption(tab_name, form.Value, `${protocol_name}_tls_host`, _(`Server Name`))
         o.depends(`${protocol_name}_tls`, "tls")
         o.rmempty = true
         o.modalonly = true
 
-        o = s.taboption(tab_name, form.Flag, `${protocol_name}_tls_insecure`, _(`[${protocol_name}][tls] Allow Insecure`))
+        o = s.taboption(tab_name, form.Flag, `${protocol_name}_tls_insecure`, _(`Allow Insecure`))
         o.depends(`${protocol_name}_tls`, "tls")
         o.rmempty = false
         o.modalonly = true
 
-        o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls_fingerprint`, _(`[${protocol_name}][tls] Fingerprint`))
+        o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls_fingerprint`, _(`Fingerprint`))
         o.depends(`${protocol_name}_tls`, "tls")
         o.value("", "(not set)")
         o.value("chrome", "chrome")
@@ -68,27 +68,27 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         o.rmempty = true
         o.modalonly = true
 
-        o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_tls_alpn`, _(`[${protocol_name}][tls] ALPN`))
+        o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_tls_alpn`, _(`ALPN`))
         o.depends(`${protocol_name}_tls`, "tls")
-        o.value("h2", "h2")
+        o.value("h2", "http/2")
         o.value("http/1.1", "http/1.1")
         o.rmempty = false
         o.modalonly = true
 
         if (have_xtls) {
-            o = s.taboption(tab_name, form.Value, `${protocol_name}_xtls_host`, _(`[${protocol_name}][xtls] Server Name`))
+            o = s.taboption(tab_name, form.Value, `${protocol_name}_xtls_host`, _(`Server Name`))
             o.depends(`${protocol_name}_tls`, "xtls")
             o.rmempty = true
             o.modalonly = true
 
-            o = s.taboption(tab_name, form.Flag, `${protocol_name}_xtls_insecure`, _(`[${protocol_name}][xtls] Allow Insecure`))
+            o = s.taboption(tab_name, form.Flag, `${protocol_name}_xtls_insecure`, _(`Allow Insecure`))
             o.depends(`${protocol_name}_tls`, "xtls")
             o.rmempty = false
             o.modalonly = true
 
-            o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_xtls_alpn`, _(`[${protocol_name}][xtls] ALPN`))
+            o = s.taboption(tab_name, form.DynamicList, `${protocol_name}_xtls_alpn`, _(`ALPN`))
             o.depends(`${protocol_name}_tls`, "xtls")
-            o.value("h2", "h2")
+            o.value("h2", "http/2")
             o.value("http/1.1", "http/1.1")
             o.rmempty = false
             o.modalonly = true
@@ -131,10 +131,10 @@ return view.extend({
     render: function (load_result) {
         const config_data = load_result[0];
         const { geoip_existence, geoip_size, geosite_existence, geosite_size } = check_resource_files(load_result[1]);
-        let asset_file_status = `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.`
+        let asset_file_status = _(`WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.`)
         if (geoip_existence) {
             if (geosite_existence) {
-                asset_file_status = `Asset files check: geoip.dat ${geoip_size} bytes; geosite.dat ${geosite_size} bytes. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.`
+                asset_file_status = _(`Asset files check: geoip.dat ${geoip_size} bytes; geosite.dat ${geosite_size} bytes. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.`)
             }
         }
 
@@ -187,7 +187,7 @@ return view.extend({
         o.datatype = 'port'
         o.placeholder = '443'
 
-        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
+        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / vless, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.modalonly = true
 
         ss.tab('protocol', _('Protocol Settings'));
@@ -201,9 +201,9 @@ return view.extend({
 
         add_flow_and_stream_security_conf(ss, "protocol", "protocol", "trojan", true, true)
 
-        o = ss.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
+        o = ss.taboption('protocol', form.ListValue, "shadowsocks_security", _("Encrypt Method"))
         o.depends("protocol", "shadowsocks")
-        o.value("none", "None")
+        o.value("none", "none")
         o.value("aes-256-gcm", "aes-256-gcm")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
@@ -212,16 +212,16 @@ return view.extend({
 
         add_flow_and_stream_security_conf(ss, "protocol", "protocol", "shadowsocks", false, true)
 
-        o = ss.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
+        o = ss.taboption('protocol', form.ListValue, "vmess_security", _("Encrypt Method"))
         o.depends("protocol", "vmess")
-        o.value("none", "None")
+        o.value("none", "none")
         o.value("auto", "auto")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
         o.rmempty = false
         o.modalonly = true
 
-        o = ss.taboption('protocol', form.ListValue, "vmess_alter_id", _("[vmess] AlterId"))
+        o = ss.taboption('protocol', form.ListValue, "vmess_alter_id", _("AlterID"))
         o.depends("protocol", "vmess")
         o.value(0, "0 (this enables VMessAEAD)")
         o.value(1, "1")
@@ -234,9 +234,9 @@ return view.extend({
 
         add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vmess", false, true)
 
-        o = ss.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
+        o = ss.taboption('protocol', form.ListValue, "vless_encryption", _("Encrypt Method"))
         o.depends("protocol", "vless")
-        o.value("none", "None")
+        o.value("none", "none")
         o.rmempty = false
         o.modalonly = true
 
@@ -253,146 +253,146 @@ return view.extend({
         o.value("grpc", "gRPC")
         o.rmempty = false
 
-        o = ss.taboption('transport', form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"))
+        o = ss.taboption('transport', form.ListValue, "tcp_guise", _("Fake Header Type"))
         o.depends("transport", "tcp")
-        o.value("none", _("None"))
+        o.value("none", "none")
         o.value("http", "HTTP")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.DynamicList, "http_host", _("[tcp][fake_http] Host"))
+        o = ss.taboption('transport', form.DynamicList, "http_host", _("Host"))
         o.depends("tcp_guise", "http")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.DynamicList, "http_path", _("[tcp][fake_http] Path"))
+        o = ss.taboption('transport', form.DynamicList, "http_path", _("Path"))
         o.depends("tcp_guise", "http")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.ListValue, "mkcp_guise", _("[mkcp] Fake Header Type"))
+        o = ss.taboption('transport', form.ListValue, "mkcp_guise", _("Fake Header Type"))
         o.depends("transport", "mkcp")
-        o.value("none", _("None"))
-        o.value("srtp", _("VideoCall (SRTP)"))
-        o.value("utp", _("BitTorrent (uTP)"))
-        o.value("wechat-video", _("WechatVideo"))
+        o.value("none", "none")
+        o.value("srtp", "VideoCall (SRTP)")
+        o.value("utp", "BitTorrent (uTP)")
+        o.value("wechat-video", "WechatVideo")
         o.value("dtls", "DTLS 1.2")
         o.value("wireguard", "WireGuard")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_mtu", _("[mkcp] Maximum Transmission Unit"))
+        o = ss.taboption('transport', form.Value, "mkcp_mtu", _("Maximum Transmission Unit"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 1350
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_tti", _("[mkcp] Transmission Time Interval"))
+        o = ss.taboption('transport', form.Value, "mkcp_tti", _("Transmission Time Interval"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 50
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_uplink_capacity", _("[mkcp] Uplink Capacity"))
+        o = ss.taboption('transport', form.Value, "mkcp_uplink_capacity", _("Uplink Capacity"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 5
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_downlink_capacity", _("[mkcp] Downlink Capacity"))
+        o = ss.taboption('transport', form.Value, "mkcp_downlink_capacity", _("Downlink Capacity"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 20
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_read_buffer_size", _("[mkcp] Read Buffer Size"))
+        o = ss.taboption('transport', form.Value, "mkcp_read_buffer_size", _("Read Buffer Size"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 2
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_write_buffer_size", _("[mkcp] Write Buffer Size"))
+        o = ss.taboption('transport', form.Value, "mkcp_write_buffer_size", _("Write Buffer Size"))
         o.datatype = "uinteger"
         o.depends("transport", "mkcp")
         o.default = 2
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Flag, "mkcp_congestion", _("[mkcp] Congestion Control"))
+        o = ss.taboption('transport', form.Flag, "mkcp_congestion", _("Congestion Control"))
         o.depends("transport", "mkcp")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "mkcp_seed", _("[mkcp] Seed"))
+        o = ss.taboption('transport', form.Value, "mkcp_seed", _("Seed"))
         o.depends("transport", "mkcp")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.ListValue, "quic_security", _("[quic] Security"))
+        o = ss.taboption('transport', form.ListValue, "quic_security", _("Security"))
         o.depends("transport", "quic")
-        o.value("none", "None")
+        o.value("none", "none")
         o.value("aes-128-gcm", "aes-128-gcm")
         o.value("chacha20-poly1305", "chacha20-poly1305")
         o.rmempty = false
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "quic_key", _("[quic] Key"))
+        o = ss.taboption('transport', form.Value, "quic_key", _("Key"))
         o.depends("transport", "quic")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.ListValue, "quic_guise", _("[quic] Fake Header Type"))
+        o = ss.taboption('transport', form.ListValue, "quic_guise", _("Fake Header Type"))
         o.depends("transport", "quic")
-        o.value("none", _("None"))
-        o.value("srtp", _("VideoCall (SRTP)"))
-        o.value("utp", _("BitTorrent (uTP)"))
-        o.value("wechat-video", _("WechatVideo"))
+        o.value("none", "none")
+        o.value("srtp", "VideoCall (SRTP)")
+        o.value("utp", "BitTorrent (uTP)")
+        o.value("wechat-video", "WechatVideo")
         o.value("dtls", "DTLS 1.2")
         o.value("wireguard", "WireGuard")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.DynamicList, "h2_host", _("[http2] Host"))
+        o = ss.taboption('transport', form.DynamicList, "h2_host", _("Host"))
         o.depends("transport", "h2")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "h2_path", _("[http2] Path"))
+        o = ss.taboption('transport', form.Value, "h2_path", _("Path"))
         o.depends("transport", "h2")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "grpc_service_name", _("[grpc] Service Name"))
+        o = ss.taboption('transport', form.Value, "grpc_service_name", _("Service Name"))
         o.depends("transport", "grpc")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Flag, "grpc_multi_mode", _("[grpc] Multi Mode"))
+        o = ss.taboption('transport', form.Flag, "grpc_multi_mode", _("Multi Mode"))
         o.depends("transport", "grpc")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Flag, "health_check", _("[grpc] Health Check"))
+        o = ss.taboption('transport', form.Flag, "health_check", _("Health Check"))
         o.depends("transport", "grpc")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Flag, "permit_without_stream", _("[grpc][Health Check] Permit Without Stream"))
+        o = ss.taboption('transport', form.Flag, "permit_without_stream", _("Permit Without Stream"))
         o.depends("health_check", "1")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "ws_host", _("[websocket] Host"))
+        o = ss.taboption('transport', form.Value, "ws_host", _("Host"))
         o.depends("transport", "ws")
         o.rmempty = true
         o.modalonly = true
 
-        o = ss.taboption('transport', form.Value, "ws_path", _("[websocket] Path"))
+        o = ss.taboption('transport', form.Value, "ws_path", _("Path"))
         o.depends("transport", "ws")
         o.rmempty = true
         o.modalonly = true
@@ -551,7 +551,7 @@ return view.extend({
 
         add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false)
 
-        o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
+        o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / vless, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.depends("web_server_enable", "1")
 
         o = s.taboption('xray_server', form.Value, 'web_server_address', _('Default Fallback HTTP Server'), _("Only HTTP/1.1 supported here. For HTTP/2 upstream, use Fallback Servers below"))
