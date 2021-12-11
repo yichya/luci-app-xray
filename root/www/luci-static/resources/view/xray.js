@@ -168,7 +168,6 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
         o.depends("transparent_proxy_enable", "1")
 
-
         s.tab('server', _('Server List'));
         o = s.taboption('server', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
         ss = o.subsection
