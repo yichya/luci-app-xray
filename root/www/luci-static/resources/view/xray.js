@@ -169,7 +169,8 @@ return view.extend({
         o.depends("transparent_proxy_enable", "1")
 
 
-        o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
+        s.tab('server', _('Server List'));
+        o = s.taboption('server', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
         ss = o.subsection
         ss.sortable = true
         ss.anonymous = true
