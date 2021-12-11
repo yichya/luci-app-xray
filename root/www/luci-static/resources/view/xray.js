@@ -104,11 +104,11 @@ function check_resource_files(load_result) {
     for (const f of load_result) {
         if (f.name == "geoip.dat") {
             geoip_existence = true;
-            geoip_size = f.size;
+            geoip_size = (f.size/1048576).toFixed(2);
         }
         if (f.name == "geosite.dat") {
             geosite_existence = true;
-            geosite_size = f.size;
+            geosite_size = (f.size/1048576).toFixed(2);
         }
     }
     return {
@@ -131,10 +131,10 @@ return view.extend({
     render: function (load_result) {
         const config_data = load_result[0];
         const { geoip_existence, geoip_size, geosite_existence, geosite_size } = check_resource_files(load_result[1]);
-        let asset_file_status = _(`WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.`)
+        let asset_file_status = _('WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.')
         if (geoip_existence) {
             if (geosite_existence) {
-                asset_file_status = _(`Asset files check: geoip.dat ${geoip_size} bytes; geosite.dat ${geosite_size} bytes. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.`)
+                asset_file_status = _('Asset files check: geoip.dat:')+`${geoip_size}`+_('MB; geosite.dat:')+`${geosite_size}`+_('MB. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.')
             }
         }
 
@@ -155,7 +155,7 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('UDP Server'))
-        o.value("sameasmainserver", "[Same as Main Server]")
+        o.value("sameasmainserver", _('[Same as Main Server]'))
         for (var v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
