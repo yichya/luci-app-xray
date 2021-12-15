@@ -155,8 +155,6 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
-        o = s.taboption('general', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
-
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'), _('This enables DNS query forwarding and TProxy for both TCP and UDP connections.'))
 
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
@@ -571,6 +569,46 @@ return view.extend({
         o = ss.option(form.Value, "dest", _("Destination Address"))
         o.datatype = 'hostport'
         o.rmempty = true
+
+        s.tab('extra_options', _('Extra Options'))
+       
+        o = s.taboption('extra_options', form.ListValue, 'loglevel', _('Log Level'), _('Read Xray log in "System Log" or use <code>logread</code> command.'))
+        o.value("debug")
+        o.value("info")
+        o.value("warning")
+        o.value("error")
+        o.value("none")
+        
+        o = s.taboption('extra_options', form.Flag, 'access_log', _('Enable Access Log'), _('Access log will also be written to System Log.'))
+
+        o = s.taboption('extra_options', form.Flag, 'dns_log', _('Enable DNS Log'), _('DNS log will also be written to System Log.'))
+
+        o = s.taboption('extra_options', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
+
+        o = s.taboption('extra_options', form.Value, 'handshake', _('Handshake Timeout'), _('Policy: Handshake timeout when connecting to upstream. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
+        o.datatype = 'uinteger'
+        o.placeholder = 4
+        o.default = 0
+
+        o = s.taboption('extra_options', form.Value, 'conn_idle', _('Connection Idle Timeout'), _('Policy: Close connection if no data is transferred within given timeout. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
+        o.datatype = 'uinteger'
+        o.placeholder = 300
+        o.default = 0
+
+        o = s.taboption('extra_options', form.Value, 'uplink_only', _('Uplink Only Timeout'), _('Policy: How long to wait before closing connection after server closed connection. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
+        o.datatype = 'uinteger'
+        o.placeholder = 2
+        o.default = 0
+
+        o = s.taboption('extra_options', form.Value, 'downlink_only', _('Downlink Only Timeout'), _('Policy: How long to wait before closing connection after client closed connection. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
+        o.datatype = 'uinteger'
+        o.placeholder = 5
+        o.default = 0
+
+        o = s.taboption('extra_options', form.Value, 'buffer_size', _('Buffer Size'), _('Policy: Internal cache size per connection. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
+        o.datatype = 'uinteger'
+        o.placeholder = 512
+        o.default = 0
 
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'), _('Check <code>/var/etc/xray/config.json</code> for tags of generated inbounds and outbounds. See <a href="https://xtls.github.io/config/features/multiple.html">here</a> for help'))
