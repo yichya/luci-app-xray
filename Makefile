@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=1.0.24
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -39,6 +39,10 @@ config PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 config PACKAGE_XRAY_USE_LARGE_LIMITS
 	bool "Increase Max Open Files Limit (recommended)"
 	default y
+
+config PACKAGE_XRAY_SET_RLIMIT_DATA
+	bool "Set Rlimit to limit system memory use (expermental)"
+	default n
 
 config PACKAGE_XRAY_OPTIONAL_FEATURE_365
 	bool "Include Optional Feature pull/365 (Certekim:web)"
@@ -93,6 +97,9 @@ ifdef CONFIG_PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 endif
 ifdef CONFIG_PACKAGE_XRAY_USE_LARGE_LIMITS
 	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_nofile $(1)/usr/share/xray/rlimit_nofile
+endif
+ifdef CONFIG_PACKAGE_XRAY_SET_RLIMIT_DATA
+	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_data $(1)/usr/share/xray/rlimit_data
 endif
 ifdef CONFIG_PACKAGE_XRAY_OPTIONAL_FEATURE_365
 	$(INSTALL_DATA) ./root/usr/share/xray/optional_feature_365 $(1)/usr/share/xray/optional_feature_365

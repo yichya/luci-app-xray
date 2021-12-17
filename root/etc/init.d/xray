@@ -40,6 +40,9 @@ start_xray() {
     if [ -s /usr/share/xray/rlimit_nofile ] ; then
         procd_set_param limits nofile="$(cat /usr/share/xray/rlimit_nofile)"
     fi
+    if [ -s /usr/share/xray/rlimit_data ] ; then
+        procd_set_param limits data="$(cat /usr/share/xray/rlimit_data)"
+    fi
     procd_set_param env XRAY_LOCATION_ASSET=/usr/share/xray
     procd_set_param stdout 1
     procd_set_param stderr 1
