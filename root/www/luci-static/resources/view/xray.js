@@ -101,6 +101,7 @@ function check_resource_files(load_result) {
     let geoip_size = 0;
     let geosite_existence = false;
     let geosite_size = 0;
+    let optional_features = {};
     for (const f of load_result) {
         if (f.name == "geoip.dat") {
             geoip_existence = true;
@@ -110,12 +111,16 @@ function check_resource_files(load_result) {
             geosite_existence = true;
             geosite_size = f.size;
         }
+        if (f.name.startsWith("optional_feature_")) {
+            optional_features[f.name] = true;
+        }
     }
     return {
         geoip_existence: geoip_existence,
         geoip_size: geoip_size,
         geosite_existence: geosite_existence,
         geosite_size: geosite_size,
+        optional_features: optional_features,
     }
 }
 
@@ -130,7 +135,7 @@ return view.extend({
 
     render: function (load_result) {
         const config_data = load_result[0];
-        const { geoip_existence, geoip_size, geosite_existence, geosite_size } = check_resource_files(load_result[1]);
+        const { geoip_existence, geoip_size, geosite_existence, geosite_size, optional_features } = check_resource_files(load_result[1]);
         let asset_file_status = `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.`
         if (geoip_existence) {
             if (geosite_existence) {
@@ -427,7 +432,7 @@ return view.extend({
         ss.addremove = true
 
         o = ss.option(form.Value, "macaddr", _("MAC Address"))
-        L.sortedKeys(load_result[2].hosts).forEach(function(mac) {
+        L.sortedKeys(load_result[2].hosts).forEach(function (mac) {
             o.value(mac, E([], [mac, ' (', E('strong', [load_result[2].hosts[mac].name || L.toArray(load_result[2].hosts[mac].ipaddrs || load_result[2].hosts[mac].ipv4)[0] || L.toArray(load_result[2].hosts[mac].ip6addrs || load_result[2].hosts[mac].ipv6)[0] || '?']), ')']));
         });
 
@@ -519,7 +524,7 @@ return view.extend({
 
         s.tab('xray_server', _('HTTPS Server'));
 
-        o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server"));
+        o = s.taboption('xray_server', form.Flag, 'web_server_enable', _('Enable Xray HTTPS Server'), _("This will start a HTTPS server at port 443 which serves both as an inbound for Xray and a reverse proxy web server."));
         o = s.taboption('xray_server', form.FileUpload, 'web_server_cert_file', _('Certificate File'));
         o.root_directory = "/etc/luci-uploads/xray"
         o.depends("web_server_enable", "1")
@@ -528,7 +533,7 @@ return view.extend({
         o.root_directory = "/etc/luci-uploads/xray"
         o.depends("web_server_enable", "1")
 
-        o = s.taboption('xray_server', form.ListValue, "web_server_protocol", _("Protocol"), _("Only protocols which support fallback are available"));
+        o = s.taboption('xray_server', form.ListValue, "web_server_protocol", _("Protocol"), _("Only protocols which support fallback are available."));
         o.value("vless", "VLESS")
         o.value("trojan", "Trojan")
         o.rmempty = false
@@ -570,15 +575,31 @@ return view.extend({
         o.datatype = 'hostport'
         o.rmempty = true
 
+        if (Object.keys(optional_features).length > 0) {
+            s.tab('optional_features', _('Optional Features'), _("Warning: all settings on this page are experimental, not guaranteed to be stable, and quite likely to be changed very frequently. Use at your own risk."))
+
+            if (optional_features["optional_feature_365"]) {
+                o = s.taboption('optional_features', form.Flag, 'http_server_enable', _('Enable Xray Web Server'), _("(<a href='https://github.com/XTLS/Xray-core/pull/365'>#365</a> Required) Enable built-in web server for HTTP API, static file handling and pprof. "));
+
+                o = s.taboption('optional_features', form.Value, 'http_server_port', _('Xray Web Server Port'), _("HTTP API and pprof may be sensitive so think twice before setting it as Default Fallback HTTP Server."))
+                o.depends("http_server_enable", "1")
+                o.datatype = 'port'
+                o.placeholder = '18888'
+
+                o = s.taboption('optional_features', form.Flag, 'http_server_pprof', _('Enable pprof'), _("Helpful when debugging performance issues."));
+                o.depends("http_server_enable", "1")
+            }
+        }
+
         s.tab('extra_options', _('Extra Options'))
-       
+
         o = s.taboption('extra_options', form.ListValue, 'loglevel', _('Log Level'), _('Read Xray log in "System Log" or use <code>logread</code> command.'))
         o.value("debug")
         o.value("info")
         o.value("warning")
         o.value("error")
         o.value("none")
-        
+
         o = s.taboption('extra_options', form.Flag, 'access_log', _('Enable Access Log'), _('Access log will also be written to System Log.'))
 
         o = s.taboption('extra_options', form.Flag, 'dns_log', _('Enable DNS Log'), _('DNS log will also be written to System Log.'))

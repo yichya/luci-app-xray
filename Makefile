@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.0.23
+PKG_VERSION:=1.0.24
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -39,6 +39,10 @@ config PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 config PACKAGE_XRAY_USE_LARGE_LIMITS
 	bool "Increase Max Open Files Limit (recommended)"
 	default y
+
+config PACKAGE_XRAY_OPTIONAL_FEATURE_365
+	bool "Include Optional Feature pull/365 (Certekim:web)"
+	default n
 
 endmenu
 endef
@@ -89,6 +93,9 @@ ifdef CONFIG_PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 endif
 ifdef CONFIG_PACKAGE_XRAY_USE_LARGE_LIMITS
 	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_nofile $(1)/usr/share/xray/rlimit_nofile
+endif
+ifdef CONFIG_PACKAGE_XRAY_OPTIONAL_FEATURE_365
+	$(INSTALL_DATA) ./root/usr/share/xray/optional_feature_365 $(1)/usr/share/xray/optional_feature_365
 endif
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua

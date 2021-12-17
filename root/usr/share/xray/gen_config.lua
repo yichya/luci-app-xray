@@ -14,6 +14,7 @@ local udp_server = ucursor:get_all("xray", udp_server_section)
 
 local geoip_existence = false
 local geosite_existence = false
+local optional_feature_365 = false
 
 local xray_data_file_iterator = nixiofs.dir("/usr/share/xray")
 
@@ -24,6 +25,9 @@ repeat
     end
     if fn == "geosite.dat" then
         geosite_existence = true
+    end
+    if fn == "optional_feature_365" then
+        optional_feature_365 = true
     end
 until fn == nil
 
@@ -699,6 +703,18 @@ local function api_conf()
     end
 end
 
+local function web_conf()
+    if optional_feature_365 then 
+        if proxy.http_server_enable == "1" then
+            return {
+                tag = "web",
+                pprof = proxy.http_server_pprof == "1"
+            }
+        end
+    end
+    return nil
+end
+
 local function inbounds()
     local i = {
         http_inbound(),
@@ -711,6 +727,19 @@ local function inbounds()
     end
     if proxy.web_server_enable == "1" then
         table.insert(i, https_inbound())
+    end
+    if optional_feature_365 then 
+        if proxy.http_server_enable == '1' then
+            table.insert(i, {
+                listen = "0.0.0.0",
+                port = proxy.http_server_port or 18888,
+                protocol = "dokodemo-door",
+                settings = {
+                    address = "127.0.0.1"
+                },
+                tag = "web"
+            })
+        end
     end
     if proxy.xray_api == '1' then
         table.insert(i, {
@@ -772,6 +801,15 @@ local function rules()
             outboundTag = "api"
         }
     }
+    if optional_feature_365 then
+        if proxy.http_server_enable == "1" then
+            table.insert(result, 1, {
+                type = "field",
+                inboundTag = {"web"},
+                outboundTag = "web"
+            })
+        end
+    end
     if geoip_existence then
         if proxy.geoip_direct_code ~= nil then
             table.insert(result, 1, {
@@ -864,6 +902,7 @@ local xray = {
     outbounds = outbounds(),
     dns = dns_conf(),
     api = api_conf(),
+    web = web_conf(),
     policy = policy(),
     log = logging(),
     routing = {
