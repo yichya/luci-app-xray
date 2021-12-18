@@ -44,6 +44,7 @@ start_xray() {
     procd_set_param stdout 1
     procd_set_param stderr 1
     procd_set_param file /etc/config/xray
+    procd_set_param pidfile /var/run/xray.pid
     procd_close_instance
 }
 
