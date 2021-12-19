@@ -6,6 +6,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 
 ## Warnings
 
+* There will be a series of **BREAKING CHANGES** in the following months due to some major refactor of DNS module and compatibility adjustments with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core). Please read changelog carefully to know about breaking changes and always backup your configuration files before updating.
 * If you see `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly` and don't know what to do, see [#52](https://github.com/yichya/luci-app-xray/issues/52#issuecomment-856059905)
 * This project **DOES NOT SUPPORT** LEDE 17.01 releases or OpenWrt 18.06 releases (including some old [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) versions) due to the fact that client side rendering requires LuCI client side apis shipped with OpenWrt 19.07 releases. If this is your case, use Passwall or similar projects instead (you could find links in [XTLS/Xray-core](https://github.com/XTLS/Xray-core/)).
 * For OpenWrt 19.07 releases, you need to prepare your own xray-core package (just download from [Releases · yichya/openwrt-xray](https://github.com/yichya/openwrt-xray/releases) and install that) because building Xray from source requires Go 1.15 which is currently only available in OpenWrt SNAPSHOT.
@@ -43,6 +44,8 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-11-14 feat: LAN access control for transparent proxy. Devices can be set to not being transparently proxied per MAC address.
 * 2021-11-15 feat: manual transparent proxy. A use case is accessing IPv6 only websites without any IPv6 address (for example, `192.0.2.1:443 -> tracker.byr.pt:443` and add hosts item `192.0.2.1 byr.pt`)
 * 2021-11-20 feat: alpn settings for outbound
+* 2021-11-21 fix: minor adjustments about service reloading, default DNS port, host hints, etc.
+* 2021-12-16 feat: expose log and policy settings
 
 ## Todo
 
