@@ -842,11 +842,43 @@ local function outbounds()
     return result
 end
 
+local function policy()
+    return {
+        levels = {
+            ["0"] = {
+                handshake = proxy.handshake == nil and 4 or tonumber(proxy.handshake),
+                connIdle = proxy.conn_idle == nil and 300 or tonumber(proxy.conn_idle),
+                uplinkOnly = proxy.uplink_only == nil and 2 or tonumber(proxy.uplink_only),
+                downlinkOnly = proxy.downlink_only == nil and 5 or tonumber(proxy.downlink_only),
+                bufferSize = proxy.buffer_size == nil and 4 or tonumber(proxy.buffer_size),
+                statsUserUplink = false,
+                statsUserDownlink = false,
+            }
+        },
+        system = {
+            statsInboundUplink = false,
+            statsInboundDownlink = false,
+            statsOutboundUplink = false,
+            statsOutboundDownlink = false
+        }
+    }
+end
+
+local function logging()
+    return {
+        access = proxy.access_log == "1" and "" or "none",
+        loglevel = proxy.loglevel or "warning",
+        dnsLog = proxy.dns_log == "1"
+    }
+end
+
 local xray = {
     inbounds = inbounds(),
     outbounds = outbounds(),
     dns = dns_conf(),
     api = api_conf(),
+    policy = policy(),
+    log = logging(),
     routing = {
         domainStrategy = proxy.routing_domain_strategy or "AsIs",
         rules = rules()
