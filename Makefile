@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
 PKG_VERSION:=1.0.22
-PKG_RELEASE:=5
+PKG_RELEASE:=4
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
@@ -35,10 +35,6 @@ config PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 config PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 	bool "Retry infinitely on Xray startup (may solve some startup problems)"
 	default n
-
-config PACKAGE_XRAY_USE_LARGE_LIMITS
-	bool "Increase Max Open Files Limit (recommended)"
-	default y
 
 endmenu
 endef
@@ -86,9 +82,6 @@ endif
 	$(INSTALL_DIR) $(1)/usr/share/xray
 ifdef CONFIG_PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 	$(INSTALL_DATA) ./root/usr/share/xray/infinite_retry $(1)/usr/share/xray/infinite_retry
-endif
-ifdef CONFIG_PACKAGE_XRAY_USE_LARGE_LIMITS
-	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_nofile $(1)/usr/share/xray/rlimit_nofile
 endif
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua
