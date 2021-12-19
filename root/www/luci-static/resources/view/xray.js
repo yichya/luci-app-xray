@@ -484,7 +484,6 @@ return view.extend({
             o.readonly = true
         }
         o.value("cn", "cn")
-        o.value("telegram", "telegram")
         o.datatype = "string"
 
         o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
