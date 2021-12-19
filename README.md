@@ -1,3 +1,5 @@
+# SELF USE,DON NOT ISSUSE ANY PROBLEM IN UPSTRAEM
+
 # luci-app-xray
 
 [luci-app-v2ray](https://github.com/yichya/luci-app-v2ray) refined to client side rendering (and switched to xray as well).
