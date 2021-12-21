@@ -182,7 +182,7 @@ return view.extend({
 
         o = ss.taboption('general', form.Value, 'server_port', _('Server Port'))
         o.datatype = 'port'
-        o.placeholder = '443'
+        o.default = '443'
 
         o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / vless, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.modalonly = true
