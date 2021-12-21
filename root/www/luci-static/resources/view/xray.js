@@ -369,6 +369,13 @@ return view.extend({
         o.rmempty = true
         o.modalonly = true
 
+        o = ss.taboption('transport', form.Value, "initial_windows_size", _("Initial Windows Size"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+        o.default = 0
+        o.datatype = 'range(0, 4194304)'
+
         o = ss.taboption('transport', form.Flag, "grpc_multi_mode", _("Multi Mode"))
         o.depends("transport", "grpc")
         o.rmempty = true

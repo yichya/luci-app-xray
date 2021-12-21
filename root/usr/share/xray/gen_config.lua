@@ -145,6 +145,7 @@ local function stream_grpc(server)
             return {
                 serviceName = server.grpc_service_name,
                 multiMode = server.grpc_multi_mode == "1",
+                initial_windows_size = tonumber(server.initial_windows_size),
                 idle_timeout = 10,
                 health_check_timeout = 20,
                 permit_without_stream = server.permit_without_stream == "1"
@@ -152,7 +153,8 @@ local function stream_grpc(server)
         else
             return {
                 serviceName = server.grpc_service_name,
-                multiMode = server.grpc_multi_mode == "1"
+                multiMode = server.grpc_multi_mode == "1",
+                initial_windows_size = tonumber(server.initial_windows_size)
             }
         end
     else
