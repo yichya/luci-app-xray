@@ -143,7 +143,11 @@ local function stream_grpc(server)
     if (server.transport == "grpc") then
         return {
             serviceName = server.grpc_service_name,
-            multiMode = server.grpc_multi_mode == "1"
+            multiMode = server.grpc_multi_mode == "1",
+            initial_windows_size = tonumber(server.grpc_initial_windows_size or 0),
+            idle_timeout = server.grpc_health_check == "1" and tonumber(server.grpc_idle_timeout or 10) or nil,
+            health_check_timeout = server.grpc_health_check == "1" and tonumber(server.grpc_health_check_timeout or 20) or nil,
+            permit_without_stream = server.grpc_health_check == "1" and (server.grpc_permit_without_stream == "1") or nil
         }
     else
         return nil

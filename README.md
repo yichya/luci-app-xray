@@ -46,6 +46,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-11-20 feat: alpn settings for outbound
 * 2021-11-21 fix: minor adjustments about service reloading, default DNS port, host hints, etc.
 * 2021-12-16 feat: expose log and policy settings
+* 2021-12-25 feat: grpc health check and initial window size
 
 ## Todo
 
