@@ -379,6 +379,37 @@ return view.extend({
         o.rmempty = true
         o.modalonly = true
 
+        o = ss.taboption('transport', form.Flag, "grpc_health_check", _("[grpc] Health Check"))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "grpc_idle_timeout", _("[grpc] Idle Timeout"))
+        o.depends({ "transport": "grpc", "grpc_health_check": "1" })
+        o.rmempty = true
+        o.modalonly = true
+        o.default = 10
+        o.datatype = 'integer'
+
+        o = ss.taboption('transport', form.Value, "grpc_health_check_timeout", _("[grpc] Health Check Timeout"))
+        o.depends({ "transport": "grpc", "grpc_health_check": "1" })
+        o.rmempty = true
+        o.modalonly = true
+        o.default = 20
+        o.datatype = 'integer'
+
+        o = ss.taboption('transport', form.Flag, "grpc_permit_without_stream", _("[grpc] Permit Without Stream"))
+        o.depends({ "transport": "grpc", "grpc_health_check": "1" })
+        o.rmempty = true
+        o.modalonly = true
+
+        o = ss.taboption('transport', form.Value, "grpc_initial_windows_size", _("[grpc] Initial Windows Size"), _("Set to 524288 to avoid Cloudflare sending ENHANCE_YOUR_CALM."))
+        o.depends("transport", "grpc")
+        o.rmempty = true
+        o.modalonly = true
+        o.default = 0
+        o.datatype = 'integer'
+
         o = ss.taboption('transport', form.Value, "ws_host", _("[websocket] Host"))
         o.depends("transport", "ws")
         o.rmempty = true
