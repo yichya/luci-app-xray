@@ -1,13 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.0.25
+PKG_VERSION:=1.1.0
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=yichya <mail@yichya.dev>
-
 PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -16,8 +15,8 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray
-	DEPENDS:=+luci-base +openwrt-xray +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle
-	CONFLICTS:=xray-core
+	DEPENDS:=+luci-base +xray-core +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle
+	PKGARCH:=all
 endef
 
 define Package/$(PKG_NAME)/description
@@ -56,6 +55,17 @@ endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
+if [[ ! -f $${IPKG_INSTROOT}/usr/share/xray/xray.init.replaced ]]; then
+	if [[ ! -f $${IPKG_INSTROOT}/etc/init.d/xray ]]; then
+	    echo "echo This file does nothing" > $${IPKG_INSTROOT}/etc/init.d/xray
+	fi
+	mv $${IPKG_INSTROOT}/etc/init.d/xray $${IPKG_INSTROOT}/usr/share/xray/xray.init.replaced
+	mkdir -p $${IPKG_INSTROOT}/etc/config
+	mv $${IPKG_INSTROOT}/tmp/xray.conf $${IPKG_INSTROOT}/etc/config/xray
+fi
+rm -f $${IPKG_INSTROOT}/tmp/xray.conf
+mkdir -p $${IPKG_INSTROOT}/etc/init.d
+mv $${IPKG_INSTROOT}/tmp/xray.init $${IPKG_INSTROOT}/etc/init.d/xray
 if [[ -z "$${IPKG_INSTROOT}" ]]; then
 	if [[ -f /etc/uci-defaults/xray ]]; then
 		( . /etc/uci-defaults/xray ) && rm -f /etc/uci-defaults/xray
@@ -70,15 +80,14 @@ define Package/$(PKG_NAME)/conffiles
 endef
 
 define Package/$(PKG_NAME)/install
+	$(INSTALL_DIR) $(1)/tmp
+	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/tmp/xray.init
+	$(INSTALL_DATA) ./root/etc/config/xray $(1)/tmp/xray.conf
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./root/usr/bin/transparent-proxy-ipset $(1)/usr/bin/transparent-proxy-ipset
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./root/etc/config/xray $(1)/etc/config/xray
 	$(INSTALL_DIR) $(1)/etc/luci-uploads/xray
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy-ipset $(1)/etc/hotplug.d/iface/01-transparent-proxy-ipset
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/etc/init.d/xray
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
 ifdef CONFIG_PACKAGE_XRAY_INCLUDE_CLOUDFLARE_ORIGIN_ROOT_CA
 	$(INSTALL_DATA) ./root/etc/ssl/certs/origin_ca_ecc_root.pem $(1)/etc/ssl/certs/origin_ca_ecc_root.pem
