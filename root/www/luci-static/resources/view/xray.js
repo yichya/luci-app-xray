@@ -165,6 +165,9 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
         o.depends("transparent_proxy_enable", "1")
 
+        o = s.taboption('general', form.Flag, 'route_only', _('RouteOnly'), _('If RouteOnly is enabled, requests domain only use for route,stil proxy destination IP.'))
+        o.depends("tproxy_sniffing", "1")
+
         s.tab('server', _('Server List'));
         o = s.taboption('server', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
         ss = o.subsection
