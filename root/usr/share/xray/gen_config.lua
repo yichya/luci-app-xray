@@ -31,6 +31,15 @@ repeat
     end
 until fn == nil
 
+local function split_ipv4_host_port(val, port_default)
+    local found, _, ip, port = val:find("([%d.]+):(%d+)")
+    if found == nil then
+        return val, tonumber(port_default)
+    else
+        return ip, tonumber(port)
+    end
+end
+
 local function direct_outbound()
     return {
         protocol = "freedom",
@@ -590,13 +599,14 @@ end
 local function dns_server_inbounds()
     local result = {}
     for i = proxy.dns_port, proxy.dns_port + (proxy.dns_count or 0), 1 do
+        local default_dns_ip, default_dns_port = split_ipv4_host_port(proxy.default_dns, 53)
         table.insert(result, {
             port = i,
             protocol = "dokodemo-door",
             tag = string.format("dns_server_inbound_%d", i),
             settings = {
-                address = proxy.default_dns,
-                port = 53,
+                address = default_dns_ip,
+                port = default_dns_port,
                 network = "tcp,udp"
             }
         })
@@ -661,27 +671,33 @@ local function fast_domain_rules()
 end
 
 local function dns_conf()
+    local fast_dns_ip, fast_dns_port = split_ipv4_host_port(proxy.fast_dns, 53)
+    local default_dns_ip, default_dns_port = split_ipv4_host_port(proxy.default_dns, 53)
     local servers = {
         {
-            address = proxy.fast_dns,
-            port = 53,
+            address = fast_dns_ip,
+            port = fast_dns_port,
             domains = upstream_domain_names(),
         },
-        proxy.default_dns
+        {
+            address = default_dns_ip,
+            port = default_dns_port,
+        }
     }
 
     if fast_domain_rules() ~= nil then
         table.insert(servers, 2, {
-            address = proxy.fast_dns,
-            port = 53,
+            address = fast_dns_ip,
+            port = fast_dns_port,
             domains = fast_domain_rules(),
         })
     end
 
     if secure_domain_rules() ~= nil then
+        local secure_dns_ip, secure_dns_port = split_ipv4_host_port(proxy.secure_dns, 53)
         table.insert(servers, 2, {
-            address = proxy.secure_dns,
-            port = 53,
+            address = secure_dns_ip,
+            port = secure_dns_port,
             domains = secure_domain_rules(),
         })
     end
