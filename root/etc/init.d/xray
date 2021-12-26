@@ -53,7 +53,7 @@ start_xray() {
 
 gen_config_file() {
     mkdir -p /var/etc/xray
-    rm /var/etc/xray/*
+    rm -f /var/etc/xray/*
     if [ -s /usr/share/xray/infinite_retry ] ; then
         while [ ! -s /var/etc/xray/config.json ] ; do
             logger -st xray[$$] -p4 "(Re)generating Xray configuration files..."
@@ -68,11 +68,13 @@ gen_config_file() {
 }
 
 setup_firewall() {
+    local fast_dns="$(uci_get_by_type general fast_dns)"
+    local secure_dns="$(uci_get_by_type general secure_dns)"
     /usr/bin/transparent-proxy-ipset \
         -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) $(uci_get_by_type general fast_dns)" \
+        -b "$(uci_get_by_type general wan_bp_ips) ${fast_dns%%:*}" \
         -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) $(uci_get_by_type general secure_dns)" \
+        -w "$(uci_get_by_type general wan_fw_ips) ${secure_dns%%:*}" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
     ip rule add fwmark 251 lookup 251
