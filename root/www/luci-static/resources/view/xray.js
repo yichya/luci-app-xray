@@ -72,7 +72,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
         o.depends(`${protocol_name}_tls`, "tls")
         o.value("h2", "h2")
         o.value("http/1.1", "http/1.1")
-        o.rmempty = false
+        o.rmempty = true
         o.modalonly = true
 
         if (have_xtls) {
@@ -90,7 +90,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
             o.depends(`${protocol_name}_tls`, "xtls")
             o.value("h2", "h2")
             o.value("http/1.1", "http/1.1")
-            o.rmempty = false
+            o.rmempty = true
             o.modalonly = true
         }
     }
