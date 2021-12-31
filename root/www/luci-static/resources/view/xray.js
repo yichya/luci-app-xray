@@ -165,8 +165,8 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
         o.depends("transparent_proxy_enable", "1")
 
-        o = s.taboption('general', form.Flag, 'route_only', _('RouteOnly'), _('If RouteOnly is enabled, requests domain only use for route,stil proxy destination IP.'))
-        o.depends("tproxy_sniffing", "1")
+        o = s.taboption('general', form.Flag, 'route_only', _('Route Only'), _('Use sniffed domain for routing only but still access through IP. Reduces unnecessary DNS requests. See <a href="https://github.com/XTLS/Xray-core/commit/a3023e43ef55d4498b1afbc9a7fe7b385138bb1a">here</a> for help.'))
+        o.depends({ "transparent_proxy_enable": "1", "tproxy_sniffing": "1" })
 
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
