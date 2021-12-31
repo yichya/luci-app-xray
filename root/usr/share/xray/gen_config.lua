@@ -9,8 +9,12 @@ local proxy = ucursor:get_all("xray", proxy_section)
 local tcp_server_section = arg[1] == nil and proxy.main_server or arg[1]
 local tcp_server = ucursor:get_all("xray", tcp_server_section)
 
-local udp_server_section = arg[2] == nil and proxy.tproxy_udp_server or arg[2]
-local udp_server = ucursor:get_all("xray", udp_server_section)
+if proxy.tproxy_udp_server == "sameasmainserver" then
+    udp_server = tcp_server
+else
+    local udp_server_section = arg[2] == nil and proxy.tproxy_udp_server or arg[2]
+    udp_server = ucursor:get_all("xray", udp_server_section)
+end
 
 local geoip_existence = false
 local geosite_existence = false

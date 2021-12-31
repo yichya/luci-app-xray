@@ -167,6 +167,7 @@ return view.extend({
 
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
+        o.value("sameasmainserver", _('[Same as Main Server]'))
         for (var v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
