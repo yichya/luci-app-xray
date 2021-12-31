@@ -22,6 +22,12 @@ config general
 	option tproxy_udp_server 'cfg034a8f'
 	option tproxy_sniffing '1'
 	option routing_domain_strategy 'AsIs'
+	option conn_idle '300'
+	option loglevel 'warning'
+	option handshake '4'
+	option uplink_only '2'
+	option downlink_only '5'
+	option buffer_size '512'
 
 config servers
 	option security 'auto'
