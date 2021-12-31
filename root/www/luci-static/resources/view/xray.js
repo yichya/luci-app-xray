@@ -165,6 +165,9 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
         o.depends("transparent_proxy_enable", "1")
 
+        o = s.taboption('general', form.Flag, 'route_only', _('RouteOnly'), _('If RouteOnly is enabled, requests domain only use for route,stil proxy destination IP.'))
+        o.depends("tproxy_sniffing", "1")
+
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
         o.depends("transparent_proxy_enable", "1")
         for (var v of uci.sections(config_data, "servers")) {

@@ -424,6 +424,7 @@ local function tproxy_tcp_inbound()
         tag = "tproxy_tcp_inbound",
         sniffing = proxy.tproxy_sniffing == "1" and {
             enabled = true,
+            routeOnly = proxy.route_only == "1",
             destOverride = {"http", "tls"},
             metadataOnly = false
         } or nil,
