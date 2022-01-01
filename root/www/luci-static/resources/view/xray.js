@@ -109,7 +109,7 @@ function check_resource_files(load_result) {
         }
         if (f.name == "geosite.dat") {
             geosite_existence = true;
-            geoip_size = (f.size/1048576).toFixed(2);
+            geosite_size = (f.size/1048576).toFixed(2);
         }
         if (f.name.startsWith("optional_feature_")) {
             optional_features[f.name] = true;
@@ -139,7 +139,7 @@ return view.extend({
         let asset_file_status = _('WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.')
         if (geoip_existence) {
             if (geosite_existence) {
-                asset_file_status = _('Asset files check: geoip.dat:')+`${geoip_size}`+_('MB; geosite.dat:')+`${geosite_size}`+_('MB. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.')
+                asset_file_status = _('Asset files check: geoip.dat ')+`${geoip_size}`+_(' MB; geosite.dat ')+`${geosite_size}`+_(' MB. Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.')
             }
         }
 
