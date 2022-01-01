@@ -105,23 +105,11 @@ function check_resource_files(load_result) {
     for (const f of load_result) {
         if (f.name == "geoip.dat") {
             geoip_existence = true;
-            if (f.size < 1024) {
-                geoip_size = f.size + 'Bytes';
-            }else if (f.size < 1048576 ){
-                geoip_size = (f.size/1024).toFixed(2) + 'KBytes';
-            }else if (f.size >= 1048576){
-                geoip_size = (f.size/1048576).toFixed(2) + 'MBytes';
-            }
+            geoip_size = '%.2mB'.format(f.size);
         }
         if (f.name == "geosite.dat") {
             geosite_existence = true;
-            if (f.size < 1024) {
-                geosite_size = f.size + 'Bytes';
-            }else if (f.size < 1048576 ){
-                geosite_size = (f.size/1024).toFixed(2) + 'KBytes';
-            }else if (f.size >= 1048576){
-                geosite_size = (f.size/1048576).toFixed(2) + 'MBytes';
-            }
+            geosite_size = '%.2mB'.format(f.size);
         }
         if (f.name.startsWith("optional_feature_")) {
             optional_features[f.name] = true;
@@ -151,7 +139,7 @@ return view.extend({
         let asset_file_status = _('WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.')
         if (geoip_existence) {
             if (geosite_existence) {
-                asset_file_status = _('Asset files check: geoip.dat ')+`${geoip_size}`+_(' ; geosite.dat ')+`${geosite_size}`+_(' . Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.')
+                asset_file_status = _('Asset files check: ') + `geoip.dat ${geoip_size}; geosite.dat ${geosite_size}. ` + _('Report issues or request for features <a href="https://github.com/yichya/luci-app-xray">here</a>.')
             }
         }
 
@@ -238,7 +226,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        o = ss.taboption('protocol', form.ListValue, "vmess_alter_id", _("[vmess] AlterId"))
+        o = ss.taboption('protocol', form.ListValue, "vmess_alter_id", _("[vmess] AlterId"), _("Deprecated. Make sure you always use VMessAEAD."))
         o.depends("protocol", "vmess")
         o.value(0, "0 (this enables VMessAEAD)")
         o.value(1, "1")
