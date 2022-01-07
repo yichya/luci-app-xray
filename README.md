@@ -49,6 +49,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-12-24 feat: grpc health check and initial window size
 * 2021-12-25 feat: be compatible with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core) again (by replacing its UCI configuration file and init script upon install). Still supports using [openwrt-xray](https://github.com/yichya/openwrt-xray). This should work in most cases and your previous configuration file of luci-app-xray is also preserved, but if you encounter problems please report.
 * 2021-12-26 feat: support custom DNS port
+* 2021-01-08 feat: bridge; add DomainStrategy for outbound; minor UI changes
 
 ## Todo
 

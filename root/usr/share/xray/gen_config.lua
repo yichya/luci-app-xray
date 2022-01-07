@@ -62,7 +62,7 @@ local function manual_tproxy_outbounds()
             tag = string.format("manual_tproxy_outbound_tcp_%d", i),
             settings = {
                 redirect = string.format("%s:%d", v.dest_addr, v.dest_port),
-                domainStrategy = "UseIP"
+                domainStrategy = v.domain_strategy or "UseIP"
             },
             proxySettings = v.force_forward == "1" and {
                 tag = "tcp_outbound"
@@ -73,7 +73,7 @@ local function manual_tproxy_outbounds()
             tag = string.format("manual_tproxy_outbound_udp_%d", i),
             settings = {
                 redirect = string.format("%s:%d", v.dest_addr, v.dest_port),
-                domainStrategy = "UseIP"
+                domainStrategy = v.domain_strategy or "UseIP"
             },
             proxySettings = v.force_forward == "1" and {
                 tag = "udp_outbound"
@@ -271,7 +271,7 @@ local function shadowsocks_outbound(server, tag)
             network = server.transport,
             sockopt = {
                 mark = tonumber(proxy.mark),
-                domainStrategy = "UseIP"
+                domainStrategy = server.domain_strategy or "UseIP"
             },
             security = server.shadowsocks_tls,
             tlsSettings = server.shadowsocks_tls == "tls" and tls_settings(server, "shadowsocks") or nil,
@@ -308,7 +308,7 @@ local function vmess_outbound(server, tag)
             network = server.transport,
             sockopt = {
                 mark = tonumber(proxy.mark),
-                domainStrategy = "UseIP"
+                domainStrategy = server.domain_strategy or "UseIP"
             },
             security = server.vmess_tls,
             tlsSettings = server.vmess_tls == "tls" and tls_settings(server, "vmess") or nil,
@@ -349,7 +349,7 @@ local function vless_outbound(server, tag)
             network = server.transport,
             sockopt = {
                 mark = tonumber(proxy.mark),
-                domainStrategy = "UseIP"
+                domainStrategy = server.domain_strategy or "UseIP"
             },
             security = server.vless_tls,
             tlsSettings = server.vless_tls == "tls" and tls_settings(server, "vless") or nil,
@@ -386,7 +386,7 @@ local function trojan_outbound(server, tag)
             network = server.transport,
             sockopt = {
                 mark = tonumber(proxy.mark),
-                domainStrategy = "UseIP"
+                domainStrategy = server.domain_strategy or "UseIP"
             },
             security = server.trojan_tls,
             tlsSettings = server.trojan_tls == "tls" and tls_settings(server, "trojan") or nil,
@@ -799,6 +799,57 @@ local function manual_tproxy_rules()
     return result
 end
 
+local function bridges()
+    local result = {}
+    local i = 0
+    ucursor:foreach("xray", "bridge", function(v)
+        i = i + 1
+        table.insert(result, {
+            tag = string.format("bridge_inbound_%d", i),
+            domain = v.domain
+        })
+    end)
+    return result
+end
+
+local function bridge_outbounds()
+    local result = {}
+    local i = 0
+    ucursor:foreach("xray", "bridge", function(v)
+        i = i + 1
+        local bridge_server = ucursor:get_all("xray", v.upstream)
+        table.insert(result, 1, server_outbound(bridge_server, string.format("bridge_upstream_outbound_%d", i)))
+        table.insert(result, 1, {
+            tag = string.format("bridge_freedom_outbound_%d", i),
+            protocol = "freedom",
+            settings = {
+                redirect = v.redirect
+            }
+        })
+    end)
+    return result
+end
+
+local function bridge_rules()
+    local result = {}
+    local i = 0
+    ucursor:foreach("xray", "bridge", function(v)
+        i = i + 1
+        table.insert(result, {
+            type = "field",
+            inboundTag = {string.format("bridge_inbound_%d", i)},
+            outboundTag = string.format("bridge_freedom_outbound_%d", i)
+        })
+        table.insert(result, {
+            type = "field",
+            inboundTag = {string.format("bridge_inbound_%d", i)},
+            domain = {string.format("full:%s", v.domain)},
+            outboundTag = string.format("bridge_upstream_outbound_%d", i)
+        })
+    end)
+    return result
+end
+
 local function rules()
     local result = {
         {
@@ -872,6 +923,9 @@ local function rules()
     for _, v in ipairs(manual_tproxy_rules()) do
         table.insert(result, 1, v)
     end
+    for _, v in ipairs(bridge_rules()) do
+        table.insert(result, 1, v)
+    end
     return result
 end
 
@@ -883,6 +937,9 @@ local function outbounds()
         dns_server_outbound()
     }
     for _, v in ipairs(manual_tproxy_outbounds()) do
+        table.insert(result, v)
+    end
+    for _, v in ipairs(bridge_outbounds()) do
         table.insert(result, v)
     end
     return result
@@ -926,6 +983,9 @@ local xray = {
     web = web_conf(),
     policy = policy(),
     log = logging(),
+    reverse = {
+        bridges = bridges()
+    },
     routing = {
         domainStrategy = proxy.routing_domain_strategy or "AsIs",
         rules = rules()

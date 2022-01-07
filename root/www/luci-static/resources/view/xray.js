@@ -174,9 +174,9 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
-        o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'))
+        o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'), _("Servers are referenced by index (order in the following list). Deleting servers may result in changes of upstream servers actually used by proxy and bridge."))
         ss = o.subsection
-        ss.sortable = true
+        ss.sortable = false
         ss.anonymous = true
         ss.addremove = true
 
@@ -187,6 +187,13 @@ return view.extend({
 
         o = ss.taboption('general', form.Value, 'server', _('Server Hostname'))
         o.datatype = 'host'
+
+        o = ss.taboption('general', form.ListValue, 'domain_strategy', _('Domain Strategy'))
+        o.value("UseIP")
+        o.value("UseIPv4")
+        o.value("UseIPv6")
+        o.default = "UseIP"
+        o.modalonly = true
 
         o = ss.taboption('general', form.Value, 'server_port', _('Server Port'))
         o.datatype = 'port'
@@ -458,10 +465,10 @@ return view.extend({
         o.rmempty = false
         o.nocreate = true
 
-        o = s.taboption('proxy', form.SectionValue, "access_control_lan_hosts", form.GridSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
+        o = s.taboption('proxy', form.SectionValue, "access_control_lan_hosts", form.TableSection, 'lan_hosts', _('LAN Hosts Access Control'), _("Will not enable transparent proxy for these MAC addresses."))
 
         ss = o.subsection;
-        ss.sortable = true
+        ss.sortable = false
         ss.anonymous = true
         ss.addremove = true
 
@@ -534,7 +541,7 @@ return view.extend({
         o = s.taboption('access_control', form.SectionValue, "access_control_manual_tproxy", form.GridSection, 'manual_tproxy', _('Manual Transparent Proxy'), _('Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href="https://github.com/v2ray/v2ray-core/issues/2233">FakeDNS</a> for details.'))
 
         ss = o.subsection;
-        ss.sortable = true
+        ss.sortable = false
         ss.anonymous = true
         ss.addremove = true
 
@@ -552,6 +559,13 @@ return view.extend({
         o = ss.option(form.Value, "dest_port", _("Destination Port"))
         o.datatype = "port"
         o.rmempty = true
+
+        o = ss.option(form.ListValue, 'domain_strategy', _('Domain Strategy'))
+        o.value("UseIP")
+        o.value("UseIPv4")
+        o.value("UseIPv6")
+        o.default = "UseIP"
+        o.modalonly = true
 
         o = ss.option(form.Flag, 'force_forward', _('Force Forward'), _('This destination must be forwarded through Xray. (This option might be removed later.)'))
         o.modalonly = true
@@ -588,7 +602,7 @@ return view.extend({
         o.depends("web_server_enable", "1")
 
         ss = o.subsection;
-        ss.sortable = true
+        ss.sortable = false
         ss.anonymous = true
         ss.addremove = true
 
@@ -608,22 +622,6 @@ return view.extend({
         o = ss.option(form.Value, "dest", _("Destination Address"))
         o.datatype = 'hostport'
         o.rmempty = true
-
-        if (Object.keys(optional_features).length > 0) {
-            s.tab('optional_features', _('Optional Features'), _("Warning: all settings on this page are experimental, not guaranteed to be stable, and quite likely to be changed very frequently. Use at your own risk."))
-
-            if (optional_features["optional_feature_365"]) {
-                o = s.taboption('optional_features', form.Flag, 'http_server_enable', _('Enable Xray Web Server'), _("(<a href='https://github.com/XTLS/Xray-core/pull/365'>#365</a> Required) Enable built-in web server for HTTP API, static file handling and pprof. "));
-
-                o = s.taboption('optional_features', form.Value, 'http_server_port', _('Xray Web Server Port'), _("HTTP API and pprof may be sensitive so think twice before setting it as Default Fallback HTTP Server."))
-                o.depends("http_server_enable", "1")
-                o.datatype = 'port'
-                o.placeholder = '18888'
-
-                o = s.taboption('optional_features', form.Flag, 'http_server_pprof', _('Enable pprof'), _("Helpful when debugging performance issues."));
-                o.depends("http_server_enable", "1")
-            }
-        }
 
         s.tab('extra_options', _('Extra Options'))
 
@@ -665,6 +663,42 @@ return view.extend({
         o.datatype = 'uinteger'
         o.placeholder = 512
         o.default = 512
+
+        o = s.taboption('extra_options', form.SectionValue, "xray_bridge", form.TableSection, 'bridge', _('Bridge'), _('Reverse proxy tool. Currently only client role (bridge) is supported. See <a href="https://xtls.github.io/config/reverse.html#bridgeobject">here</a> for help.'))
+
+        ss = o.subsection;
+        ss.sortable = false
+        ss.anonymous = true
+        ss.addremove = true
+
+        o = ss.option(form.ListValue, "upstream", _("Upstream"))
+        o.datatype = "uciname"
+        for (var v of uci.sections(config_data, "servers")) {
+            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
+        }
+
+        o = ss.option(form.Value, "domain", _("Domain"))
+        o.rmempty = false
+
+        o = ss.option(form.Value, "redirect", _("Redirect address"))
+        o.datatype = "hostport"
+        o.rmempty = false
+
+        if (Object.keys(optional_features).length > 0) {
+            s.tab('optional_features', _('Optional Features'), _("Warning: all settings on this page are experimental, not guaranteed to be stable, and quite likely to be changed very frequently. Use at your own risk."))
+
+            if (optional_features["optional_feature_365"]) {
+                o = s.taboption('optional_features', form.Flag, 'http_server_enable', _('Enable Xray Web Server'), _("(<a href='https://github.com/XTLS/Xray-core/pull/365'>#365</a> Required) Enable built-in web server for HTTP API, static file handling and pprof. "));
+
+                o = s.taboption('optional_features', form.Value, 'http_server_port', _('Xray Web Server Port'), _("HTTP API and pprof may be sensitive so think twice before setting it as Default Fallback HTTP Server."))
+                o.depends("http_server_enable", "1")
+                o.datatype = 'port'
+                o.placeholder = '18888'
+
+                o = s.taboption('optional_features', form.Flag, 'http_server_pprof', _('Enable pprof'), _("Helpful when debugging performance issues."));
+                o.depends("http_server_enable", "1")
+            }
+        }
 
         s.tab('custom_options', _('Custom Options'))
         o = s.taboption('custom_options', form.TextValue, 'custom_config', _('Custom Configurations'), _('Check <code>/var/etc/xray/config.json</code> for tags of generated inbounds and outbounds. See <a href="https://xtls.github.io/config/features/multiple.html">here</a> for help'))
