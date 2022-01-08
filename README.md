@@ -12,12 +12,12 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * For OpenWrt 19.07 releases, you need to prepare your own xray-core package (just download from [Releases · yichya/openwrt-xray](https://github.com/yichya/openwrt-xray/releases) and install that) because building Xray from source requires Go 1.15 which is currently only available in OpenWrt SNAPSHOT.
 * This project may change its code structure, configuration files format, user interface or dependencies quite frequently since it is still in its very early stage. 
 
-## Changelog
+## Changelog 2022
 
-* 2020-11-14 feature: basic transparent proxy function
-* 2020-11-15 fix: vless flow settings & compatible with busybox ip command
-* 2020-12-04 feature: add xtls-rprx-splice to flow
-* 2020-12-26 feature: allow to determine whether to use proxychains during build; trojan xtls flow settings
+* 2022-01-08 feat: bridge; add DomainStrategy for outbound; minor UI changes
+
+## Changelog 2021
+
 * 2021-01-01 feature: build Xray from source; various fixes about tproxy and logging
 * 2021-01-25 feature: Xray act as HTTPS server
 * 2021-01-29 fix: add ipset as dependency to fix transparent proxy problems; remove useless and faulty extra_command in init.d script
@@ -49,7 +49,12 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2021-12-24 feat: grpc health check and initial window size
 * 2021-12-25 feat: be compatible with [OpenWrt Packages: xray-core](https://github.com/openwrt/packages/tree/master/net/xray-core) again (by replacing its UCI configuration file and init script upon install). Still supports using [openwrt-xray](https://github.com/yichya/openwrt-xray). This should work in most cases and your previous configuration file of luci-app-xray is also preserved, but if you encounter problems please report.
 * 2021-12-26 feat: support custom DNS port
-* 2021-01-08 feat: bridge; add DomainStrategy for outbound; minor UI changes
+
+## Changelog 2020
+* 2020-11-14 feature: basic transparent proxy function
+* 2020-11-15 fix: vless flow settings & compatible with busybox ip command
+* 2020-12-04 feature: add xtls-rprx-splice to flow
+* 2020-12-26 feature: allow to determine whether to use proxychains during build; trojan xtls flow settings
 
 ## Todo
 
