@@ -7,9 +7,16 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 ## Warnings
 
 * There will be a series of **BREAKING CHANGES** in the following months due to some major refactor of DNS module. Please read changelog carefully to know about breaking changes and always backup your configuration files before updating.
-* If you see `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly` and don't know what to do, see [#52](https://github.com/yichya/luci-app-xray/issues/52#issuecomment-856059905)
-* This project **DOES NOT SUPPORT** LEDE 17.01 releases or OpenWrt 18.06 releases (including some old [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) versions) due to the fact that client side rendering requires LuCI client side apis shipped with OpenWrt 19.07 releases. If this is your case, use Passwall or similar projects instead (you could find links in [XTLS/Xray-core](https://github.com/XTLS/Xray-core/)).
-* For OpenWrt 19.07 releases, you need to prepare your own xray-core package (just download from [Releases · yichya/openwrt-xray](https://github.com/yichya/openwrt-xray/releases) and install that) because building Xray from source requires Go 1.15 which is currently only available in OpenWrt SNAPSHOT.
+* If you see `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly` and don't know what to do:
+    * try `opkg update && opkg install xray-geodata` (at least OpenWrt 21.02 releases)
+    * if that did't work or you are using OpenWrt 19.07 releases, see [#52](https://github.com/yichya/luci-app-xray/issues/52#issuecomment-856059905)
+* This project **DOES NOT SUPPORT** the following versions of OpenWrt due to the fact that client side rendering requires LuCI client side APIs shipped with at least OpenWrt 19.07 releases. 
+    * LEDE 17.01
+    * OpenWrt 18.06
+    * [Lean's OpenWrt Source](https://github.com/coolsnowwolf/lede) (which uses a variant of LuCI shipped with OpenWrt 18.06)
+
+    If this is your case, use Passwall or similar projects instead (you could find links in [XTLS/Xray-core](https://github.com/XTLS/Xray-core/)).
+* For OpenWrt 19.07 releases, you need to prepare your own xray-core package (just download from [Releases · yichya/openwrt-xray](https://github.com/yichya/openwrt-xray/releases) and install that) because building Xray from source requires Go 1.17 which is currently only available in at least OpenWrt 21.02 releases.
 * This project may change its code structure, configuration files format, user interface or dependencies quite frequently since it is still in its very early stage. 
 
 ## Changelog 2022
