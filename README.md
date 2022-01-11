@@ -2,14 +2,14 @@
 
 [luci-app-v2ray](https://github.com/yichya/luci-app-v2ray) refined to client side rendering (and switched to xray as well).
 
-Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple protocols support, DNS server, even HTTPS reverse proxy server for actual HTTP services) while keeping thin and elegant.
+Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple protocols support, DNS server, bridge (reverse proxy), even HTTPS proxy server for actual HTTP services) while keeping thin and elegant.
 
 ## Warnings
 
 * There will be a series of **BREAKING CHANGES** in the following months due to some major refactor of DNS module. Please read changelog carefully to know about breaking changes and always backup your configuration files before updating.
 * If you see `WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly` and don't know what to do:
     * try `opkg update && opkg install xray-geodata` (at least OpenWrt 21.02 releases)
-    * if that did't work or you are using OpenWrt 19.07 releases, see [#52](https://github.com/yichya/luci-app-xray/issues/52#issuecomment-856059905)
+    * if that doesn't work or you are using OpenWrt 19.07 releases, see [#52](https://github.com/yichya/luci-app-xray/issues/52#issuecomment-856059905)
 * This project **DOES NOT SUPPORT** the following versions of OpenWrt due to the fact that client side rendering requires LuCI client side APIs shipped with at least OpenWrt 19.07 releases. 
     * LEDE 17.01
     * OpenWrt 18.06
