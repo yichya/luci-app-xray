@@ -77,20 +77,12 @@ setup_firewall() {
         -w "$(uci_get_by_type general wan_fw_ips) ${secure_dns%%:*}" \
         -a "$(config_foreach get_lan_hosts lan_hosts)"
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
-    ip rule add fwmark 251 lookup 251
-    ip rule add fwmark 252 lookup 252
-    ip route add local default dev lo table 251
-    ip route add local default dev lo table 252
     /etc/init.d/firewall restart > /dev/null 2>&1
 }
 
 flush_firewall() {
     /usr/bin/lua ${FIREWALL_INCLUDE} flush > $(uci get firewall.xray.path)
     /etc/init.d/firewall restart > /dev/null 2>&1
-    ip rule del fwmark 251 lookup 251
-    ip rule del fwmark 252 lookup 252
-    ip route del local default dev lo table 251
-    ip route del local default dev lo table 252
     /usr/bin/transparent-proxy-ipset -f
 }
 

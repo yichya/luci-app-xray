@@ -1,10 +1,18 @@
 #!/usr/bin/lua
 local ucursor = require "luci.model.uci"
-local json = require "luci.jsonc"
 
-local flush = [[# firewall include file
+local flush = [[# firewall include file to stop transparent proxy
+ip rule del fwmark 251 lookup 251
+ip rule del fwmark 252 lookup 252
+ip route del local default dev lo table 251
+ip route del local default dev lo table 252
 iptables-save -c | grep -v "TP_SPEC" | iptables-restore -c]]
-local header = [[iptables-restore -n <<-EOF
+local header = [[# firewall include file to start transparent proxy
+ip rule add fwmark 251 lookup 251
+ip rule add fwmark 252 lookup 252
+ip route add local default dev lo table 251
+ip route add local default dev lo table 252
+iptables-restore -n <<-EOF
 *nat
 COMMIT
 *mangle
