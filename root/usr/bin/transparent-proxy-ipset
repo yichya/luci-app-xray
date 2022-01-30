@@ -38,8 +38,8 @@ flush_rules() {
 }
 
 gen_lan_host_ipset_entry() {
-    logger_level 6 "gen_lan_host_ipset_entry"
-    for host in "${LAN_HOSTS}"; do
+    logger_level 6 "gen_lan_host_ipset_entry ${LAN_HOSTS}"
+    for host in ${LAN_HOSTS}; do
         case "${host:0:1}" in
             n|N)
                 echo add tp_spec_src_ac ${host:2}
