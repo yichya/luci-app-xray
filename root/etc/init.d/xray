@@ -8,25 +8,9 @@ NAME=xray
 GENERATE_CONF="/usr/share/xray/gen_config.lua"
 FIREWALL_INCLUDE="/usr/share/xray/firewall_include.lua"
 
-uci_get_by_name() {
-    local ret=$(uci get ${NAME}.$1.$2 2> /dev/null)
-    echo ${ret:=$3}
-}
-
 uci_get_by_type() {
     local ret=$(uci get ${NAME}.@$1[0].$2 2> /dev/null)
     echo ${ret:=$3}
-}
-
-uci_bool_by_name() {
-    case "$(uci_get_by_name $1 $2)" in
-        1 | on | true | yes | enabled) return 0 ;;
-    esac
-    return 1
-}
-
-get_lan_hosts() {
-    uci_bool_by_name $1 bypassed && echo "b,$(uci_get_by_name $1 macaddr)"
 }
 
 start_xray() {
@@ -68,22 +52,29 @@ gen_config_file() {
 }
 
 setup_firewall() {
-    local fast_dns="$(uci_get_by_type general fast_dns)"
-    local secure_dns="$(uci_get_by_type general secure_dns)"
-    /usr/bin/transparent-proxy-ipset \
-        -B "$(uci_get_by_type general wan_bp_list)" \
-        -b "$(uci_get_by_type general wan_bp_ips) ${fast_dns%%:*}" \
-        -W "$(uci_get_by_type general wan_fw_list)" \
-        -w "$(uci_get_by_type general wan_fw_ips) ${secure_dns%%:*}" \
-        -a "$(config_foreach get_lan_hosts lan_hosts)"
+    logger -st xray[$$] -p4 "Setting ipset rules..."
+    lua /usr/share/xray/gen_ipset_rules.lua | ipset -! restore
+    /etc/hotplug.d/iface/01-transparent-proxy-ipset
+
+    logger -st xray[$$] -p4 "Generating firewall rules..."
     /usr/bin/lua ${FIREWALL_INCLUDE} enable > $(uci get firewall.xray.path)
+
+    logger -st xray[$$] -p4 "Triggering firewall restart..."
     /etc/init.d/firewall restart > /dev/null 2>&1
 }
 
 flush_firewall() {
+    logger -st xray[$$] -p4 "Flushing firewall rules..."
     /usr/bin/lua ${FIREWALL_INCLUDE} flush > $(uci get firewall.xray.path)
+
+    logger -st xray[$$] -p4 "Triggering firewall restart..."
     /etc/init.d/firewall restart > /dev/null 2>&1
-    /usr/bin/transparent-proxy-ipset -f
+
+    logger -st xray[$$] -p4 "Flushing ipset rules..."
+    for setname in $(ipset -n list | grep "tp_spec"); do
+        ipset -! destroy $setname
+    done
+    /etc/hotplug.d/iface/01-transparent-proxy-ipset
 }
 
 setup_dnsmasq() {
