@@ -1,0 +1,278 @@
+#!/usr/bin/lua
+
+local json = require("luci.jsonc")
+local pb = require("pb")
+local test_net = {"192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24"}
+local private_append = {"255.255.255.255/32"}
+
+local function read_file(path)
+    local file = io.open(path, "rb")
+    if not file then
+        return nil
+    end
+    local content = file:read("*a")
+    file:close()
+    return content
+end
+
+local function render_ipv4(ip, prefix)
+    local b0 = string.byte(ip, 1) or 0
+    local b1 = string.byte(ip, 2) or 0
+    local b2 = string.byte(ip, 3) or 0
+    local b3 = string.byte(ip, 4) or 0
+    return string.format("%d.%d.%d.%d/%d", b0, b1, b2, b3, prefix)
+end
+
+local function render_ipv6(ip, prefix)
+    local b0 = (string.byte(ip, 1) or 0) * 256 + (string.byte(ip, 2) or 0)
+    local b1 = (string.byte(ip, 3) or 0) * 256 + (string.byte(ip, 4) or 0)
+    local b2 = (string.byte(ip, 5) or 0) * 256 + (string.byte(ip, 6) or 0)
+    local b3 = (string.byte(ip, 7) or 0) * 256 + (string.byte(ip, 8) or 0)
+    local b4 = (string.byte(ip, 9) or 0) * 256 + (string.byte(ip, 10) or 0)
+    local b5 = (string.byte(ip, 11) or 0) * 256 + (string.byte(ip, 12) or 0)
+    local b6 = (string.byte(ip, 13) or 0) * 256 + (string.byte(ip, 14) or 0)
+    local b7 = (string.byte(ip, 15) or 0) * 256 + (string.byte(ip, 16) or 0)
+    local full = string.format("%x:%x:%x:%x:%x:%x:%x:%x/%d", b0, b1, b2, b3, b4, b5, b6, b7, prefix)
+    full = full:gsub(":[:0]+", "::", 1)
+    full = full:gsub("^0::", "::", 1)
+    return full
+end
+
+local methods = {
+    list_geoip_codes = {
+        call = function()
+            local geoip_list = assert(pb.decode("GeoIPList", read_file("/usr/share/xray/geoip.dat")))
+            local geoip_codes = {}
+            for _, x in ipairs(geoip_list.entry) do
+                table.insert(geoip_codes, x.country_code)
+            end
+            return {
+                result = geoip_codes
+            }
+        end
+    },
+    list_geosite_codes = {
+        call = function()
+            local geoip_list = assert(pb.decode("GeoSiteList", read_file("/usr/share/xray/geosite.dat")))
+            local geoip_codes = {}
+            for _, x in ipairs(geoip_list.entry) do
+                table.insert(geoip_codes, x.country_code)
+            end
+            return {
+                result = geoip_codes
+            }
+        end
+    },
+    get_geoip_data_by_code = {
+        args = {
+            code = "CN",
+            offset = 0,
+            limit = 100
+        },
+        call = function(args)
+            if args.code == nil then
+                return {}
+            end
+            local offset = args.offset
+            if offset == nil then
+                offset = 0
+            end
+            local limit = args.limit
+            if limit == nil then
+                limit = 100
+            end
+            local total = 0
+            local geoip_list = assert(pb.decode("GeoIPList", read_file("/usr/share/xray/geoip.dat")))
+            local geoip_code_list = {}
+            local reverse_match = nil
+            local name_upper = args.code:upper()
+            for _, x in ipairs(geoip_list.entry) do
+                if x.country_code == name_upper then
+                    reverse_match = x.reverse_match
+                    for index, y in ipairs(x.cidr) do
+                        total = total + 1
+                        if index > offset then
+                            if index <= offset + limit then
+                                if string.byte(y.ip, 16) == nil then
+                                    table.insert(geoip_code_list, render_ipv4(y.ip, y.prefix))
+                                else
+                                    table.insert(geoip_code_list, render_ipv6(y.ip, y.prefix))
+                                end
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+            return {
+                result = geoip_code_list,
+                reverse_match = reverse_match,
+                pagination = {
+                    offset = offset,
+                    limit = limit,
+                    total = total
+                }
+            }
+        end
+    },
+    get_geosite_data_by_code = {
+        args = {
+            code = "CN",
+            offset = 0,
+            limit = 100
+        },
+        call = function(args)
+            if args.code == nil then
+                return {}
+            end
+            local offset = args.offset
+            if offset == nil then
+                offset = 0
+            end
+            local limit = args.limit
+            if limit == nil then
+                limit = 100
+            end
+            local total = 0
+            local geosite_list = assert(pb.decode("GeoSiteList", read_file("/usr/share/xray/geosite.dat")))
+            local geosite_code_list = {}
+            local name_upper = args.code:upper()
+            for _, x in ipairs(geosite_list.entry) do
+                if x.country_code == name_upper then
+                    for index, y in ipairs(x.domain) do
+                        total = total + 1
+                        if index > offset then
+                            if index <= offset + limit then
+                                table.insert(geosite_code_list, y)
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+            return {
+                result = geosite_code_list,
+                pagination = {
+                    offset = offset,
+                    limit = limit,
+                    total = total
+                }
+            }
+        end
+    }
+}
+
+local function parseInput()
+    local parse = json.new()
+    local done, err
+
+    while true do
+        local chunk = io.read(4096)
+        if not chunk then
+            break
+        elseif not done and not err then
+            done, err = parse:parse(chunk)
+        end
+    end
+
+    if not done then
+        print(json.stringify({
+            error = err or "Incomplete input"
+        }))
+        os.exit(1)
+    end
+
+    return parse:get()
+end
+
+local function validateArgs(func, uargs)
+    local method = methods[func]
+    if not method then
+        print(json.stringify({
+            error = "Method not found"
+        }))
+        os.exit(1)
+    end
+
+    if type(uargs) ~= "table" then
+        print(json.stringify({
+            error = "Invalid arguments"
+        }))
+        os.exit(1)
+    end
+
+    uargs.ubus_rpc_session = nil
+
+    local k, v
+    local margs = method.args or {}
+    for k, v in pairs(uargs) do
+        if margs[k] == nil or (v ~= nil and type(v) ~= type(margs[k])) then
+            print(json.stringify({
+                error = "Invalid arguments"
+            }))
+            os.exit(1)
+        end
+    end
+
+    return method
+end
+
+local function generate_rule(data, name, ipset, append, remove)
+    if name == nil then
+        return
+    end
+    local name_upper = name:upper()
+    for _, x in ipairs(data.entry) do
+        if x.country_code == name_upper then
+            for _, y in ipairs(x.cidr) do
+                if string.byte(y.ip, 16) == nil then
+                    local cidr = render_ipv4(y.ip, y.prefix)
+                    local skip = false
+                    for _, x in ipairs(remove) do
+                        if x == cidr then
+                            skip = true
+                            break
+                        end
+                    end
+                    if not skip then
+                        print(string.format("add %s %s", ipset, render_ipv4(y.ip, y.prefix, ipset)))
+                    end
+                end
+            end
+        end
+    end
+    for _, x in ipairs(append) do
+        print(string.format("add %s %s", ipset, x))
+    end
+end
+
+pb.load(read_file("/usr/share/xray/geoip_list.pb"))
+
+if arg == nil then
+    arg = {}
+end
+if arg[1] == "list" then
+    local _, method, rv = nil, nil, {}
+    for _, method in pairs(methods) do
+        rv[_] = method.args or {}
+    end
+    print((json.stringify(rv):gsub(":%[%]", ":{}")))
+elseif arg[1] == "call" then
+    local args = parseInput()
+    local method = validateArgs(arg[2], args)
+    local result, code = method.call(args)
+    print((json.stringify(result):gsub("^%[%]$", "{}")))
+    os.exit(code or 0)
+else
+    return function(proxy)
+        local geoip_list = assert(pb.decode("GeoIPList", read_file("/usr/share/xray/geoip.dat")))
+        local private_remove = test_net
+        if proxy.geoip_private_append_test_net == "1" then
+            private_remove = {}
+        end
+        generate_rule(geoip_list, "PRIVATE", "tp_spec_dst_sp", private_append, private_remove)
+        if proxy.geoip_direct_ipset == "1" then
+            generate_rule(geoip_list, proxy.geoip_direct_code, "tp_spec_dst_sp", {}, {})
+        end
+    end
+end

@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.11.0
+PKG_VERSION:=1.99.0
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -15,7 +15,7 @@ define Package/$(PKG_NAME)
 	SECTION:=Custom
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray
-	DEPENDS:=+luci-base +xray-core +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle
+	DEPENDS:=+luci-base +xray-core +dnsmasq +ipset +firewall +iptables +iptables-mod-tproxy +ca-bundle +@PACKAGE_XRAY_INCLUDE_GEODATA_BROWSER:xray-geodata +@PACKAGE_XRAY_INCLUDE_GEODATA_BROWSER:lua-protobuf
 	PKGARCH:=all
 endef
 
@@ -49,6 +49,10 @@ choice
 	config PACKAGE_XRAY_RLIMIT_DATA_LARGE
 		bool "Large limit (about 210MB)"
 endchoice
+
+config PACKAGE_XRAY_INCLUDE_GEODATA_BROWSER
+	bool "Include GeoIP and GeoSite Browser"
+	default n
 
 endmenu
 endef
@@ -115,11 +119,17 @@ ifdef CONFIG_PACKAGE_XRAY_RLIMIT_DATA_LARGE
 	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_data_large $(1)/usr/share/xray/rlimit_data
 endif
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules.lua $(1)/usr/share/xray/gen_ipset_rules.lua
-	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules_extra_normal.lua $(1)/usr/share/xray/gen_ipset_rules_extra.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua
 	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
 	$(INSTALL_BIN) ./root/usr/libexec/rpcd/xray $(1)/usr/libexec/rpcd/xray
+ifdef CONFIG_PACKAGE_XRAY_INCLUDE_GEODATA_BROWSER
+	$(INSTALL_DATA) ./root/usr/share/xray/geoip_list.pb $(1)/usr/share/xray/geoip_list.pb
+	$(INSTALL_BIN) ./root/usr/libexec/rpcd/geodata $(1)/usr/libexec/rpcd/geodata
+	$(LN) ../../libexec/rpcd/geodata $(1)/usr/share/xray/gen_ipset_rules_extra.lua
+else
+	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules_extra_normal.lua $(1)/usr/share/xray/gen_ipset_rules_extra.lua
+endif
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
