@@ -480,8 +480,10 @@ return view.extend({
         o.datatype = "macaddr"
         o.rmempty = false
 
-        o = ss.option(form.Flag, "bypassed", _("Bypass Transparent Proxy"))
-        o.rmempty = true
+        o = ss.option(form.ListValue, "bypassed", _("Access Control Strategy"))
+        o.value("0", "Always forwarded")
+        o.value("1", "Always bypassed")
+        o.rmempty = false
 
         s.tab('dns', _('DNS Settings'));
 

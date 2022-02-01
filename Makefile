@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.3.1
+PKG_VERSION:=1.4.0
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -83,8 +83,6 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/tmp
 	$(INSTALL_BIN) ./root/etc/init.d/xray $(1)/tmp/xray.init
 	$(INSTALL_DATA) ./root/etc/config/xray $(1)/tmp/xray.conf
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) ./root/usr/bin/transparent-proxy-ipset $(1)/usr/bin/transparent-proxy-ipset
 	$(INSTALL_DIR) $(1)/etc/luci-uploads/xray
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) ./root/etc/hotplug.d/iface/01-transparent-proxy-ipset $(1)/etc/hotplug.d/iface/01-transparent-proxy-ipset
@@ -113,6 +111,8 @@ endif
 ifdef CONFIG_PACKAGE_XRAY_OPTIONAL_FEATURE_365
 	$(INSTALL_DATA) ./root/usr/share/xray/optional_feature_365 $(1)/usr/share/xray/optional_feature_365
 endif
+	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules.lua $(1)/usr/share/xray/gen_ipset_rules.lua
+	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules_extra_normal.lua $(1)/usr/share/xray/gen_ipset_rules_extra.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua
 endef
