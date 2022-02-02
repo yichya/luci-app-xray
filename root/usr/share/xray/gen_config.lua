@@ -52,6 +52,13 @@ local function direct_outbound()
     }
 end
 
+local function blackhole_outbound()
+    return {
+        tag = "blackhole_outbound",
+        protocol = "blackhole"
+    }
+end
+
 local function manual_tproxy_outbounds()
     local result = {}
     local i = 0
@@ -671,9 +678,14 @@ local function fast_domain_rules()
     return domain_rules("bypassed_domain_rules")
 end
 
+local function blocked_domain_rules()
+    return domain_rules("blocked_domain_rules")
+end
+
 local function dns_conf()
     local fast_dns_ip, fast_dns_port = split_ipv4_host_port(proxy.fast_dns, 53)
     local default_dns_ip, default_dns_port = split_ipv4_host_port(proxy.default_dns, 53)
+    local hosts = {}
     local servers = {
         {
             address = fast_dns_ip,
@@ -703,7 +715,14 @@ local function dns_conf()
         })
     end
 
+    if blocked_domain_rules() ~= nil then
+        for _, rule in ipairs(blocked_domain_rules()) do
+            hosts[rule] = "100::/64"
+        end
+    end
+
     return {
+        hosts = hosts,
         servers = servers,
         tag = "dns_conf_inbound"
     }
@@ -908,9 +927,17 @@ local function rules()
             })
             table.insert(result, 1, {
                 type = "field",
-                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+                inboundTag = {"tproxy_tcp_inbound", "dns_conf_inbound"},
                 outboundTag = "tcp_outbound",
                 domain = secure_domain_rules(),
+            })
+        end
+        if blocked_domain_rules() ~= nil then
+            table.insert(result, 1, {
+                type = "field",
+                inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
+                outboundTag = "blackhole_outbound",
+                domain = blocked_domain_rules(),
             })
         end
         table.insert(result, 1, {
@@ -934,7 +961,8 @@ local function outbounds()
         server_outbound(tcp_server, "tcp_outbound"),
         server_outbound(udp_server, "udp_outbound"),
         direct_outbound(),
-        dns_server_outbound()
+        dns_server_outbound(),
+        blackhole_outbound()
     }
     for _, v in ipairs(manual_tproxy_outbounds()) do
         table.insert(result, v)

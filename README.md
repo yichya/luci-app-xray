@@ -23,7 +23,8 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 
 * 2022-01-08 feat: bridge; add DomainStrategy for outbound; minor UI changes
 * 2022-01-31 fix: multiple hosts in lan access control; simplify init script
-* 2022-02-02 feat: refactor transparent-proxy-ipset to use lua
+* 2022-02-01 feat: refactor transparent-proxy-ipset to use lua
+* 2022-02-02 feat: return certain domain names as NXDOMAIN
 
 ## Changelog 2021
 
