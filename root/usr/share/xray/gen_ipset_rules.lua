@@ -6,6 +6,18 @@ local proxy_section = ucursor:get_first("xray", "general")
 local proxy = ucursor:get_all("xray", proxy_section)
 local gen_ipset_rules_extra = dofile("/usr/share/xray/gen_ipset_rules_extra.lua")
 
+local create_ipset_rules = [[create tp_spec_src_ac hash:mac hashsize 64
+create tp_spec_src_bp hash:mac hashsize 64
+create tp_spec_src_fw hash:mac hashsize 64
+create tp_spec_dst_sp hash:net hashsize 64
+create tp_spec_dst_bp hash:net hashsize 64
+create tp_spec_dst_fw hash:net hashsize 64
+create tp_spec_def_gw hash:net hashsize 64]]
+
+local function create_ipset()
+    print(create_ipset_rules)
+end
+
 local function split_ipv4_host_port(val, port_default)
     local found, _, ip, port = val:find("([%d.]+):(%d+)")
     if found == nil then
@@ -58,13 +70,7 @@ local function dns_ips()
     print(string.format("add tp_spec_dst_fw %s", secure_dns_ip))
 end
 
-print([[create tp_spec_src_ac hash:mac hashsize 64
-create tp_spec_src_bp hash:mac hashsize 64
-create tp_spec_src_fw hash:mac hashsize 64
-create tp_spec_dst_sp hash:net hashsize 64
-create tp_spec_dst_bp hash:net hashsize 64
-create tp_spec_dst_fw hash:net hashsize 64
-create tp_spec_def_gw hash:net hashsize 64]])
+create_ipset()
 dns_ips()
 lan_access_control()
 iterate_list("wan_bp_ips", "tp_spec_dst_bp")
