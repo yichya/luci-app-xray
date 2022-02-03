@@ -25,6 +25,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2022-01-31 fix: multiple hosts in lan access control; simplify init script
 * 2022-02-01 feat: refactor transparent-proxy-ipset to use lua
 * 2022-02-02 feat: return certain domain names as NXDOMAIN
+* 2022-02-03 fix: failed to start Xray when blocked domain list is empty
 
 ## Changelog 2021
 
