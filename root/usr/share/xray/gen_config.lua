@@ -685,7 +685,7 @@ end
 local function dns_conf()
     local fast_dns_ip, fast_dns_port = split_ipv4_host_port(proxy.fast_dns, 53)
     local default_dns_ip, default_dns_port = split_ipv4_host_port(proxy.default_dns, 53)
-    local hosts = {}
+    local hosts = nil
     local servers = {
         {
             address = fast_dns_ip,
@@ -716,6 +716,7 @@ local function dns_conf()
     end
 
     if blocked_domain_rules() ~= nil then
+        hosts = {}
         for _, rule in ipairs(blocked_domain_rules()) do
             hosts[rule] = "100::/64"
         end
