@@ -12,7 +12,7 @@ config general
 	option default_dns '1.1.1.1'
 	list bypassed_domain_rules 'geosite:cn'
 	list forwarded_domain_rules 'geosite:geolocation-!cn'
-	list blocked_domain_rules 'geosite:category-ads-all'
+	list blocked_domain_rules 'geosite:category-ads'
 	option transparent_proxy_enable '1'
 	option wan_bp_list '/dev/null'
 	option lan_target 'TP_SPEC_WAN_AC'
