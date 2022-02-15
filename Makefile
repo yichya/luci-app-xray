@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.5.2
+PKG_VERSION:=1.6.0
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -35,13 +35,20 @@ config PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 	bool "Retry infinitely on Xray startup (may solve some startup problems)"
 	default n
 
-config PACKAGE_XRAY_USE_LARGE_LIMITS
+config PACKAGE_XRAY_RLIMIT_NOFILE_LARGE
 	bool "Increase Max Open Files Limit (recommended)"
 	default y
 
-config PACKAGE_XRAY_SET_RLIMIT_DATA
-	bool "Set Rlimit to limit system memory use (expermental)"
-	default n
+choice
+	prompt "Limit memory use by setting rlimit_data (experimental)"
+	default PACKAGE_XRAY_RLIMIT_DATA_UNLIMITED
+	config PACKAGE_XRAY_RLIMIT_DATA_UNLIMITED
+		bool "Not limited"
+	config PACKAGE_XRAY_RLIMIT_DATA_SMALL
+		bool "Small limit (about 50MB)"
+	config PACKAGE_XRAY_RLIMIT_DATA_LARGE
+		bool "Large limit (about 130MB)"
+endchoice
 
 config PACKAGE_XRAY_OPTIONAL_FEATURE_365
 	bool "Include Optional Feature pull/365 (Certekim:web)"
@@ -102,11 +109,14 @@ endif
 ifdef CONFIG_PACKAGE_XRAY_INFINITE_RETRY_ON_STARTUP
 	$(INSTALL_DATA) ./root/usr/share/xray/infinite_retry $(1)/usr/share/xray/infinite_retry
 endif
-ifdef CONFIG_PACKAGE_XRAY_USE_LARGE_LIMITS
-	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_nofile $(1)/usr/share/xray/rlimit_nofile
+ifdef CONFIG_PACKAGE_XRAY_RLIMIT_NOFILE_LARGE
+	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_nofile_large $(1)/usr/share/xray/rlimit_nofile
 endif
-ifdef CONFIG_PACKAGE_XRAY_SET_RLIMIT_DATA
-	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_data $(1)/usr/share/xray/rlimit_data
+ifdef CONFIG_PACKAGE_XRAY_RLIMIT_DATA_SMALL
+	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_data_small $(1)/usr/share/xray/rlimit_data
+endif
+ifdef CONFIG_PACKAGE_XRAY_RLIMIT_DATA_LARGE
+	$(INSTALL_DATA) ./root/usr/share/xray/rlimit_data_large $(1)/usr/share/xray/rlimit_data
 endif
 ifdef CONFIG_PACKAGE_XRAY_OPTIONAL_FEATURE_365
 	$(INSTALL_DATA) ./root/usr/share/xray/optional_feature_365 $(1)/usr/share/xray/optional_feature_365
