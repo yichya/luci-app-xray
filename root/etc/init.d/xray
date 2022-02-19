@@ -13,6 +13,12 @@ uci_get_by_type() {
     echo ${ret:=$3}
 }
 
+log_procd_set_param() {
+    local type="$1"
+    shift
+    logger -st xray[$$] -p4 "Using procd_set_param $type" "$@"
+}
+
 start_xray() {
     logger -st xray[$$] -p4 "Starting Xray from $1"
     procd_open_instance
@@ -21,12 +27,33 @@ start_xray() {
     procd_append_param command run
     procd_append_param command -confdir
     procd_append_param command /var/etc/xray
+
+    local rlimit_nofile
     if [ -s /usr/share/xray/rlimit_nofile ] ; then
-        procd_set_param limits nofile="$(cat /usr/share/xray/rlimit_nofile)"
+        rlimit_nofile="nofile=""$(cat /usr/share/xray/rlimit_nofile)"
     fi
+
+    local rlimit_data
     if [ -s /usr/share/xray/rlimit_data ] ; then
-        procd_set_param limits data="$(cat /usr/share/xray/rlimit_data)"
+        rlimit_data="data=""$(cat /usr/share/xray/rlimit_data)"
     fi
+
+    # this param passing method is just so fucking weird
+    if [ -z "${rlimit_nofile}" ] ; then
+        if [ ! -z "${rlimit_data}" ]; then
+            log_procd_set_param limits "${rlimit_data}"
+            procd_set_param limits "${rlimit_data}"
+        fi
+    else
+        if [ -z "${rlimit_data}" ]; then
+            log_procd_set_param limits "${rlimit_nofile}"
+            procd_set_param limits "${rlimit_nofile}"
+        else
+            log_procd_set_param limits "${rlimit_data}" "${rlimit_nofile}"
+            procd_set_param limits "${rlimit_data}" "${rlimit_nofile}"
+        fi
+    fi
+
     procd_set_param env XRAY_LOCATION_ASSET=/usr/share/xray
     procd_set_param stdout 1
     procd_set_param stderr 1
