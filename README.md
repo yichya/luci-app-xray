@@ -27,6 +27,7 @@ Focus on making the most of Xray (HTTP/HTTPS/Socks/TProxy inbounds, multiple pro
 * 2022-02-02 feat: return certain domain names as NXDOMAIN
 * 2022-02-03 fix: failed to start Xray when blocked domain list is empty
 * 2022-02-15 feat: add a large rlimit_data option
+* 2022-02-19 fix: rlimit_data and rlimit_nofile does not work together
 
 ## Changelog 2021
 
