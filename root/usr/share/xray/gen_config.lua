@@ -718,7 +718,7 @@ local function dns_conf()
     if blocked_domain_rules() ~= nil then
         hosts = {}
         for _, rule in ipairs(blocked_domain_rules()) do
-            hosts[rule] = "100::/64"
+            hosts[rule] = {"127.127.127.127", "100::6c62:636f:656b:2164"} -- blocked!
         end
     end
 
