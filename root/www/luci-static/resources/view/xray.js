@@ -160,6 +160,11 @@ return view.extend({
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
+        o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
+        for (var v of uci.sections(config_data, "servers")) {
+            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
+        }
+
         o = s.taboption('general', form.Flag, 'transparent_proxy_enable', _('Enable Transparent Proxy'), _('This enables DNS query forwarding and TProxy for both TCP and UDP connections.'))
 
         o = s.taboption('general', form.Flag, 'tproxy_sniffing', _('Enable Sniffing'), _('If sniffing is enabled, requests will be routed according to domain settings in "DNS Settings" tab.'))
@@ -167,12 +172,6 @@ return view.extend({
 
         o = s.taboption('general', form.Flag, 'route_only', _('Route Only'), _('Use sniffed domain for routing only but still access through IP. Reduces unnecessary DNS requests. See <a href="https://github.com/XTLS/Xray-core/commit/a3023e43ef55d4498b1afbc9a7fe7b385138bb1a">here</a> for help.'))
         o.depends({ "transparent_proxy_enable": "1", "tproxy_sniffing": "1" })
-
-        o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('TProxy UDP Server'))
-        o.depends("transparent_proxy_enable", "1")
-        for (var v of uci.sections(config_data, "servers")) {
-            o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
-        }
 
         o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'), _("Servers are referenced by index (order in the following list). Deleting servers may result in changes of upstream servers actually used by proxy and bridge."))
         ss = o.subsection
