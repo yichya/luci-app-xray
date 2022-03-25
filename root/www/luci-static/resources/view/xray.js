@@ -647,6 +647,8 @@ return view.extend({
 
         o = s.taboption('extra_options', form.Flag, 'xray_api', _('Enable Xray API Service'), _('Xray API Service uses port 8080 and GRPC protocol. See <a href="https://xtls.github.io/document/command.html#xray-api">here</a> for help.'))
 
+        o = s.taboption('extra_options', form.Flag, 'stats', _('Enable Statistics'), _('Enable statistics of inbounds / outbounds data. Use Xray API to query values.'))
+
         o = s.taboption('extra_options', form.Value, 'handshake', _('Handshake Timeout'), _('Policy: Handshake timeout when connecting to upstream. See <a href="https://xtls.github.io/config/policy.html#levelpolicyobject">here</a> for help.'))
         o.datatype = 'uinteger'
         o.placeholder = 4
@@ -695,16 +697,13 @@ return view.extend({
         if (Object.keys(optional_features).length > 0) {
             s.tab('optional_features', _('Optional Features'), _("Warning: all settings on this page are experimental, not guaranteed to be stable, and quite likely to be changed very frequently. Use at your own risk."))
 
-            if (optional_features["optional_feature_365"]) {
-                o = s.taboption('optional_features', form.Flag, 'http_server_enable', _('Enable Xray Web Server'), _("(<a href='https://github.com/XTLS/Xray-core/pull/365'>#365</a> Required) Enable built-in web server for HTTP API, static file handling and pprof. "));
+            if (optional_features["optional_feature_1000"]) {
+                o = s.taboption('optional_features', form.Flag, 'metrics_server_enable', _('Enable Xray Metrics Server'), _("(<a href='https://github.com/XTLS/Xray-core/pull/1000'>#1000</a> Required) Enable built-in metrics server for pprof, expvars and prometheus exporter. "));
 
-                o = s.taboption('optional_features', form.Value, 'http_server_port', _('Xray Web Server Port'), _("HTTP API and pprof may be sensitive so think twice before setting it as Default Fallback HTTP Server."))
-                o.depends("http_server_enable", "1")
+                o = s.taboption('optional_features', form.Value, 'metrics_server_port', _('Xray Metrics Server Port'), _("Metrics may be sensitive so think twice before setting it as Default Fallback HTTP Server."))
+                o.depends("metrics_server_enable", "1")
                 o.datatype = 'port'
                 o.placeholder = '18888'
-
-                o = s.taboption('optional_features', form.Flag, 'http_server_pprof', _('Enable pprof'), _("Helpful when debugging performance issues."));
-                o.depends("http_server_enable", "1")
             }
         }
 

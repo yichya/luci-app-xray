@@ -14,7 +14,7 @@ local udp_server = ucursor:get_all("xray", udp_server_section)
 
 local geoip_existence = false
 local geosite_existence = false
-local optional_feature_365 = false
+local optional_feature_1000 = false
 
 local xray_data_file_iterator = nixiofs.dir("/usr/share/xray")
 
@@ -26,8 +26,8 @@ repeat
     if fn == "geosite.dat" then
         geosite_existence = true
     end
-    if fn == "optional_feature_365" then
-        optional_feature_365 = true
+    if fn == "optional_feature_1000" then
+        optional_feature_1000 = true
     end
 until fn == nil
 
@@ -744,12 +744,11 @@ local function api_conf()
     end
 end
 
-local function web_conf()
-    if optional_feature_365 then 
-        if proxy.http_server_enable == "1" then
+local function metrics_conf()
+    if optional_feature_1000 then
+        if proxy.metrics_server_enable == "1" then
             return {
-                tag = "web",
-                pprof = proxy.http_server_pprof == "1"
+                tag = "metrics",
             }
         end
     end
@@ -769,16 +768,16 @@ local function inbounds()
     if proxy.web_server_enable == "1" then
         table.insert(i, https_inbound())
     end
-    if optional_feature_365 then 
-        if proxy.http_server_enable == '1' then
+    if optional_feature_1000 then
+        if proxy.metrics_server_enable == '1' then
             table.insert(i, {
                 listen = "0.0.0.0",
-                port = proxy.http_server_port or 18888,
+                port = proxy.metrics_server_port or 18888,
                 protocol = "dokodemo-door",
                 settings = {
                     address = "127.0.0.1"
                 },
-                tag = "web"
+                tag = "metrics"
             })
         end
     end
@@ -893,12 +892,12 @@ local function rules()
             outboundTag = "api"
         }
     }
-    if optional_feature_365 then
-        if proxy.http_server_enable == "1" then
+    if optional_feature_1000 then
+        if proxy.metrics_server_enable == "1" then
             table.insert(result, 1, {
                 type = "field",
-                inboundTag = {"web"},
-                outboundTag = "web"
+                inboundTag = {"metrics"},
+                outboundTag = "metrics"
             })
         end
     end
@@ -975,6 +974,7 @@ local function outbounds()
 end
 
 local function policy()
+    local stats = proxy.stats == "1"
     return {
         levels = {
             ["0"] = {
@@ -983,15 +983,15 @@ local function policy()
                 uplinkOnly = proxy.uplink_only == nil and 2 or tonumber(proxy.uplink_only),
                 downlinkOnly = proxy.downlink_only == nil and 5 or tonumber(proxy.downlink_only),
                 bufferSize = proxy.buffer_size == nil and 4 or tonumber(proxy.buffer_size),
-                statsUserUplink = false,
-                statsUserDownlink = false,
+                statsUserUplink = stats,
+                statsUserDownlink = stats,
             }
         },
         system = {
-            statsInboundUplink = false,
-            statsInboundDownlink = false,
-            statsOutboundUplink = false,
-            statsOutboundDownlink = false
+            statsInboundUplink = stats,
+            statsInboundDownlink = stats,
+            statsOutboundUplink = stats,
+            statsOutboundDownlink = stats
         }
     }
 end
@@ -1009,9 +1009,12 @@ local xray = {
     outbounds = outbounds(),
     dns = dns_conf(),
     api = api_conf(),
-    web = web_conf(),
+    metrics = metrics_conf(),
     policy = policy(),
     log = logging(),
+    stats = proxy.stats == "1" and {
+        place = "holder"
+    } or nil,
     reverse = {
         bridges = bridges()
     },
