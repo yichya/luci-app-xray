@@ -1004,6 +1004,16 @@ local function logging()
     }
 end
 
+local function observatory()
+    if proxy.observatory == "1" then
+        return {
+            subjectSelector = {"tcp_outbound", "udp_outbound"},
+            probeInterval = "1s"
+        }
+    end
+    return nil
+end
+
 local xray = {
     inbounds = inbounds(),
     outbounds = outbounds(),
@@ -1015,6 +1025,7 @@ local xray = {
     stats = proxy.stats == "1" and {
         place = "holder"
     } or nil,
+    observatory = observatory(),
     reverse = {
         bridges = bridges()
     },
