@@ -659,12 +659,30 @@ local function domain_rules(k)
 
     local result = {}
     for _, x in ipairs(proxy[k]) do
-        if x:sub(1, 8) == "geosite:" then
+        if ((x:sub(1, 8) == "geosite:") or (x:sub(1, 7) == "domain:")) then
             if geosite_existence then
                 table.insert(result, x)
             end
         else
-            table.insert(result, x)
+            table.insert(result, "domain:" .. x)
+        end
+    end
+    return result
+end
+
+local function direct_rules(k)
+    if proxy[k] == nil then
+        return nil
+    end
+
+    local result = {}
+    for _, x in ipairs(proxy[k]) do
+        if x:sub(1, 6) == "geoip:" then
+            if geoip_existence then
+                table.insert(result, x)
+            end
+        else
+            table.insert(result, "geoip:" .. x)
         end
     end
     return result
@@ -907,7 +925,7 @@ local function rules()
                 type = "field",
                 inboundTag = {"tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound"},
                 outboundTag = "direct",
-                ip = {"geoip:" .. proxy.geoip_direct_code}
+                ip = direct_rules("geoip_direct_code")
             })
         end
         table.insert(result, 1, {

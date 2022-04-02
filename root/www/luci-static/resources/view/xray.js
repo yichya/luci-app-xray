@@ -522,14 +522,15 @@ return view.extend({
         s.tab('access_control', _('Transparent Proxy Rules'));
 
         if (geoip_existence) {
-            o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts."))
+            o = s.taboption('access_control', form.DynamicList, 'geoip_direct_code', _('GeoIP Direct Code'), _("Hosts in this GeoIP set will not be forwarded through Xray. Set to unspecified to forward all non-private hosts. <br/>Specify rules like <code>geoip:cn</code> or <code>geoip:hk</code>. See <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details."))
         } else {
-            o = s.taboption('access_control', form.Value, 'geoip_direct_code', _('GeoIP Direct Code'), _("Resource file /usr/share/xray/geoip.dat not exist. All network traffic will be forwarded. <br/> Compile your firmware again with data files to use this feature, or<br/><a href=\"https://github.com/v2fly/geoip\">download one</a> (maybe disable transparent proxy first) and upload it to your router."))
+            o = s.taboption('access_control', form.DynamicList, 'geoip_direct_code', _('GeoIP Direct Code'), _("Resource file /usr/share/xray/geoip.dat not exist. All network traffic will be forwarded. <br/> Compile your firmware again with data files to use this feature, or<br/><a href=\"https://github.com/v2fly/geoip\">download one</a> (maybe disable transparent proxy first) and upload it to your router."))
             o.readonly = true
         }
-        o.value("cn", "cn")
-        o.value("telegram", "telegram")
-        o.datatype = "string"
+        o.value("geoip:cn", "geoip:cn")
+        o.value("geoip:hk", "geoip:hk")
+        o.rmempty = true
+        o.modalonly = true
 
         o = s.taboption('access_control', form.ListValue, 'routing_domain_strategy', _('Routing Domain Strategy'), _("Domain resolution strategy when matching domain against rules."))
         o.value("AsIs", "AsIs")
@@ -540,7 +541,7 @@ return view.extend({
 
         o = s.taboption('access_control', form.DynamicList, "wan_bp_ips", _("Bypassed IP"), _("Requests to these IPs won't be forwarded through Xray."))
         o.datatype = "ip4addr"
-        o.rmempty = false
+        o.rmempty = true
 
         o = s.taboption('access_control', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
