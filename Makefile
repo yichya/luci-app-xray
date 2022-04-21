@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xray
-PKG_VERSION:=1.8.0
+PKG_VERSION:=1.9.0
 PKG_RELEASE:=1
 
 PKG_LICENSE:=MPLv2
@@ -47,7 +47,7 @@ choice
 	config PACKAGE_XRAY_RLIMIT_DATA_SMALL
 		bool "Small limit (about 50MB)"
 	config PACKAGE_XRAY_RLIMIT_DATA_LARGE
-		bool "Large limit (about 150MB)"
+		bool "Large limit (about 200MB)"
 endchoice
 
 config PACKAGE_XRAY_OPTIONAL_FEATURE_1000
@@ -125,6 +125,8 @@ endif
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_ipset_rules_extra_normal.lua $(1)/usr/share/xray/gen_ipset_rules_extra.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/gen_config.lua $(1)/usr/share/xray/gen_config.lua
 	$(INSTALL_BIN) ./root/usr/share/xray/firewall_include.lua $(1)/usr/share/xray/firewall_include.lua
+	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
+	$(INSTALL_BIN) ./root/usr/libexec/rpcd/xray $(1)/usr/libexec/rpcd/xray
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
