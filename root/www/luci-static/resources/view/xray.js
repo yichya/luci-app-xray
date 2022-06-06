@@ -225,7 +225,7 @@ return view.extend({
         o.modalonly = true
 
         o = ss.taboption('protocol', form.Flag, 'shadowsocks_udp_over_tcp', _('[shadowsocks] UDP over TCP'), _('Only available for shadowsocks-2022 ciphers (2022-*)'))
-        o.depends("protocol", "shadowsocks")
+        o.depends("shadowsocks_security", /2022/)
         o.rmempty = false
         o.modalonly = true
 
