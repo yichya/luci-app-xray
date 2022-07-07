@@ -2,56 +2,57 @@
 local ucursor = require "luci.model.uci"
 
 local flush = [[# firewall include file to stop transparent proxy
-ip rule del fwmark 251 lookup 251
-ip rule del fwmark 252 lookup 252
-ip route del local default dev lo table 251
-ip route del local default dev lo table 252
-iptables-save -c | grep -v "TP_SPEC" | iptables-restore -c]]
+ip rule  del   table 100
+ip route flush table 100
+iptables-save -c | grep -v "XRAY" | iptables-restore -c]]
 local header = [[# firewall include file to start transparent proxy
-ip rule add fwmark 251 lookup 251
-ip rule add fwmark 252 lookup 252
-ip route add local default dev lo table 251
-ip route add local default dev lo table 252
+ip route add local default dev lo table 100
+ip rule  add fwmark 0x2333        table 100
+
 iptables-restore -n <<-EOF
-*nat
-COMMIT
 *mangle
-:TP_SPEC_LAN_AC - [0:0]
-:TP_SPEC_LAN_DG - [0:0]
-:TP_SPEC_LAN_RE - [0:0]
-:TP_SPEC_WAN_AC - [0:0]
-:TP_SPEC_WAN_DG - [0:0]
-:TP_SPEC_WAN_RE - [0:0]
-:TP_SPEC_WAN_FW - [0:0]
--I PREROUTING 1 -m mark --mark 0xfc -j TP_SPEC_WAN_AC]]
-local lan = "-I PREROUTING 1 -i %s -j TP_SPEC_LAN_DG"
-local rules = [[-A OUTPUT -j TP_SPEC_WAN_DG
--A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_bp src -j RETURN
--A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_fw src -j TP_SPEC_WAN_FW
--A TP_SPEC_LAN_AC -m set --match-set tp_spec_src_ac src -j TP_SPEC_WAN_AC
--A TP_SPEC_LAN_AC -j TP_SPEC_WAN_AC
--A TP_SPEC_LAN_DG -m set --match-set tp_spec_dst_fw dst -j TP_SPEC_LAN_RE
--A TP_SPEC_LAN_DG -m set --match-set tp_spec_dst_sp dst -j RETURN
--A TP_SPEC_LAN_DG -m set --match-set tp_spec_dst_bp dst -j RETURN
--A TP_SPEC_LAN_DG -m set --match-set tp_spec_def_gw dst -j RETURN
--A TP_SPEC_LAN_DG -j TP_SPEC_LAN_RE
--A TP_SPEC_LAN_RE -p tcp -j TP_SPEC_LAN_AC
--A TP_SPEC_LAN_RE -p udp -j TP_SPEC_LAN_AC
--A TP_SPEC_WAN_AC -m set --match-set tp_spec_dst_fw dst -j TP_SPEC_WAN_FW
--A TP_SPEC_WAN_AC -m set --match-set tp_spec_dst_bp dst -j RETURN
--A TP_SPEC_WAN_AC -j TP_SPEC_WAN_FW
--A TP_SPEC_WAN_DG -m mark --mark 0x%x -j RETURN
--A TP_SPEC_WAN_DG -m set --match-set tp_spec_dst_fw dst -j TP_SPEC_WAN_RE
--A TP_SPEC_WAN_DG -m set --match-set tp_spec_dst_sp dst -j RETURN
--A TP_SPEC_WAN_DG -m set --match-set tp_spec_dst_bp dst -j RETURN
--A TP_SPEC_WAN_DG -m set --match-set tp_spec_def_gw dst -j RETURN
--A TP_SPEC_WAN_DG -j TP_SPEC_WAN_RE
--A TP_SPEC_WAN_RE -p tcp -j MARK --set-xmark 0xfc/0xffffffff
--A TP_SPEC_WAN_RE -p udp -j MARK --set-xmark 0xfc/0xffffffff
--A TP_SPEC_WAN_FW -p tcp -j TPROXY --on-port %d --on-ip 0.0.0.0 --tproxy-mark 0xfb/0xffffffff
--A TP_SPEC_WAN_FW -p udp -j TPROXY --on-port %d --on-ip 0.0.0.0 --tproxy-mark 0xfb/0xffffffff
-COMMIT
-*filter
+:XRAY_RULES - [0:0]
+:XRAY_PROXY - [0:0]
+]]
+local rules = [[
+##### XRAY_RULES #####
+# ignore traffic marked by xray outbound
+-A XRAY_RULES -m mark --mark 0x%x -j RETURN
+# connection-mark -> packet-mark
+-A XRAY_RULES -j CONNMARK --restore-mark
+
+# ignore traffic sent to reserved addresses
+-A XRAY_RULES -m set --match-set tp_spec_dst_sp dst -j RETURN
+
+# route traffic depends on whitelist/blacklists
+-A XRAY_RULES -m set --match-set tp_spec_src_bp src -j RETURN
+-A XRAY_RULES -m set --match-set tp_spec_src_fw src -j XRAY_PROXY
+
+-A XRAY_RULES -m set --match-set tp_spec_dst_fw dst -j XRAY_PROXY
+-A XRAY_RULES -m set --match-set tp_spec_dst_bp dst -j RETURN
+-A XRAY_RULES -j XRAY_PROXY
+
+##### XRAY_PROXY #####
+# mark the first packet of the connection
+-A XRAY_PROXY -p tcp --syn                      -j MARK --set-mark 0x2333
+-A XRAY_PROXY -p udp -m conntrack --ctstate NEW -j MARK --set-mark 0x2333
+
+# packet-mark -> connection-mark
+-A XRAY_PROXY -j CONNMARK --save-mark
+
+##### OUTPUT #####
+-A OUTPUT -p tcp -m addrtype --src-type LOCAL ! --dst-type LOCAL -j XRAY_RULES
+-A OUTPUT -p udp -m addrtype --src-type LOCAL ! --dst-type LOCAL -j XRAY_RULES
+
+##### PREROUTING #####
+# proxy traffic passing through this machine (other->other)
+-A PREROUTING -i %s -p tcp -m addrtype ! --src-type LOCAL ! --dst-type LOCAL -j XRAY_RULES
+-A PREROUTING -i %s -p udp -m addrtype ! --src-type LOCAL ! --dst-type LOCAL -j XRAY_RULES
+
+# hand over the marked package to TPROXY for processing
+-A PREROUTING -p tcp -m mark --mark 0x2333 -j TPROXY --on-ip 127.0.0.1 --on-port %d
+-A PREROUTING -p udp -m mark --mark 0x2333 -j TPROXY --on-ip 127.0.0.1 --on-port %d
+
 COMMIT
 EOF]]
 
@@ -66,8 +67,9 @@ if proxy.transparent_proxy_enable ~= "1" then
 end
 if arg[1] == "enable" then
     print(header)
-    print(string.format(lan, proxy.lan_ifaces))
-    print(string.format(rules, tonumber(proxy.mark), proxy.tproxy_port_tcp, proxy.tproxy_port_udp))
+    print(string.format(rules, tonumber(proxy.mark),
+        proxy.lan_ifaces, proxy.lan_ifaces,
+        proxy.tproxy_port_tcp, proxy.tproxy_port_udp))
 else
     print("# arg[1] == " .. arg[1] .. ", not enable")
 end
