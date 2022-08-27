@@ -42,7 +42,7 @@ local function direct_outbound()
         tag = "direct",
         settings = {
             domainStrategy = "UseIPv4"
-            },
+        },
         streamSettings = {
             sockopt = {
                 mark = tonumber(proxy.mark)
