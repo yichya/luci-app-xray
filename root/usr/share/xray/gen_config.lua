@@ -691,7 +691,8 @@ local function dns_conf()
     return {
         hosts = hosts,
         servers = servers,
-        tag = "dns_conf_inbound"
+        tag = "dns_conf_inbound",
+        queryStrategy = "UseIPv4"
     }
 end
 
