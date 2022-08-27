@@ -40,6 +40,9 @@ local function direct_outbound()
     return {
         protocol = "freedom",
         tag = "direct",
+        settings = {
+            domainStrategy = "UseIPv4"
+            },
         streamSettings = {
             sockopt = {
                 mark = tonumber(proxy.mark)
