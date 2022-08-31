@@ -746,6 +746,8 @@ local function manual_tproxy_outbounds()
                     local force_forward_server_tcp = ucursor:get_all("xray", v.force_forward_server_tcp)
                     table.insert(result, server_outbound(force_forward_server_tcp, tcp_tag))
                 end
+            else
+                tcp_tag = "tcp_outbound"
             end
             if v.force_forward_server_udp ~= nil then
                 if v.force_forward_server_udp == proxy.tproxy_udp_server then
@@ -755,6 +757,8 @@ local function manual_tproxy_outbounds()
                     local force_forward_server_udp = ucursor:get_all("xray", v.force_forward_server_udp)
                     table.insert(result, server_outbound(force_forward_server_udp, udp_tag))
                 end
+            else
+                udp_tag = "udp_outbound"
             end
         end
 
