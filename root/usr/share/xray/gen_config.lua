@@ -445,6 +445,20 @@ local function fallbacks()
     return f
 end
 
+local function tls_inbound_settings()
+    return {
+        alpn = {
+            "http/1.1"
+        },
+        certificates = {
+            {
+                certificateFile = proxy.web_server_cert_file,
+                keyFile = proxy.web_server_key_file
+            }
+        }
+    }
+end
+
 local function https_trojan_inbound()
     return {
         port = 443,
@@ -462,28 +476,8 @@ local function https_trojan_inbound()
         streamSettings = {
             network = "tcp",
             security = proxy.trojan_tls,
-            tlsSettings = proxy.trojan_tls == "tls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
-            } or nil,
-            xtlsSettings = proxy.trojan_tls == "xtls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
-            } or nil
+            tlsSettings = proxy.trojan_tls == "tls" and tls_inbound_settings() or nil,
+            xtlsSettings = proxy.trojan_tls == "xtls" and tls_inbound_settings() or nil
         }
     }
 end
@@ -506,28 +500,8 @@ local function https_vless_inbound()
         streamSettings = {
             network = "tcp",
             security = proxy.vless_tls,
-            tlsSettings = proxy.vless_tls == "tls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
-            } or nil,
-            xtlsSettings = proxy.vless_tls == "xtls" and {
-                alpn = {
-                    "http/1.1"
-                },
-                certificates = {
-                    {
-                        certificateFile = proxy.web_server_cert_file,
-                        keyFile = proxy.web_server_key_file
-                    }
-                }
-            } or nil
+            tlsSettings = proxy.vless_tls == "tls" and tls_inbound_settings() or nil,
+            xtlsSettings = proxy.vless_tls == "xtls" and tls_inbound_settings() or nil
         }
     }
 end
