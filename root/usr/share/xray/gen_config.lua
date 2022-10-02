@@ -461,7 +461,7 @@ end
 
 local function https_trojan_inbound()
     return {
-        port = 443,
+        port = proxy.web_server_port or 443,
         protocol = "trojan",
         tag = "https_inbound",
         settings = {
@@ -484,7 +484,7 @@ end
 
 local function https_vless_inbound()
     return {
-        port = 443,
+        port = proxy.web_server_port or 443,
         protocol = "vless",
         tag = "https_inbound",
         settings = {
