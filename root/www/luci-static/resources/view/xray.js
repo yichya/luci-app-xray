@@ -177,11 +177,14 @@ return view.extend({
 
         o = s.taboption('general', form.ListValue, 'main_server', _('TCP Server'))
         o.datatype = "uciname"
+        o.value("disabled", _("Disabled"))
         for (const v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
 
         o = s.taboption('general', form.ListValue, 'tproxy_udp_server', _('UDP Server'))
+        o.datatype = "uciname"
+        o.value("disabled", _("Disabled"))
         for (const v of uci.sections(config_data, "servers")) {
             o.value(v[".name"], v.alias || v.server + ":" + v.server_port)
         }
