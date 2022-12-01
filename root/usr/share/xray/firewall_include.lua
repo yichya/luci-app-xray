@@ -20,6 +20,8 @@ local rules = [[
 -A XRAY_RULES -m mark --mark 0x%x -j RETURN
 # connection-mark -> packet-mark
 -A XRAY_RULES -j CONNMARK --restore-mark
+# ignore established connections
+-A XRAY_RULES -m mark --mark 0x2333 -j RETURN
 
 # ignore traffic sent to reserved addresses
 -A XRAY_RULES -m set --match-set tp_spec_dst_sp dst -j RETURN
