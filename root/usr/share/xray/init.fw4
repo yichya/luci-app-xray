@@ -9,7 +9,6 @@ setup_firewall() {
 
     logger -st xray[$$] -p4 "Triggering firewall4 restart..."
     /etc/init.d/firewall restart > /dev/null 2>&1
-    /etc/hotplug.d/iface/01-transparent-proxy-ipset
 }
 
 flush_firewall() {
@@ -21,7 +20,6 @@ flush_firewall() {
 
     logger -st xray[$$] -p4 "Triggering firewall4 restart..."
     /etc/init.d/firewall restart > /dev/null 2>&1
-    /etc/hotplug.d/iface/01-transparent-proxy-ipset
 }
 
 impl_gen_config_file() {

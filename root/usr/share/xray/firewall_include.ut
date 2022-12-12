@@ -59,12 +59,6 @@
         elements = { {{ join(", ", wan_fw_ips)}} }
     }
 
-    set tp_spec_def_gw {
-        type ipv4_addr
-        size 65536
-        flags interval
-    }
-
     chain xray_rules {
 {% if (length(uids_direct) > 0): %}
         meta skuid { {{ join(", ", uids_direct) }} } return comment "ignore traffic from processes owned by specific UIDs"

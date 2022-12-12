@@ -10,8 +10,7 @@ local create_ipset_rules = [[create tp_spec_src_bp hash:mac hashsize 64
 create tp_spec_src_fw hash:mac hashsize 64
 create tp_spec_dst_sp hash:net hashsize 64
 create tp_spec_dst_bp hash:net hashsize 64
-create tp_spec_dst_fw hash:net hashsize 64
-create tp_spec_def_gw hash:net hashsize 64]]
+create tp_spec_dst_fw hash:net hashsize 64]]
 
 local function create_ipset()
     print(create_ipset_rules)
