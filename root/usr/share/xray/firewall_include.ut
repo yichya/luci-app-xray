@@ -16,11 +16,6 @@
     const wan_bp_ips = uniq(wan_bp_ips_no_dns);
     const wan_fw_ips = uniq(wan_fw_ips_no_dns);
 %}
-    set tp_spec_src_ac {
-        type ether_addr
-        size 65536
-    }
-
     set tp_spec_src_bp {
         type ether_addr
         size 65536
