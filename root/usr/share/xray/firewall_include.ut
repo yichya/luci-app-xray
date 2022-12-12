@@ -100,13 +100,13 @@
     chain xray_prerouting {
         type filter hook prerouting priority filter; policy accept;
 
-        iifname "{{ general.lan_ifaces }}" ip protocol {tcp, udp} fib saddr type != local counter jump xray_rules comment "proxy TCP/UDP traffic passing through this router (other->other)"
+        iifname "{{ general.lan_ifaces }}" ip protocol {tcp, udp} fib saddr type != local fib daddr type != local counter jump xray_rules comment "proxy TCP/UDP traffic passing through this router (other->other)"
 
-        meta l4proto tcp meta mark set 0x2333 tproxy ip to 127.0.0.1:{{ general.tproxy_port_tcp }} accept comment "hand over marked TCP packets to xray"
-        meta l4proto udp meta mark set 0x2333 tproxy ip to 127.0.0.1:{{ general.tproxy_port_udp }} accept comment "hand over marked UDP packets to xray"
+        meta l4proto tcp meta mark 0x2333 tproxy ip to 127.0.0.1:{{ general.tproxy_port_tcp }} accept comment "hand over marked TCP packets to xray"
+        meta l4proto udp meta mark 0x2333 tproxy ip to 127.0.0.1:{{ general.tproxy_port_udp }} accept comment "hand over marked UDP packets to xray"
     }
 
     chain xray_output {
         type route hook output priority filter; policy accept;
-        ip protocol {tcp, udp} fib saddr type != local counter jump xray_rules comment "Proxy TCP/UDP traffic from router itself"
+        ip protocol {tcp, udp} fib saddr type local fib daddr type != local counter jump xray_rules comment "Proxy TCP/UDP traffic from router itself"
     }
