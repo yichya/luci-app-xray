@@ -24,7 +24,7 @@ function validate_object(id, a) {
     }
 }
 
-function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, have_tls_flow, client_side) {
+function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, protocol_name, have_xtls, have_tls_flow, client_side, fw4_enabled) {
     let o = s.taboption(tab_name, form.ListValue, `${protocol_name}_tls`, _(`[${protocol_name}] Stream Security`))
     let odep = {}
     odep[depends_field_name] = protocol_name
@@ -38,7 +38,7 @@ function add_flow_and_stream_security_conf(s, tab_name, depends_field_name, prot
     if (have_xtls) {
         o.value("xtls", "XTLS")
     }
-    if (have_tls_flow) {
+    if (have_tls_flow && fw4_enabled) {
         o.value("reality", "REALITY (Experimental)")
     }
     o.depends(odep)
@@ -405,7 +405,7 @@ return view.extend({
         o.value("shadowsocks", "Shadowsocks")
         o.rmempty = false
 
-        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "trojan", true, false, true)
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "trojan", true, false, true, firewall4)
 
         o = ss.taboption('protocol', form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"))
         o.depends("protocol", "shadowsocks")
@@ -424,7 +424,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "shadowsocks", false, false, true)
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "shadowsocks", false, false, true, firewall4)
 
         o = ss.taboption('protocol', form.ListValue, "vmess_security", _("[vmess] Encrypt Method"))
         o.depends("protocol", "vmess")
@@ -446,7 +446,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vmess", false, false, true)
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vmess", false, false, true, firewall4)
 
         o = ss.taboption('protocol', form.ListValue, "vless_encryption", _("[vless] Encrypt Method"))
         o.depends("protocol", "vless")
@@ -454,7 +454,7 @@ return view.extend({
         o.rmempty = false
         o.modalonly = true
 
-        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vless", true, true, true)
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "vless", true, true, true, firewall4)
 
         ss.tab('transport', _('Transport Settings'));
 
@@ -847,9 +847,9 @@ return view.extend({
         o.rmempty = false
         o.depends("web_server_enable", "1")
 
-        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "vless", true, true, false)
+        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "vless", true, true, false, firewall4)
 
-        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false, false)
+        add_flow_and_stream_security_conf(s, "xray_server", "web_server_protocol", "trojan", true, false, false, firewall4)
 
         o = s.taboption('xray_server', form.Value, 'web_server_password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.depends("web_server_enable", "1")
