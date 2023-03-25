@@ -368,6 +368,9 @@ return view.extend({
         o = s.taboption('general', form.Flag, 'route_only', _('Route Only'), _('Use sniffed domain for routing only but still access through IP. Reduces unnecessary DNS requests. See <a href="https://github.com/XTLS/Xray-core/commit/a3023e43ef55d4498b1afbc9a7fe7b385138bb1a">here</a> for help.'))
         o.depends({ "transparent_proxy_enable": "1", "tproxy_sniffing": "1" })
 
+        o = s.taboption('general', form.Flag, 'direct_bittorrent', _('Bittorrent Direct'), _("If enabled, all bittorrent request won't be forwarded through Xray."))
+        o.depends({ "transparent_proxy_enable": "1", "tproxy_sniffing": "1" })
+
         o = s.taboption('general', form.SectionValue, "xray_servers", form.GridSection, 'servers', _('Xray Servers'), _("Servers are referenced by index (order in the following list). Deleting servers may result in changes of upstream servers actually used by proxy and bridge."))
         ss = o.subsection
         ss.sortable = false
@@ -802,9 +805,6 @@ return view.extend({
         o = s.taboption('transparent_proxy_rules', form.DynamicList, "wan_fw_ips", _("Forwarded IP"))
         o.datatype = "ip4addr"
         o.rmempty = true
-
-        o = s.taboption('transparent_proxy_rules', form.Flag, 'direct_bittorrent', _('Bittorrent Direct'), _("If enabled, all bittorrent request won't be forwarded through Xray."))
-        o.depends("tproxy_sniffing", "1")
 
         o = s.taboption('transparent_proxy_rules', form.SectionValue, "access_control_manual_tproxy", form.GridSection, 'manual_tproxy', _('Manual Transparent Proxy'), _('Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href="https://github.com/v2ray/v2ray-core/issues/2233">FakeDNS</a> for details.'))
 
