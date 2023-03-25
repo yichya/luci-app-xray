@@ -803,6 +803,9 @@ return view.extend({
         o.datatype = "ip4addr"
         o.rmempty = true
 
+        o = s.taboption('transparent_proxy_rules', form.Flag, 'direct_bittorrent', _('Bittorrent Direct'), _("If enabled, all bittorrent request won't be forwarded through Xray."))
+        o.depends("tproxy_sniffing", "1")
+
         o = s.taboption('transparent_proxy_rules', form.SectionValue, "access_control_manual_tproxy", form.GridSection, 'manual_tproxy', _('Manual Transparent Proxy'), _('Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href="https://github.com/v2ray/v2ray-core/issues/2233">FakeDNS</a> for details.'))
 
         ss = o.subsection;
