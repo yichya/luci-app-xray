@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  PACKAGE_NAME: luci-app-xray-fw4
+  PACKAGE_NAME: luci-app-xray
+  PACKAGE_VARIANT: fw4
   CACHE_DIR: ~/cache
 
 jobs:
@@ -97,17 +98,13 @@ jobs:
         run: |
           cd "$SDK_HOME"
           ./scripts/feeds update -a
-          test -d "feeds/packages/net/$PACKAGE_NAME" && rm -rf "feeds/packages/net/$PACKAGE_NAME" || true
-          test -d "feeds/packages/lang/golang" && rm -rf "feeds/packages/lang/golang" || true
-          curl https://codeload.github.com/openwrt/packages/tar.gz/${OPENWRT_GOLANG_COMMIT:-master} | tar -xz -C "feeds/packages/lang" --strip=2 packages-${OPENWRT_GOLANG_COMMIT:-master}/lang/golang
-          ln -s "${{ github.workspace }}" "package/$PACKAGE_NAME"
           ./scripts/feeds install -a
           cd -
       - name: Build Packages
         run: |
           cd "$SDK_HOME"
           make defconfig
-          make package/${PACKAGE_NAME}/{clean,compile} V=s
+          make package/${PACKAGE_NAME}/${PACKAGE_VARIANT}/{clean,compile} V=s
           find "$SDK_HOME/bin/" -type f -name "*.ipk" -exec ls -lh {} \;
           cd -
       - name: Copy Bin Files
