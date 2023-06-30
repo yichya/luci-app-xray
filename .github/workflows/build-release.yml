@@ -8,7 +8,6 @@ on:
 
 env:
   PACKAGE_NAME: luci-app-xray
-  PACKAGE_VARIANT: fw4
   CACHE_DIR: ~/cache
 
 jobs:
