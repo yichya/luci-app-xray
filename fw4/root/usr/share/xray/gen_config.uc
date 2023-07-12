@@ -703,11 +703,17 @@ function dns_conf() {
         });
     }
 
-    let hosts = null;
+    let hosts = {};
     if (length(blocked_domain_rules()) > 0) {
-        hosts = {};
         for (let rule in (blocked_domain_rules())) {
             hosts[rule] = ["127.127.127.127", "100::6c62:636f:656b:2164"] // blocked!
+        }
+    }
+    for (let key in manual_tproxy) {
+        if (config[key].domain_names != null) {
+            for (let d in config[key].domain_names) {
+                hosts[d] = [config[key].source_addr];
+            }
         }
     }
 
@@ -932,13 +938,15 @@ function rules() {
             type: "field",
             inboundTag: dns_server_tags(),
             outboundTag: "dns_server_outbound"
-        },
-        {
+        }
+    ];
+    if (proxy["xray_api"] == '1') {
+        push(result, {
             type: "field",
             inboundTag: ["api"],
             outboundTag: "api"
-        }
-    ];
+        });
+    }
     if (proxy["metrics_server_enable"] == "1") {
         splice(result, 0, 0, {
             type: "field",
