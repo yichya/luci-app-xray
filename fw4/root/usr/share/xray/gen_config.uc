@@ -252,6 +252,34 @@ function stream_settings(server, protocol, tag) {
     }
 }
 
+function http_outbound(server, tag) {
+    const stream_settings_object = stream_settings(server, "http", tag);
+    const stream_settings_result = stream_settings_object["stream_settings"];
+    const dialer_proxy = stream_settings_object["dialer_proxy"];
+    return {
+        outbound: {
+            protocol: "http",
+            tag: tag,
+            settings: {
+                servers: [
+                    {
+                        address: server["server"],
+                        port: int(server["server_port"]),
+                        users: [
+                            {
+                                user: server["user"],
+                                pass: server["password"]
+                            }
+                        ]
+                    }
+                ]
+            },
+            streamSettings: stream_settings_result
+        },
+        dialer_proxy: dialer_proxy
+    }
+}
+
 function shadowsocks_outbound(server, tag) {
     const stream_settings_object = stream_settings(server, "shadowsocks", tag);
     const stream_settings_result = stream_settings_object["stream_settings"];
@@ -387,6 +415,8 @@ function server_outbound_recursive(t, server, tag) {
         outbound_result = shadowsocks_outbound(server, tag);
     } else if (server["protocol"] == "trojan") {
         outbound_result = trojan_outbound(server, tag);
+    } else if (server["protocol"] == "http") {
+        outbound_result = http_outbound(server, tag);
     }
     if (outbound_result == null) {
         die("unknown outbound server protocol");

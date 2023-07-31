@@ -332,7 +332,10 @@ return view.extend({
         o.datatype = 'port'
         o.placeholder = '443'
 
-        o = ss.taboption('general', form.Value, 'password', _('UserId / Password'), _('Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
+        o = ss.taboption('general', form.Value, 'user', _('User'), _('Fill user for http'))
+        o.modalonly = true
+
+        o = ss.taboption('general', form.Value, 'password', _('Password'), _('Fill user_id for http, vmess / VLESS, or password for shadowsocks / trojan (also supports <a href="https://github.com/XTLS/Xray-core/issues/158">Xray UUID Mapping</a>)'))
         o.modalonly = true
 
         ss.tab('protocol', _('Protocol Settings'));
@@ -342,7 +345,10 @@ return view.extend({
         o.value("vless", "VLESS")
         o.value("trojan", "Trojan")
         o.value("shadowsocks", "Shadowsocks")
+        o.value("http", "http")
         o.rmempty = false
+
+        add_flow_and_stream_security_conf(ss, "protocol", "protocol", "http", false, true)
 
         add_flow_and_stream_security_conf(ss, "protocol", "protocol", "trojan", false, true)
 
