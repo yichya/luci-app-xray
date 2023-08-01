@@ -16,6 +16,7 @@ define Package/$(PKG_NAME)
 	CATEGORY:=Extra packages
 	TITLE:=LuCI Support for Xray (Shared Components)
 	DEPENDS:=+luci-base +xray-core +dnsmasq +ca-bundle
+	CONFILICTS:=v2ray-geoip v2ray-geosite
 	PKGARCH:=all
 endef
 
@@ -73,6 +74,8 @@ endif
 	$(INSTALL_DIR) $(1)/usr/share/xray
 	$(LN) /var/run/xray.pid $(1)/usr/share/xray/xray.pid
 	$(LN) /usr/bin/xray $(1)/usr/share/xray/xray
+	$(INSTALL_DATA) ./root/usr/share/xray/geoip.dat $(1)/usr/share/xray/geoip.dat
+	$(INSTALL_DATA) ./root/usr/share/xray/geosite.dat $(1)/usr/share/xray/geosite.dat
 ifdef CONFIG_PACKAGE_XRAY_IGNORE_TP_SPEC_DEF_GW
 	$(INSTALL_DATA) ./root/usr/share/xray/ignore_tp_spec_def_gw $(1)/usr/share/xray/ignore_tp_spec_def_gw
 endif
