@@ -944,6 +944,14 @@ function rules() {
             outboundTag: "dns_server_outbound"
         }
     ];
+    const fast_dns_object = split_ipv4_host_port(proxy["fast_dns"], 53);
+    splice(result, 0, 0, {
+        type: "field",
+        inboundTag: ["tproxy_tcp_inbound", "tproxy_udp_inbound", "dns_conf_inbound", "https_inbound", "http_inbound"],
+        outboundTag: "direct",
+        ip: [fast_dns_object["address"]],
+        port: fast_dns_object["port"]
+    });
     if (proxy["xray_api"] == '1') {
         push(result, {
             type: "field",
