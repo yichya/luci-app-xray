@@ -111,7 +111,7 @@ const dump = network_dump();
 const dg = get_default_gateway(dump);
 const pd = get_prefix_delegate(dump);
 const lans = get_lan_addresses(dump);
-const log = join(", ", [...dg, ...pd]);
+const log = join(", ", [...dg, ...pd, ...lans.l4s, ...lans.l6s]);
 if (log == "") {
     print("default gateway not available, please wait for interface ready");
 } else {
