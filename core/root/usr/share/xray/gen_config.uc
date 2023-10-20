@@ -121,7 +121,7 @@ function rules(geoip_existence, proxy, bridge, manual_tproxy, extra_inbound, fak
                 });
             }
             return dns_rule;
-        },
+        }(),
         ...manual_tproxy_rules(manual_tproxy),
         ...extra_inbound_rules(extra_inbound),
         ...system_route_rules(proxy),
