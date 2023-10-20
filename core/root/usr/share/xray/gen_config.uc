@@ -109,6 +109,19 @@ function rules(geoip_existence, proxy, bridge, manual_tproxy, extra_inbound, fak
     const extra_inbound_global_udp = extra_inbound_global_udp_tags() || [];
     let result = [
         ...fake_dns_rules(fakedns),
+        ...function () {
+            const dns_rule = [];
+            if (proxy["redirect_dns_port"] == "1") {
+                push(dns_rule, {
+                    type: "field",
+                    inboundTag: [...tproxy_tcp_inbound_v6_tags, ...tproxy_udp_inbound_v6_tags, ...built_in_tcp_inbounds, ...tproxy_udp_inbound_v4_tags, ...extra_inbound_global_tcp, ...extra_inbound_global_udp],
+                    network: "tcp,udp",
+                    port: 53,
+                    outboundTag: "dns_server_outbound"
+                });
+            }
+            return dns_rule;
+        },
         ...manual_tproxy_rules(manual_tproxy),
         ...extra_inbound_rules(extra_inbound),
         ...system_route_rules(proxy),

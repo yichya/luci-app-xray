@@ -289,6 +289,17 @@
     }
 {% endif %}
 
+    set tp_spec_lv4_dr {
+        type ipv4_addr
+        size 16
+        flags interval
+    }
+    set tp_spec_lv6_dr {
+        type ipv6_addr
+        size 16
+        flags interval
+    }
+
     chain xray_transparent_proxy {
         type filter hook prerouting priority filter {{ firewall_priority }}; policy accept;
         mark 0x000000fb {{ counter }} goto tp_spec_wan_fw
@@ -424,6 +435,12 @@
         ip6 daddr @tp_spec_dv6_dg {{ counter }} accept
         ip daddr @tp_spec_dv4_bp {{ counter }} accept
         ip6 daddr @tp_spec_dv6_bp {{ counter }} accept
+{% if (general.redirect_dns_port == "1"): %}
+        ip daddr @tp_spec_lv4_dr tcp dport 53 {{ counter }} goto tp_spec_lan_re
+        ip daddr @tp_spec_lv4_dr udp dport 53 {{ counter }} goto tp_spec_lan_re
+        ip6 daddr @tp_spec_lv6_dr tcp dport 53 {{ counter }} goto tp_spec_lan_re
+        ip6 daddr @tp_spec_lv6_dr udp dport 53 {{ counter }} goto tp_spec_lan_re
+{% endif %}
         ip daddr @tp_spec_dv4_sp {{ counter }} accept
         ip6 daddr @tp_spec_dv6_sp {{ counter }} accept
         {{ counter }} goto tp_spec_lan_re

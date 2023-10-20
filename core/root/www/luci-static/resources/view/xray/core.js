@@ -674,6 +674,9 @@ return view.extend({
         o.default = "AsIs";
         o.rmempty = false;
 
+        o = s.taboption('dns', form.Flag, 'redirect_dns_port', _('Redirect Subnets DNS Queries'), _('Enable redirecting TCP/UDP port 53 to the xray dns module.'));
+        o.modalonly = true;
+
         s.tab('transparent_proxy_rules', _('Transparent Proxy Rules'));
 
         if (geoip_existence) {
