@@ -70,19 +70,19 @@ function gen_tp_spec_dv6_dg(pd) {
     return "";
 }
 
-function generate_include(dg, pd) {
-    const handle = open("/var/etc/xray/gateway_include.nft", "w");
-    handle.write(gen_tp_spec_dv4_dg(dg));
-    handle.write(gen_tp_spec_dv6_dg(pd));
+function generate_include(rule_dg, rule_pd, file_path) {
+    const handle = open(file_path, "w");
+    handle.write(rule_dg);
+    handle.write(rule_pd);
     handle.flush();
     handle.close();
 }
 
-function update_nft(dg, pd) {
+function update_nft(rule_dg, rule_pd) {
     const handle = popen("nft -f -", "w");
     handle.write(`table inet fw4 {
-        ${gen_tp_spec_dv4_dg(dg)}
-        ${gen_tp_spec_dv6_dg(pd)}
+        ${rule_dg}
+        ${rule_pd}
     }`);
     handle.flush();
     handle.close();
@@ -102,7 +102,9 @@ if (log == "") {
     print("default gateway not available, please wait for interface ready");
 } else {
     print(`default gateway available at ${log}\n`);
-    update_nft(dg, pd);
-    generate_include(dg, pd);
+    const rule_dg = gen_tp_spec_dv4_dg(dg);
+    const rule_pd = gen_tp_spec_dv6_dg(pd);
+    update_nft(rule_dg, rule_pd);
+    generate_include(rule_dg, rule_pd, "/var/etc/xray/02_default_gateway_include.nft");
 }
 restart_dnsmasq_if_necessary();
