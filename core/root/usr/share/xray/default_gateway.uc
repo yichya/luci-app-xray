@@ -1,7 +1,7 @@
 #!/usr/bin/ucode
 "use strict";
 
-import { popen, stat } from "fs";
+import { open, popen, stat } from "fs";
 import { connect } from "ubus";
 
 function network_dump() {
@@ -48,24 +48,44 @@ function gen_tp_spec_dv4_dg(dg) {
         return "";
     }
     if (length(dg) > 0) {
-        return `flush set inet fw4 tp_spec_dv4_dg\nadd element inet fw4 tp_spec_dv4_dg { ${join(", ", dg)} }\n`;
+        return `set tp_spec_dv4_dg {
+            type ipv4_addr
+            size 16
+            flags interval
+            elements = { ${join(", ", dg)} }
+        }\n`;
     }
     return "";
 }
 
 function gen_tp_spec_dv6_dg(pd) {
     if (length(pd) > 0) {
-        return `flush set inet fw4 tp_spec_dv6_dg\nadd element inet fw4 tp_spec_dv6_dg { ${join(", ", pd)} }\n`;
+        return `set tp_spec_dv6_dg {
+            type ipv6_addr
+            size 16
+            flags interval
+            elements = { ${join(", ", pd)} }
+        }\n`;
     }
     return "";
 }
 
+function generate_include(dg, pd) {
+    const handle = open("/var/etc/xray/gateway_include.nft", "w");
+    handle.write(gen_tp_spec_dv4_dg(dg));
+    handle.write(gen_tp_spec_dv6_dg(pd));
+    handle.flush();
+    handle.close();
+}
+
 function update_nft(dg, pd) {
-    const process = popen("nft -f -", "w");
-    process.write(gen_tp_spec_dv4_dg(dg));
-    process.write(gen_tp_spec_dv6_dg(pd));
-    process.flush();
-    process.close();
+    const handle = popen("nft -f -", "w");
+    handle.write(`table inet fw4 {
+        ${gen_tp_spec_dv4_dg(dg)}
+        ${gen_tp_spec_dv6_dg(pd)}
+    }`);
+    handle.flush();
+    handle.close();
 }
 
 function restart_dnsmasq_if_necessary() {
@@ -83,5 +103,6 @@ if (log == "") {
 } else {
     print(`default gateway available at ${log}\n`);
     update_nft(dg, pd);
+    generate_include(dg, pd);
 }
 restart_dnsmasq_if_necessary();
