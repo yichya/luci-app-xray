@@ -26,6 +26,9 @@
     const wan_fw_udp_ports = general.wan_fw_udp_ports || [];
     const wan_bp_tcp_ports = general.wan_bp_tcp_ports || [];
     const wan_bp_udp_ports = general.wan_bp_udp_ports || [];
+    const wan_bp_src_tcp_ports = general.wan_bp_src_tcp_ports || [];
+    const wan_bp_src_udp_ports = general.wan_bp_src_udp_ports || [];
+
     const counter = function () {
         if (general.fw4_counter == "1") {
             return "counter packets 0 bytes 0";
@@ -516,6 +519,12 @@
     {% endif %}
     {% if (length(wan_bp_udp_ports) > 0): %}
         udp dport { {{ join(", ", wan_bp_udp_ports) }} } {{ counter }} accept
+    {% endif %}
+    {% if (length(wan_bp_src_tcp_ports) > 0): %}
+        tcp sport { {{ join(", ", wan_bp_src_tcp_ports) }} } {{ counter }} accept
+    {% endif %}
+    {% if (length(wan_bp_src_udp_ports) > 0): %}
+        udp sport { {{ join(", ", wan_bp_src_udp_ports) }} } {{ counter }} accept
     {% endif %}
         meta l4proto tcp {{ counter }} goto tp_spec_lan_dd
         meta l4proto udp {{ counter }} goto tp_spec_lan_dd

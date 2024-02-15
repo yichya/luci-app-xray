@@ -308,7 +308,7 @@ return view.extend({
         balancer_strategy.rmempty = false;
         balancer_strategy.modalonly = true;
 
-        s.tab("lan_hosts_access_control", _("LAN Hosts Access Control"));
+        s.tab("lan_hosts_access_control", _(" Access Control"));
 
         let tproxy_ifaces_v4 = s.taboption('lan_hosts_access_control', widgets.DeviceSelect, 'tproxy_ifaces_v4', _("Devices to enable IPv4 tproxy"), _("Enable IPv4 transparent proxy on these interfaces / network devices."));
         tproxy_ifaces_v4.noaliases = true;
@@ -557,6 +557,14 @@ return view.extend({
         o.datatype = "portrange";
 
         o = s.taboption('outbound_routing', form.DynamicList, "wan_bp_udp_ports", _("Bypassed UDP Ports"), _("Requests to these UDP Ports won't be forwarded through Xray."));
+        o.depends("transparent_default_port_policy", "forwarded");
+        o.datatype = "portrange";
+
+        o = s.taboption('outbound_routing', form.DynamicList, "wan_bp_src_tcp_ports", _("Bypassed Src TCP Ports"), _("Requests From these TCP Ports won't be forwarded through Xray."));
+        o.depends("transparent_default_port_policy", "forwarded");
+        o.datatype = "portrange";
+
+        o = s.taboption('outbound_routing', form.DynamicList, "wan_bp_src_udp_ports", _("Bypassed Src UDP Ports"), _("Requests From these UDP Ports won't be forwarded through Xray."));
         o.depends("transparent_default_port_policy", "forwarded");
         o.datatype = "portrange";
 
