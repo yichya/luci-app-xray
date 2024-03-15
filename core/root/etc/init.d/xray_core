@@ -114,14 +114,14 @@ flush_dnsmasq() {
 create_when_enable() {
     [ "$(uci_get_by_type general transparent_proxy_enable)" == "1" ] || return 0
     logger -st xray[$$] -p4 "Setting dnsmasq and firewall for transparent proxy..."
-    setup_dnsmasq
+    # setup_dnsmasq
     setup_firewall
     logger -st xray[$$] -p4 $(ucode /usr/share/xray/default_gateway.uc)
 }
 
 flush_when_disable() {
     logger -st xray[$$] -p4 "Resetting dnsmasq and firewall configurations..."
-    flush_dnsmasq
+    # flush_dnsmasq
     flush_firewall
 }
 
