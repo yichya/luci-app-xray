@@ -81,7 +81,7 @@ jobs:
 
           if ! [ -f "$SDK_HOME/Makefile" ]; then 
              echo "$SDK_HOME exists, no need download sdk"
-          else:
+          else
             echo "$SDK_HOME not exists, download sdk......."
             if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
               wget -q -O "$SDK_FILE" "$SDK_URL_PATH/$SDK_FILE"
