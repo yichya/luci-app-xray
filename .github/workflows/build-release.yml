@@ -13,7 +13,8 @@ env:
 jobs:
   release:
     name: Build for ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     strategy:
       fail-fast: false
       matrix:
