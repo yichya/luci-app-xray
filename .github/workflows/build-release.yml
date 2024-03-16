@@ -79,7 +79,7 @@ jobs:
           test -d "$SDK_HOME" || mkdir -p "$SDK_HOME"
           echo "SDK_HOME=$SDK_HOME" >> $GITHUB_ENV
 
-          if ! [ -f "$SDK_HOME/Makefile" ]; then 
+          if  [ -f "$SDK_HOME/Makefile" ]; then 
              echo "$SDK_HOME exists, no need download sdk"
           else
             echo "$SDK_HOME not exists, download sdk......."
