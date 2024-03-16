@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/snapshots/targets/x86/64
-            sdk_name: -sdk-x86-64_
+          - arch: mediatek-filogic
+            sdk_url_path: https://downloads.openwrt.org/releases/23.05.2/targets/mediatek/filogic/
+            sdk_name: openwrt-sdk-23.05.2-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
@@ -62,7 +62,8 @@ jobs:
           echo "CACHE_DIR_SDK=$CACHE_DIR_SDK" >> $GITHUB_ENV
           echo "CACHE_DIR_DL=$CACHE_DIR_DL" >> $GITHUB_ENV
           echo "CACHE_DIR_FEEDS=$CACHE_DIR_FEEDS" >> $GITHUB_ENV
-          echo "SDK_HOME=$(mktemp -d)" >> $GITHUB_ENV
+          # 2024.03.16 amintong 设置固定的sdk路径 ～/sdk/$SDK_FILE
+          # echo "SDK_HOME=$(mktemp -d)" >> $GITHUB_ENV
       - name: Download and Unzip SDK
         run: |
           cd "$CACHE_DIR_SDK"
@@ -80,6 +81,13 @@ jobs:
           fi
           cd -
           file "$CACHE_DIR_SDK/$SDK_FILE"
+
+          # 2024.03.16 amintong 设置固定的sdk路径 ～/sdk/$SDK_FILE
+          SDK_HOME="$(eval echo "~/sdk/$SDK_FILE")"
+          echo "SDK_HOME: $SDK_HOME"
+          test -d "$SDK_HOME" || mkdir -p "$SDK_HOME"
+          echo "SDK_HOME=$SDK_HOME" >> $GITHUB_ENV
+          
           tar -Jxf "$CACHE_DIR_SDK/$SDK_FILE" -C "$SDK_HOME" --strip=1
           cd "$SDK_HOME"
           test -d "dl" && rm -rf "dl" || true
