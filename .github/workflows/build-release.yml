@@ -21,7 +21,7 @@ jobs:
         include:
           - arch: mediatek-filogic
             sdk_url_path: https://downloads.openwrt.org/releases/23.05.2/targets/mediatek/filogic/
-            sdk_name: openwrt-sdk-23.05.2-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+            sdk_name: openwrt-sdk-23.05.2-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
@@ -72,23 +72,29 @@ jobs:
             exit 1
           fi
           SDK_FILE="$(cat sha256sums.small | cut -d' ' -f2 | sed 's/*//g')"
-          if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-            wget -q -O "$SDK_FILE" "$SDK_URL_PATH/$SDK_FILE"
-            if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-              echo "::error::SDK can not be verified!"
-              exit 1
-            fi
-          fi
-          cd -
-          file "$CACHE_DIR_SDK/$SDK_FILE"
-
+          
           # 2024.03.16 amintong 设置固定的sdk路径 ～/sdk/$SDK_FILE
-          SDK_HOME="$(eval echo "~/sdk/$SDK_FILE")"
+          SDK_HOME="$(eval echo "~/sdk/$SDK_NAME")"
           echo "SDK_HOME: $SDK_HOME"
           test -d "$SDK_HOME" || mkdir -p "$SDK_HOME"
           echo "SDK_HOME=$SDK_HOME" >> $GITHUB_ENV
+
+          if ! [ -f "$SDK_HOME/Makefile" ]; then 
+             echo "$SDK_HOME exists, no need download sdk"
+          else:
+            echo "$SDK_HOME not exists, download sdk......."
+            if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
+              wget -q -O "$SDK_FILE" "$SDK_URL_PATH/$SDK_FILE"
+              if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
+                echo "::error::SDK can not be verified!"
+                exit 1
+              fi
+            fi
+            cd -
+            file "$CACHE_DIR_SDK/$SDK_FILE"
+            tar -Jxf "$CACHE_DIR_SDK/$SDK_FILE" -C "$SDK_HOME" --strip=1
+          fi
           
-          tar -Jxf "$CACHE_DIR_SDK/$SDK_FILE" -C "$SDK_HOME" --strip=1
           cd "$SDK_HOME"
           test -d "dl" && rm -rf "dl" || true
           test -d "feeds" && rm -rf "feeds" || true
