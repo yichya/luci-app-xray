@@ -33,6 +33,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Print 
-        run: echo "::github path  ${{ github.workspace }} "
+        run:  workspace_=`echo "${{ github.workspace }}" | sed 's/\/$//'` && echo ${workspace}
 
     
