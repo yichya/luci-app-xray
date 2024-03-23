@@ -110,7 +110,9 @@ jobs:
         run: |
           cd "$SDK_HOME"
           ./scripts/feeds update -a
-          workspace_=`echo "${{ github.workspace }}" | sed 's/\/$//'` && ln -s "${workspace_}" "package/$PACKAGE_NAME"
+          # amintong 先删除旧软链，防止出现嵌套
+          rm "package/$PACKAGE_NAME"
+          ln -sv "${{github.workspace}}" "package/$PACKAGE_NAME"
           ./scripts/feeds install -a
           cd -
       - name: Build Packages
