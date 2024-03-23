@@ -110,7 +110,7 @@ jobs:
         run: |
           cd "$SDK_HOME"
           ./scripts/feeds update -a
-          ln -s "${{ github.workspace }}"/$PACKAGE_NAME "package/$PACKAGE_NAME"
+          workspace_=`echo "${{ github.workspace }}" | sed 's/\/$//'` && ln -s "${workspace_}" "package/$PACKAGE_NAME"
           ./scripts/feeds install -a
           cd -
       - name: Build Packages
