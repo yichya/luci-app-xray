@@ -1,0 +1,38 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+env:
+  PACKAGE_NAME: luci-app-xray
+  CACHE_DIR: ~/cache
+
+jobs:
+  release:
+    name: Build for ${{ matrix.arch }}
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: mediatek-filogic
+            sdk_url_path: https://downloads.openwrt.org/releases/23.05.2/targets/mediatek/filogic/
+            sdk_name: openwrt-sdk-23.05.2-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64
+
+    env:
+      SDK_URL_PATH: ${{ matrix.sdk_url_path }}
+      SDK_NAME: ${{ matrix.sdk_name }}
+      CCACHE_DIR: ~/.ccache
+      CONFIG_CCACHE: y
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Print 
+        run: echo "::github path  ${{ github.workspace }} "
+
+    
