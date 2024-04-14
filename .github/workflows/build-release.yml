@@ -111,8 +111,8 @@ jobs:
           cd "$SDK_HOME"
           ./scripts/feeds update -a
           # amintong 使用go1.22.0
-          rm -rf feeds/packages/lang/golang
-          git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
+          #rm -rf feeds/packages/lang/golang
+          #git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
 
           # amintong 先删除旧软链，防止出现嵌套
           rm "package/$PACKAGE_NAME"
