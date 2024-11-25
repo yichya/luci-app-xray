@@ -40,6 +40,10 @@ Fork this repository and:
 * Wait until actions finish
 * Use `opkg -i *` to install both ipks from Releases.
 
+## Changelog since 3.5.0
+
+* 2024-11-26 chore: bump status version
+
 ## Changelog since 3.4.0
 
 * 2024-02-18 chore: optimize code style; bump version
