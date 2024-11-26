@@ -19,8 +19,8 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/snapshots/targets/x86/64
-            sdk_name: -sdk-x86-64_
+            sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
+            sdk_name: -sdk-23.05.5-x86-64_
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
