@@ -6,5 +6,5 @@ config general
 	list geoip_direct_code_list_v6 'cn'
 	list tproxy_ifaces_v4 'br-lan'
 	list tproxy_ifaces_v6 'br-lan'
-	option transparent_proxy_enable '1'
+	option transparent_proxy_enable '0'
 	option xray_bin '/usr/bin/xray'
