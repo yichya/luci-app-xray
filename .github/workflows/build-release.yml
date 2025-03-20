@@ -33,10 +33,10 @@ jobs:
 
       - name: Prepare Cache Key
         id: cache_key
-        run: echo "::set-output name=timestamp::$(date +"%s")"
+        run: echo "::setOutput name=timestamp::$(date +"%s")"
 
       - name: Setup Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ env.CACHE_DIR }}
