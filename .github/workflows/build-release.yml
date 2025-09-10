@@ -102,10 +102,13 @@ jobs:
         run: |
           cd "$SDK_HOME"
           make defconfig
-          make package/${PACKAGE_NAME}/status/{clean,compile} V=s
+          make package/luci-app-xray/{clean,compile} V=s
+          make package/luci-app-xray-status/{clean,compile} V=s
           find "$SDK_HOME/bin/" -type f -name "*.ipk" -exec ls -lh {} \;
           cd -
       - name: Copy Bin Files
+       env:
+          PACKAGE_NAME: luci-app-xray
         run: |
           find "$SDK_HOME/bin/" -type f -name "${PACKAGE_NAME}*.ipk" -exec cp {} "${{ github.workspace }}" \;
           find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
