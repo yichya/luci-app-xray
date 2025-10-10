@@ -1,0 +1,75 @@
+filename: .github/workflows/build-mips24kc.yml
+action: replace
+fragment: |
+  name: build-luci-app-xray-mips24kc
+  on:
+    workflow_dispatch:
+    push:
+      tags: ['build-*']
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      env:
+        OWRT_VER: "23.05.6"
+        TARGET: "ath79"
+        SUBTARGET: "generic"
+        SDK_FILE: "openwrt-sdk-${{ env.OWRT_VER }}-${{ env.TARGET }}-${{ env.SUBTARGET }}_gcc-12.3.0_musl.Linux-x86_64.tar.zst"
+        SDK_URL: "https://downloads.openwrt.org/releases/${{ env.OWRT_VER }}/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/${{ env.SDK_FILE }}"
+      steps:
+        - uses: actions/checkout@v4
+        - name: Deps
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3 unzip zlib1g-dev file wget curl rsync zstd
+        - name: Download SDK
+          run: wget -q "$SDK_URL"
+        - name: Extract SDK
+          run: |
+            tar --zstd -xf "$SDK_FILE"
+            echo "SDK_DIR=$(basename "$SDK_FILE" .tar.zst)" >> $GITHUB_ENV
+        - name: Feeds
+          working-directory: ${{ env.SDK_DIR }}
+          run: |
+            cat > feeds.conf.default <<'EOF'
+            src-git packages https://git.openwrt.org/feed/packages.git;openwrt-23.05
+            src-git luci https://git.openwrt.org/project/luci.git;openwrt-23.05
+            src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05
+            src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-23.05
+            EOF
+            ./scripts/feeds update -a
+            ./scripts/feeds install -a
+        - name: Add luci-app-xray
+          working-directory: ${{ env.SDK_DIR }}
+          run: |
+            mkdir -p package/luci-app-xray
+            rsync -a --exclude .git "$GITHUB_WORKSPACE"/ package/luci-app-xray/
+            ./scripts/feeds install xray-core v2ray-geoip v2ray-geosite || true
+        - name: Build
+          working-directory: ${{ env.SDK_DIR }}
+          run: |
+            make defconfig
+            make package/luci-app-xray/compile -j$(nproc) V=s
+            make package/xray-core/compile -j$(nproc) V=s || true
+            make package/v2ray-geoip/compile -j$(nproc) V=s || true
+            make package/v2ray-geosite/compile -j$(nproc) V=s || true
+        - name: Collect
+          working-directory: ${{ env.SDK_DIR }}
+          run: |
+            mkdir -p dist
+            find bin/packages -type f -name "*xray*.ipk" -exec cp -v {} dist/ \;
+            ls -l dist
+        - uses: actions/upload-artifact@v4
+          with:
+            name: ipks-mips_24kc
+            path: ${{ env.SDK_DIR }}/dist/*.ipk
+commit: "CI: включили Actions и сборку под mips_24kc (ath79, 23.05.6)"
+git: |
+  # альтернатива через Git:
+  git switch -c ci/mips24kc
+  mkdir -p .github/workflows
+  $EDITOR .github/workflows/build-mips24kc.yml
+  git add .github/workflows/build-mips24kc.yml
+  git commit -m "CI: сборка luci-app-xray под mips_24kc (ath79, 23.05.6)"
+  git push -u origin ci/mips24kc
+  git tag -a build-$(date +%F)-mips24kc -m build
+  git push origin --tags
