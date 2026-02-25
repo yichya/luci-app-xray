@@ -3,7 +3,7 @@
 'require form';
 
 function transport_tcp(transport, sub_section, tab_name) {
-    transport.value("tcp", "TCP");
+    transport.value("tcp", "TCP (RAW)");
 
     let tcp_guise = sub_section.taboption(tab_name, form.ListValue, "tcp_guise", _("[tcp] Fake Header Type"));
     tcp_guise.depends("transport", "tcp");
@@ -197,7 +197,7 @@ function transport_httpupgrade(transport, sub_section, tab_name) {
 }
 
 function transport_splithttp(transport, sub_section, tab_name) {
-    transport.value("splithttp", "SplitHTTP");
+    transport.value("splithttp", "SplitHTTP (XHTTP)");
 
     let splithttp_host = sub_section.taboption(tab_name, form.Value, "splithttp_host", _("[splithttp] Host"));
     splithttp_host.depends("transport", "splithttp");
@@ -206,6 +206,38 @@ function transport_splithttp(transport, sub_section, tab_name) {
     let splithttp_path = sub_section.taboption(tab_name, form.Value, "splithttp_path", _("[splithttp] Path"));
     splithttp_path.depends("transport", "splithttp");
     splithttp_path.modalonly = true;
+}
+
+function transport_hysteria(transport, sub_section, tab_name) {
+    transport.value("hysteria", "Hysteria");
+
+    let hysteria_up = sub_section.taboption(tab_name, form.Value, "hysteria_up", _("[hysteria] Up Speed Limit"), _("Unit in Mbps; Leave both up and down empty to disable Brutal congestion control."));
+    hysteria_up.depends("transport", "hysteria");
+    hysteria_up.placeholder = "";
+    hysteria_up.datatype = "uinteger";
+    hysteria_up.rmempty = true;
+    hysteria_up.modalonly = true;
+
+    let hysteria_down = sub_section.taboption(tab_name, form.Value, "hysteria_down", _("[hysteria] Down Speed Limit"), _("Unit in Mbps; Leave both up and down empty to disable Brutal congestion control."));
+    hysteria_down.depends("transport", "hysteria");
+    hysteria_down.placeholder = "";
+    hysteria_down.datatype = "uinteger";
+    hysteria_down.rmempty = true;
+    hysteria_down.modalonly = true;
+
+    let hysteria_udphop_port = sub_section.taboption(tab_name, form.Value, "hysteria_udphop_port", _("[hysteria] UDP Hop"), _("Port Range"));
+    hysteria_udphop_port.depends("transport", "hysteria");
+    hysteria_udphop_port.placeholder = "";
+    hysteria_udphop_port.datatype = "portrange";
+    hysteria_udphop_port.rmempty = true;
+    hysteria_udphop_port.modalonly = true;
+
+    let hysteria_udphop_interval = sub_section.taboption(tab_name, form.Value, "hysteria_udphop_interval", _("[hysteria] UDP Hop Interval"), _("seconds"));
+    hysteria_udphop_interval.depends("transport", "hysteria");
+    hysteria_udphop_interval.placeholder = "30";
+    hysteria_udphop_interval.datatype = "uinteger";
+    hysteria_udphop_interval.rmempty = true;
+    hysteria_udphop_interval.modalonly = true;
 }
 
 return baseclass.extend({
@@ -218,5 +250,6 @@ return baseclass.extend({
         transport_grpc(transport, sub_section, tab_name);
         transport_splithttp(transport, sub_section, tab_name);
         transport_httpupgrade(transport, sub_section, tab_name);
+        transport_hysteria(transport, sub_section, tab_name);
     }
 });
