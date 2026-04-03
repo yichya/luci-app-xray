@@ -1,0 +1,1109 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "/usr/bin/xray (default, exist)"
+msgstr "/usr/bin/xray (默认, 存在)"
+
+msgid "<i>any</i>"
+msgstr "<i>任意</i>"
+
+msgid "<i>never</i>"
+msgstr "<i>从不</i>"
+
+msgid "<i>original</i>"
+msgstr "<i>原始</i>"
+
+msgid "<i>unreachable</i>"
+msgstr "<i>不可达</i>"
+
+msgid "ALPN"
+msgstr "ALPN"
+
+msgid "Access Control Strategy (IPv4)"
+msgstr "访问控制策略 (IPv4)"
+
+msgid "Access Control Strategy (IPv6)"
+msgstr "访问控制策略 (IPv6)"
+
+msgid "Access log will also be written to System Log."
+msgstr "访问日志也会被写入系统日志。"
+
+msgid "Add <a href=\"/cgi-bin/luci/admin/status/nftables\">counters to firewall4</a> for transparent proxy rules. (Not supported in all OpenWrt versions. )"
+msgstr "为透明代理规则在 <a href=\"/cgi-bin/luci/admin/status/nftables\">防火墙4 添加计数器</a>。(部分 OpenWrt 版本不支持。)"
+
+msgid "Add more socks5 / http inbounds and redirect to other outbounds."
+msgstr "添加更多 socks5 / http 入站并重定向到其他出站。"
+
+msgid "Address Pool (IPv4)"
+msgstr ""
+
+msgid "Address Pool (IPv6)"
+msgstr ""
+
+msgid "Address Pool Size (IPv4)"
+msgstr ""
+
+msgid "Address Pool Size (IPv6)"
+msgstr ""
+
+msgid "Alias (optional)"
+msgstr "别名 (可选)"
+
+msgid "Alias / MAC Address"
+msgstr "别名 / MAC 地址"
+
+msgid "Align Fast DNS & GeoIP Direct"
+msgstr ""
+
+msgid "Asset files check: "
+msgstr ""
+
+msgid "Availability of outbound servers are probed every few seconds."
+msgstr "每隔几秒钟探测一次出站服务器的可用性。"
+
+msgid "Avoid dnsmasq filtering RFC1918 IP addresses (and some TESTNET addresses as well) from result.<br/>Must be enabled for TESTNET addresses (<code>192.0.2.0/24</code>, <code>198.51.100.0/24</code>, <code>203.0.113.0/24</code>). Addresses like <a href=\"https://www.as112.net/\">AS112 Project</a> (<code>192.31.196.0/24</code>, <code>192.175.48.0/24</code>) or <a href=\"https://www.nyiix.net/technical/rtbh/\">NYIIX RTBH</a> (<code>198.32.160.7</code>) can avoid that."
+msgstr "避免 dnsmasq 从结果中过滤 RFC1918 IP 地址（以及一些 TESTNET 地址）。<br/>必须为 TESTNET 地址（<code>192.0.2.0/24</code>，<code>198.51.100.0/24</code>，<code>203.0.113.0/24</code>）启用。像 <a href=\"https://www.as112.net/\">AS112 Project</a>（<code>192.31.196.0/24</code>，<code>192.175.48.0/24</code>）或 <a href=\"https://www.nyiix.net/technical/rtbh/\">NYIIX RTBH</a>（<code>198.32.160.7</code>）这样的地址可以避免这种情况。"
+
+msgid "Avoid proxy loopback problems with local (gateway) traffic"
+msgstr "避免本地（网关）流量的代理环回问题"
+
+msgid "Balancer Strategy"
+msgstr ""
+
+msgid "BitTorrent (uTP)"
+msgstr "BitTorrent (uTP)"
+
+msgid "Bittorrent Direct"
+msgstr ""
+
+msgid "Blocked domain rules"
+msgstr ""
+
+msgid "Blocked to loopback"
+msgstr ""
+
+msgid "Bridge"
+msgstr "桥接"
+
+msgid "Buffer Size"
+msgstr "缓冲区大小"
+
+msgid "Bypass tproxy for gids"
+msgstr ""
+
+msgid "Bypass tproxy for uids"
+msgstr ""
+
+msgid "Bypassed"
+msgstr "已绕过"
+
+msgid "Bypassed IP"
+msgstr "绕过 IP"
+
+msgid "Bypassed TCP Ports"
+msgstr "绕过 TCP 端口"
+
+msgid "Bypassed UDP Ports"
+msgstr "绕过 UDP 端口"
+
+msgid "Bypassed domain rules"
+msgstr ""
+
+msgid "Compared to iptables REDIRECT, Xray could do NAT46 / NAT64 (for example accessing IPv6 only sites). See <a href=\"https://github.com/v2ray/v2ray-core/issues/2233\">FakeDNS</a> for details."
+msgstr "与 iptables REDIRECT 相比，Xray 可以执行 NAT46 / NAT64（例如访问仅限 IPv6 的站点）。有关详细信息，请参阅 <a href=\"https://github.com/v2ray/v2ray-core/issues/2233\">FakeDNS</a>。"
+
+msgid "Connection Idle Timeout"
+msgstr "连接空闲超时"
+
+msgid "Country Code"
+msgstr ""
+
+msgid "Custom Configuration Hook"
+msgstr "自定义配置钩子"
+
+msgid "Custom Configurations"
+msgstr ""
+
+msgid "Custom Options"
+msgstr ""
+
+msgid "DNS"
+msgstr ""
+
+msgid "DNS Hijacking"
+msgstr "DNS 劫持"
+
+msgid "DNS for resolving known polluted domains (specify forwarded domain rules here)"
+msgstr "用于解析已知被污染域名的 DNS (在此处指定转发域名规则)"
+
+msgid "DNS for resolving other sites (not in the rules above) and DNS records other than A or AAAA (TXT and MX for example)"
+msgstr "用于解析其他站点 (不在上述规则中) 以及除 A 或 AAAA 之外的 DNS 记录 (例如 TXT 和 MX) 的 DNS"
+
+msgid "DNS for resolving outbound domains and following bypassed domains"
+msgstr "用于解析出站域名和以下绕过域名的 DNS"
+
+msgid "DNS log will also be written to System Log."
+msgstr "DNS 日志也会被写入系统日志。"
+
+msgid "DNS over HTTPS"
+msgstr "DNS over HTTPS"
+
+msgid "DNS over HTTPS (direct)"
+msgstr "DNS over HTTPS (直连)"
+
+msgid "DNS over QUIC (direct)"
+msgstr "DNS over QUIC (直连)"
+
+msgid "Data transferred for inbounds since Xray start."
+msgstr "自 Xray 启动以来入站传输的数据。"
+
+msgid "Data transferred for outbounds since Xray start."
+msgstr "自 Xray 启动以来出站传输的数据。"
+
+msgid "Default DNS"
+msgstr ""
+
+msgid "Default Fallback HTTP Server"
+msgstr "默认回退 HTTP 服务器"
+
+msgid "Default Ports Policy"
+msgstr ""
+
+msgid "Default instance"
+msgstr "默认实例"
+
+msgid "Deprecated Features"
+msgstr ""
+
+msgid "Deprecated for security concerns and will be removed in next major version. Use Extra Inbound instead."
+msgstr "出于安全考虑已弃用，并将在下一个主要版本中删除。请改用额外入站。"
+
+msgid "Deprecated. Make sure you always use VMessAEAD."
+msgstr "已弃用。确保您始终使用 VMessAEAD。"
+
+msgid "Destination"
+msgstr ""
+
+msgid "Destination Address"
+msgstr "目标地址"
+
+msgid "Destination Port"
+msgstr "目标端口"
+
+msgid "Devices to disable IPv4 tproxy"
+msgstr "禁用 IPv4 透明代理的设备"
+
+msgid "Devices to disable IPv6 tproxy"
+msgstr "禁用 IPv6 透明代理的设备"
+
+msgid "Devices to enable IPv4 tproxy"
+msgstr "启用 IPv4 透明代理的设备"
+
+msgid "Devices to enable IPv6 tproxy"
+msgstr "启用 IPv6 透明代理的设备"
+
+msgid "Dialer Proxy"
+msgstr ""
+
+msgid "Disable tproxy"
+msgstr "禁用透明代理"
+
+msgid "Disable transparent proxy"
+msgstr "禁用透明代理"
+
+msgid "Disabled"
+msgstr "已禁用"
+
+msgid "Dnsmasq Integration Mode"
+msgstr ""
+
+msgid "Do not override TTL for packets with these destination TCP / UDP ports."
+msgstr "不要覆盖具有这些目标 TCP/UDP 端口的数据包的 TTL。"
+
+msgid "Do not use port 53 (dnsmasq), port 5353 (mDNS) or other common ports"
+msgstr "不要使用端口 53 (dnsmasq)、端口 5353 (mDNS) 或其他常用端口"
+
+msgid "Domain"
+msgstr "域名"
+
+msgid "Domain Strategy"
+msgstr ""
+
+msgid "Domain names"
+msgstr "域名"
+
+msgid "Domain names to associate"
+msgstr "要关联的域名"
+
+msgid "Domain resolution strategy when matching domain against rules. (For tproxy, this is effective only when sniffing is enabled.)"
+msgstr "匹配域名规则时的域名解析策略。(对于透明代理，这仅在启用嗅探时有效。)"
+
+msgid "Downlink"
+msgstr ""
+
+msgid "Downlink Only Timeout"
+msgstr "仅下行超时"
+
+msgid "Dynamic Direct"
+msgstr ""
+
+msgid "Dynamic Direct Timeout"
+msgstr ""
+
+msgid "Effective when DNS above is set. Direct methods will bypass Xray completely so it may get blocked."
+msgstr "当设置了上述 DNS 时有效。直连方法将完全绕过 Xray，因此可能会被阻止。"
+
+msgid "Email / Username"
+msgstr ""
+
+msgid "Enable Access Log"
+msgstr "启用访问日志"
+
+msgid "Enable DNS Log"
+msgstr "启用 DNS 日志"
+
+msgid "Enable Firewall Counters"
+msgstr "启用防火墙计数器"
+
+msgid "Enable IPv4 transparent proxy on these interfaces / network devices."
+msgstr "在这些接口/网络设备上启用 IPv4 透明代理。"
+
+msgid "Enable IPv6 transparent proxy on these interfaces / network devices."
+msgstr "在这些接口/网络设备上启用 IPv6 透明代理。"
+
+msgid "Enable Observatory"
+msgstr "启用观测站"
+
+msgid "Enable Sniffing"
+msgstr ""
+
+msgid "Enable Statistics"
+msgstr "启用统计"
+
+msgid "Enable Transparent Proxy"
+msgstr ""
+
+msgid "Enable Xray API Service"
+msgstr "启用 Xray API 服务"
+
+msgid "Enable Xray HTTPS Server"
+msgstr "启用 Xray HTTPS 服务器"
+
+msgid "Enable Xray Metrics Server"
+msgstr "启用 Xray 指标服务器"
+
+msgid "Enable built-in metrics server for pprof and expvar. See <a href='https://github.com/XTLS/Xray-core/pull/1000'>here</a> for details."
+msgstr "为 pprof 和 expvar 启用内置指标服务器。有关详细信息，请参见 <a href='https://github.com/XTLS/Xray-core/pull/1000'>此处</a>。"
+
+msgid "Enable for IPv4 TCP"
+msgstr "启用 IPv4 TCP"
+
+msgid "Enable for IPv4 UDP"
+msgstr "启用 IPv4 UDP"
+
+msgid "Enable for IPv6 TCP"
+msgstr "启用 IPv6 TCP"
+
+msgid "Enable for IPv6 UDP"
+msgstr "启用 IPv6 UDP"
+
+msgid "Enable integrations with dnsmasq and nftables. To disable luci-app-xray completely, go to <a href=\"/cgi-bin/luci/admin/system/startup\">Startup</a> and disable <code>xray_core</code>."
+msgstr ""
+
+msgid "Enable latency measurement for TCP and UDP outbounds."
+msgstr "启用对 TCP 和 UDP 出站的延迟测量。"
+
+msgid "Enable statistics of inbounds / outbounds data. Use Xray API to query values."
+msgstr "启用入站/出站数据统计。使用 Xray API 查询值。"
+
+msgid "Enable tproxy"
+msgstr "启用透明代理"
+
+msgid "Enable transparent proxy"
+msgstr "启用透明代理"
+
+msgid "Exempt rebind protection"
+msgstr "豁免重绑定保护"
+
+msgid "Expected Server IPs"
+msgstr "预期的服务器 IP"
+
+msgid "Extra DNS Server Ports"
+msgstr "额外 DNS 服务器端口"
+
+msgid "Extra Firewall Options"
+msgstr "额外防火墙选项"
+
+msgid "Extra Inbounds"
+msgstr "额外入站"
+
+msgid "Extra Options"
+msgstr "额外选项"
+
+msgid "Extra inbound (TCP4)"
+msgstr "额外入站 (TCP4)"
+
+msgid "Extra inbound (TCP6)"
+msgstr "额外入站 (TCP6)"
+
+msgid "Extra inbound (UDP4)"
+msgstr "额外入站 (UDP4)"
+
+msgid "Extra inbound (UDP6)"
+msgstr "额外入站 (UDP6)"
+
+msgid "FakeDNS"
+msgstr "FakeDNS"
+
+msgid "FakeDNS Routing"
+msgstr "FakeDNS 路由"
+
+msgid "Fallback Servers"
+msgstr "回退服务器"
+
+msgid "Fast DNS"
+msgstr "快速 DNS"
+
+msgid "Fill <code>0</code> to keep original port unchanged."
+msgstr "填写 <code>0</code> 以保持原始端口不变。"
+
+msgid "Fill an IP address or a rule like <code>geoip:cn</code> or <code>ext:/geoip/cloudflare.dat:cloudflare</code>."
+msgstr "填写 IP 地址或类似 <code>geoip:cn</code> 或 <code>ext:/geoip/cloudflare.dat:cloudflare</code> 的规则。"
+
+msgid "Fill user_id for vmess / VLESS, or password for other outbound (also supports <a href=\"https://github.com/XTLS/Xray-core/issues/158\">Xray UUID Mapping</a>)"
+msgstr "填写 vmess / VLESS 的 user_id，或其他出站的密码（也支持 <a href=\"https://github.com/XTLS/Xray-core/issues/158\">Xray UUID 映射</a>）"
+
+msgid "Fill user_id for vmess / VLESS, or password for shadowsocks / trojan (also supports <a href=\"https://github.com/XTLS/Xray-core/issues/158\">Xray UUID Mapping</a>)"
+msgstr "填写 vmess / VLESS 的 user_id，或 shadowsocks / trojan 的密码（也支持 <a href=\"https://github.com/XTLS/Xray-core/issues/158\">Xray UUID 映射</a>）"
+
+msgid "Filter GeoIP by Country Code"
+msgstr "按国家代码过滤 GeoIP"
+
+msgid "Filter GeoSite by Country Code"
+msgstr "按国家代码过滤 GeoSite"
+
+msgid "Filter resolved IPs by GeoIP or CIDR. Resource file <code>geoip.dat</code> is required for GeoIP filtering."
+msgstr "按 GeoIP 或 CIDR 过滤解析的 IP。GeoIP 过滤需要资源文件 <code>geoip.dat</code>。"
+
+msgid "Force Forward (TCP)"
+msgstr "强制转发 (TCP)"
+
+msgid "Force Forward (UDP)"
+msgstr "强制转发 (UDP)"
+
+msgid "Force Forward server (TCP)"
+msgstr "强制转发服务器 (TCP)"
+
+msgid "Force Forward server (UDP)"
+msgstr "强制转发服务器 (UDP)"
+
+msgid "Forward via extra inbound"
+msgstr "通过额外入站转发"
+
+msgid "Forwarded"
+msgstr "已转发"
+
+msgid "Forwarded IP"
+msgstr "转发 IP"
+
+msgid "Forwarded TCP Ports"
+msgstr "转发 TCP 端口"
+
+msgid "Forwarded UDP Ports"
+msgstr "转发 UDP 端口"
+
+msgid "Forwarded domain rules"
+msgstr "转发域名规则"
+
+msgid "General Settings"
+msgstr "常规设置"
+
+msgid "GeoIP"
+msgstr "GeoIP"
+
+msgid "GeoIP Direct Code List (IPv4)"
+msgstr "GeoIP 直连代码列表 (IPv4)"
+
+msgid "GeoIP Direct Code List (IPv6)"
+msgstr "GeoIP 直连代码列表 (IPv6)"
+
+msgid "GeoIP entries"
+msgstr ""
+
+msgid "GeoSite"
+msgstr "GeoSite"
+
+msgid "GeoSite entries"
+msgstr ""
+
+msgid "Global"
+msgstr "全局"
+
+msgid "HTTP Proxy"
+msgstr "HTTP 代理"
+
+msgid "HTTP proxy port"
+msgstr "HTTP 代理端口"
+
+msgid "HTTPS Server"
+msgstr "HTTPS 服务器"
+
+msgid "Handshake Timeout"
+msgstr "握手超时"
+
+msgid "Hijack TCP DNS Requests"
+msgstr "劫持 TCP DNS 请求"
+
+msgid "Hijack UDP DNS Requests"
+msgstr "劫持 UDP DNS 请求"
+
+msgid "Hosts in these GeoIP sets will not be forwarded through Xray. Remove all items to forward all non-private hosts."
+msgstr "这些 GeoIP 集合中的主机不会通过 Xray 转发。删除所有项目以转发所有非私有主机。"
+
+msgid "If enabled, no bittorrent request will be forwarded through Xray."
+msgstr "如果启用，则不会通过 Xray 转发任何 bittorrent 请求。"
+
+msgid "If not selected, this inbound will use global settings (including sniffing settings)."
+msgstr "如果不选择，此入站将使用全局设置（包括嗅探设置）。"
+
+msgid "Inbound Statistics"
+msgstr "入站统计"
+
+msgid "Inbound Type"
+msgstr "入站类型"
+
+msgid "Inbounds"
+msgstr "入站"
+
+msgid "Instance"
+msgstr "实例"
+
+msgid "Integrated Instances"
+msgstr "集成实例"
+
+msgid "LAN Hosts Access Control"
+msgstr "局域网主机访问控制"
+
+msgid "Larger value consumes more memory and performs generally better. Unit in seconds."
+msgstr "较大的值消耗更多内存，通常性能更好。单位为秒。"
+
+msgid "Last check"
+msgstr "上次检查"
+
+msgid "Last seen"
+msgstr "上次查看"
+
+msgid "Latency"
+msgstr "延迟"
+
+msgid "Leave empty to forward all ports."
+msgstr "留空以转发所有端口。"
+
+msgid "Leave empty to keep original address unchanged."
+msgstr "留空以保持原始地址不变。"
+
+msgid "Listen Address"
+msgstr "监听地址"
+
+msgid "Listen Port"
+msgstr "监听端口"
+
+msgid "Listen for DNS Requests on multiple ports (all of which serves as dnsmasq upstream servers).<br/>For example if Xray DNS Server Port is 5300 and use 3 extra ports, 5300 - 5303 will be used for DNS requests.<br/>Increasing this value may help reduce the possibility of temporary DNS lookup failures."
+msgstr "在多个端口上侦听 DNS 请求（所有端口都充当 dnsmasq 上游服务器）。<br/>例如，如果 Xray DNS 服务器端口为 5300 并使用 3 个额外端口，则 5300 - 5303 将用于 DNS 请求。<br/>增加此值可能有助于降低临时 DNS 查找失败的可能性。"
+
+msgid "Log Level"
+msgstr "日志级别"
+
+msgid "MAC Address"
+msgstr "MAC 地址"
+
+msgid "Manual Transparent Proxy"
+msgstr "手动透明代理"
+
+msgid "Metrics may be sensitive so think twice before setting it as Default Fallback HTTP Server."
+msgstr "指标可能很敏感，因此在将其设置为默认回退 HTTP 服务器之前请三思。"
+
+msgid "No server configured"
+msgstr "未配置服务器"
+
+msgid "None"
+msgstr "无"
+
+msgid "Observatory"
+msgstr "观测站"
+
+msgid "Only HTTP/1.1 supported here. For HTTP/2 upstream, use Fallback Servers below"
+msgstr "此处仅支持 HTTP/1.1。对于 HTTP/2 上游，请使用下面的回退服务器"
+
+msgid "Only available for shadowsocks-2022 ciphers (2022-*)"
+msgstr "仅适用于 shadowsocks-2022 密码（2022-*）"
+
+msgid "Only first"
+msgstr ""
+
+msgid "Only override TTL / hop limit for packets with specific TTL / hop limit."
+msgstr "仅针对具有特定 TTL / 跳数限制的数据包覆盖 TTL / 跳数限制。"
+
+msgid "Only protocols which support fallback are available. Note that REALITY does not support fallback right now."
+msgstr "只有支持回退的协议可用。请注意，REALITY 目前不支持回退。"
+
+msgid "Optional; username for SOCKS / HTTP outbound, email for other outbound."
+msgstr ""
+
+msgid "Outbound Observatory"
+msgstr "出站观测站"
+
+msgid "Outbound Routing"
+msgstr "出站路由"
+
+msgid "Outbound Statistics"
+msgstr "出站统计"
+
+msgid "Outbounds"
+msgstr "出站"
+
+msgid "Override IPv4 TTL"
+msgstr "覆盖 IPv4 TTL"
+
+msgid "Override IPv6 Hop Limit"
+msgstr "覆盖 IPv6 跳数限制"
+
+msgid "Password (Optional)"
+msgstr "密码 (可选)"
+
+msgid "Path"
+msgstr "路径"
+
+msgid "Per Instance"
+msgstr "每个实例"
+
+msgid "Per Instance mode requires OpenWrt 24.10 or later versions."
+msgstr ""
+
+msgid "Per-device settings here override per-interface enabling settings above. FakeDNS and manual transparent proxy won't be affected by these options."
+msgstr "此处的每设备设置会覆盖上面的每接口启用设置。FakeDNS 和手动透明代理不受这些选项的影响。"
+
+msgid "Policy: Close connection if no data is transferred within given timeout. See <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">here</a> for help."
+msgstr "策略：如果在给定超时内没有传输数据，则关闭连接。有关帮助，请参见 <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">此处</a>。"
+
+msgid "Policy: Handshake timeout when connecting to upstream. See <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">here</a> for help."
+msgstr "策略：连接到上游时的握手超时。有关帮助，请参见 <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">此处</a>。"
+
+msgid "Policy: How long to wait before closing connection after client closed connection. See <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">here</a> for help."
+msgstr "策略：客户端关闭连接后，在关闭连接前等待多长时间。有关帮助，请参见 <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">此处</a>。"
+
+msgid "Policy: How long to wait before closing connection after server closed connection. See <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">here</a> for help."
+msgstr "策略：服务器关闭连接后在关闭连接之前等待多长时间。有关帮助，请参见 <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">此处</a>。"
+
+msgid "Policy: Internal cache size per connection. See <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">here</a> for help."
+msgstr "策略：每个连接的内部缓存大小。有关帮助，请参见 <a href=\"https://xtls.github.io/config/policy.html#levelpolicyobject\">此处</a>。"
+
+msgid "Port Range"
+msgstr "端口范围"
+
+msgid "Ports to bypass TTL override"
+msgstr "绕过 TTL 覆盖的端口"
+
+msgid "Preview or Deprecated"
+msgstr "预览或不推荐使用"
+
+msgid "Priority for Firewall Rules"
+msgstr "防火墙规则优先级"
+
+msgid "Processes started by users in groups with these gids won't be forwarded through Xray."
+msgstr "这些 gid 组中用户启动的进程不会通过 Xray 转发。"
+
+msgid "Processes started by users with these uids won't be forwarded through Xray."
+msgstr "这些 uid 的用户启动的进程不会通过 Xray 转发。"
+
+msgid "Protocol"
+msgstr "协议"
+
+msgid "Protocol Settings"
+msgstr "协议设置"
+
+msgid "Read <a href=\"https://ucode.mein.io/\">ucode Documentation</a> for the language used. Code filled here may need to change after upgrading luci-app-xray."
+msgstr "阅读 <a href=\"https://ucode.mein.io/\">ucode 文档</a> 以了解使用的语言。在此处填写的代码在升级 luci-app-xray 后可能需要更改。"
+
+msgid "Read Xray log in \"System Log\" or use <code>logread</code> command."
+msgstr "在 \"系统日志\" 中阅读 Xray 日志或使用 <code>logread</code> 命令。"
+
+msgid "Redirect address"
+msgstr "重定向地址"
+
+msgid "Redirect all outgoing TCP requests with destination port 53 to the address specified. In most cases not necessary."
+msgstr "将所有目标端口为 53 的传出 TCP 请求重定向到指定地址。在大多数情况下没有必要。"
+
+msgid "Redirect all outgoing UDP requests with destination port 53 to the address specified. Recommended to use <code>127.0.0.1:53</code>."
+msgstr "将所有目标端口为 53 的传出 UDP 请求重定向到指定地址。建议使用 <code>127.0.0.1:53</code>。"
+
+msgid "Report issues or request for features <a href=\"https://github.com/yichya/luci-app-xray\">here</a>."
+msgstr ""
+
+msgid "Requests to these IPs will always be handled by Xray (but still might be bypassed by Xray itself, like private addresses).<br/>Useful for some really strange network. If you really need to forward private addresses, try Manual Transparent Proxy below."
+msgstr "对这些 IP 的请求将始终由 Xray 处理 (但仍可能被 Xray 本身绕过，如私有地址)。<br/>对于某些非常奇怪的网络很有用。如果你真的需要转发私有地址，请尝试下面的手动透明代理。"
+
+msgid "Requests to these IPs won't be forwarded through Xray."
+msgstr "对这些 IP 的请求不会通过 Xray 转发。"
+
+msgid "Requests to these TCP Ports will be forwarded through Xray. Recommended ports: 80, 443, 853"
+msgstr "对这些 TCP 端口的请求将通过 Xray 转发。推荐端口：80, 443, 853"
+
+msgid "Requests to these TCP Ports won't be forwarded through Xray."
+msgstr "对这些 TCP 端口的请求不会通过 Xray 转发。"
+
+msgid "Requests to these UDP Ports will be forwarded through Xray. Recommended ports: 53, 443"
+msgstr "对这些 UDP 端口的请求将通过 Xray 转发。推荐端口：53, 443"
+
+msgid "Requests to these UDP Ports won't be forwarded through Xray."
+msgstr "对这些 UDP 端口的请求不会通过 Xray 转发。"
+
+msgid "Resolve Domain DNS Method"
+msgstr "解析域名 DNS 方法"
+
+msgid "Resolve Domain via DNS"
+msgstr "通过 DNS 解析域名"
+
+msgid "Resolve these domains to Source Address above. Only possible when an IP address is used."
+msgstr "将这些域名解析为上面的源地址。只有在使用 IP 地址时才可能。"
+
+msgid "Resource file /usr/share/xray/geoip.dat not exist. All network traffic will be forwarded. <br/> Compile your firmware again with data files to use this feature, or<br/><a href=\"https://github.com/v2fly/geoip\">download one</a> (maybe disable transparent proxy first) and upload it to your router."
+msgstr "资源文件 /usr/share/xray/geoip.dat 不存在。所有网络流量都将被转发。<br/>使用数据文件重新编译固件以使用此功能，或<br/><a href=\"https://github.com/v2fly/geoip\">下载一个</a>(可能先禁用透明代理) 并将其上传到您的路由器。"
+
+msgid "Return <code>127.127.127.127</code> as response for blocked domain rules. If not selected, <code>NXDOMAIN</code> will be returned."
+msgstr ""
+
+msgid "Return only IP addresses from GeoIP Direct List for Fast DNS."
+msgstr "仅返回快速 DNS 的 GeoIP 直连列表中的 IP 地址。"
+
+msgid "Reverse proxy tool. Currently only client role (bridge) is supported. See <a href=\"https://xtls.github.io/config/reverse.html#bridgeobject\">here</a> for help."
+msgstr "反向代理工具。目前仅支持客户端角色 (桥接)。有关帮助，请参见 <a href=\"https://xtls.github.io/config/reverse.html#bridgeobject\">此处</a>。"
+
+msgid "Route Only"
+msgstr "仅路由"
+
+msgid "Route requests according to domain settings in \"DNS Settings\" tab in core settings. Deprecated; use FakeDNS instead."
+msgstr ""
+
+msgid "Routing Domain Strategy"
+msgstr "路由域名策略"
+
+msgid "SNI"
+msgstr "SNI"
+
+msgid "Search GeoIP"
+msgstr "搜索 GeoIP"
+
+msgid "Search GeoIP..."
+msgstr "搜索 GeoIP..."
+
+msgid "Search GeoSite"
+msgstr "搜索 GeoSite"
+
+msgid "Search GeoSite..."
+msgstr "搜索 GeoSite..."
+
+msgid "Secure DNS"
+msgstr "安全 DNS"
+
+msgid "See <a href=\"https://github.com/v2ray/v2ray-core/issues/2233\">FakeDNS</a> for details."
+msgstr "有关详细信息，请参阅 <a href=\"https://github.com/v2ray/v2ray-core/issues/2233\">FakeDNS</a>。"
+
+msgid "See <a href=\"https://xtls.github.io/config/features/multiple.html\">here</a> for help. Deprecated and will be removed in next major version."
+msgstr ""
+
+msgid "See firewall status page for rules Xray used and <a href=\"https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks#Priority_within_hook\">Netfilter Internal Priority</a> for reference."
+msgstr "参阅防火墙状态页面了解 Xray 使用的规则，参考 <a href=\"https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks#Priority_within_hook\">Netfilter 内部优先级</a>。"
+
+msgid "Select multiple outbound servers to enable load balancing. Select none to disable TCP Outbound."
+msgstr "选择多个出站服务器以启用负载均衡。不选以禁用 TCP 出站。"
+
+msgid "Select multiple outbound servers to enable load balancing. Select none to disable UDP Outbound."
+msgstr "选择多个出站服务器以启用负载均衡。不选以禁用 UDP 出站。"
+
+msgid "Select multiple outbounds for load balancing. If none selected, requests will be sent via direct outbound."
+msgstr "选择多个出站以进行负载均衡。如果未选择，请求将通过直连出站发送。"
+
+msgid "Select none to disable dnsmasq integration. This could also be used to avoid conflicts with other DNS services, for example<br/>AdGuard Home. Some features like manual transparent proxy with associated domain names still need dnsmasq integration."
+msgstr "不选以禁用 dnsmasq 集成。这也可以用来避免与其他 DNS 服务（例如<br/>AdGuard Home）冲突。某些功能（如带有相关域名的手动透明代理）仍需要 dnsmasq 集成。"
+
+msgid "Server Hostname"
+msgstr "服务器主机名"
+
+msgid "Server Hostname Resolving"
+msgstr "服务器主机名解析"
+
+msgid "Server Port"
+msgstr "服务器端口"
+
+msgid "Servers are referenced by index (order in the following list). Deleting servers may result in changes of upstream servers actually used by proxy and bridge."
+msgstr "服务器通过索引 (以下列表中的顺序) 引用。删除服务器可能会导致代理和网桥实际使用的上游服务器发生变化。"
+
+msgid "Set to 524288 to avoid Cloudflare sending ENHANCE_YOUR_CALM."
+msgstr "设置为 524288 以避免 Cloudflare 发送 ENHANCE_YOUR_CALM。"
+
+msgid "Show preview or deprecated features (requires reboot to take effect)."
+msgstr "显示预览或不推荐使用的功能 (需要重新启动才能生效)。"
+
+msgid "Similar to <a href=\"https://xtls.github.io/config/outbound.html#proxysettingsobject\">ProxySettings.Tag</a>"
+msgstr ""
+
+msgid "Sniffing"
+msgstr "嗅探"
+
+msgid "Socket Mark Number"
+msgstr "Socket 标记编号"
+
+msgid "Socks5 Proxy"
+msgstr "Socks5 代理"
+
+msgid "Socks5 proxy port"
+msgstr "Socks5 代理端口"
+
+msgid "Source Address"
+msgstr "源地址"
+
+msgid "Source Port"
+msgstr "源端口"
+
+msgid "Specify Outbound"
+msgstr "指定出站"
+
+msgid "Specify a DNS to resolve server hostname. Be careful of possible recursion."
+msgstr "指定用于解析服务器主机名的 DNS。注意可能的递归。"
+
+msgid "Specify rules like <code>domain:baidu.com</code> or see <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."
+msgstr ""
+
+msgid "Specify rules like <code>domain:bilibili.com</code> or see <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."
+msgstr ""
+
+msgid "Specify rules like <code>domain:youtube.com</code> or see <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details.<br/> In order to use Geosite rules you need a valid resource file /usr/share/xray/geosite.dat.<br/>Compile your firmware again with data files to use Geosite rules, or <a href=\"https://github.com/v2fly/domain-list-community\">download one</a> and upload it to your router."
+msgstr "指定规则，如 <code>domain:youtube.com</code> 或参阅 <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">文档</a> 了解详情。<br/>为了使用 Geosite 规则，您需要有效的资源文件 /usr/share/xray/geosite.dat。<br/>使用数据文件重新编译您的固件以使用 Geosite 规则，或 <a href=\"https://github.com/v2fly/domain-list-community\">下载一个</a> 并上传到您的路由器。"
+
+msgid "Specify rules like <code>geosite:category-ads</code> or <code>domain:baidu.com</code>. See <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details."
+msgstr ""
+
+msgid "Specify rules like <code>geosite:cn</code> or <code>domain:bilibili.com</code>. See <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details."
+msgstr ""
+
+msgid "Specify rules like <code>geosite:geolocation-!cn</code> or <code>domain:youtube.com</code>. See <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">documentation</a> for details."
+msgstr "指定规则，如 <code>geosite:geolocation-!cn</code> 或 <code>domain:youtube.com</code>。有关详细信息，请参阅 <a href=\"https://xtls.github.io/config/dns.html#dnsobject\">文档</a>。"
+
+msgid "Specify upstream servers here."
+msgstr "在此处指定上游服务器。"
+
+msgid "Strategy <code>leastPing</code> requires observatory (see \"Extra Options\" tab) to be enabled."
+msgstr ""
+
+msgid "Strongly not recommended. Only used for some network environments with specific restrictions."
+msgstr "强烈不建议使用。仅用于具有特定限制的某些网络环境。"
+
+msgid "TCP"
+msgstr "TCP"
+
+msgid "TCP (direct)"
+msgstr "TCP (直连)"
+
+msgid "TCP Server (IPv4)"
+msgstr "TCP 服务器 (IPv4)"
+
+msgid "TCP Server (IPv6)"
+msgstr "TCP 服务器 (IPv6)"
+
+msgid "TTL / Hop Limit Match"
+msgstr "TTL / 跳数限制匹配"
+
+msgid "Tag"
+msgstr "标签"
+
+msgid "This destination must be forwarded through an outbound server."
+msgstr "此目标必须通过出站服务器转发。"
+
+msgid "This may cause problems and is not very useful at the same time. Not recommended."
+msgstr "这可能会导致问题，同时也不是很有用。不推荐。"
+
+msgid "This may cause problems but worth a try."
+msgstr "这可能会导致问题，但值得一试。"
+
+msgid "This may not be very useful but it should be good enough for a try."
+msgstr "这可能不是很有用，但应该足以尝试。"
+
+msgid "This overrides per-device settings below. FakeDNS and manual transparent proxy won't be affected by this option."
+msgstr "这会覆盖下面的每设备设置。FakeDNS 和手动透明代理不受此选项影响。"
+
+msgid "This port needs to be set <code>accept input</code> manually in firewall settings."
+msgstr "此端口需要在防火墙设置中手动设置 <code>accept input</code>。"
+
+msgid "This should improve performance with large number of connections."
+msgstr "这应该可以提高大量连接的性能。"
+
+msgid "This will start a HTTPS server which serves both as an inbound for Xray and a reverse proxy web server."
+msgstr "这将启动一个 HTTPS 服务器，它既可以作为 Xray 的入站，也可以作为反向代理 Web 服务器。"
+
+msgid "Transparent Proxy (TCP)"
+msgstr "透明代理 (TCP)"
+
+msgid "Transparent Proxy (UDP)"
+msgstr "透明代理 (UDP)"
+
+msgid "Transparent proxy port (TCP4)"
+msgstr "透明代理端口 (TCP4)"
+
+msgid "Transparent proxy port (TCP6)"
+msgstr "透明代理端口 (TCP6)"
+
+msgid "Transparent proxy port (UDP4)"
+msgstr "透明代理端口 (UDP4)"
+
+msgid "Transparent proxy port (UDP6)"
+msgstr "透明代理端口 (UDP6)"
+
+msgid "Transport"
+msgstr "传输"
+
+msgid "Transport Settings"
+msgstr "传输设置"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "UDP Server (IPv4)"
+msgstr "UDP 服务器 (IPv4)"
+
+msgid "UDP Server (IPv6)"
+msgstr "UDP 服务器 (IPv6)"
+
+msgid "Unit in Mbps; Leave both up and down empty to disable Brutal congestion control."
+msgstr "单位为 Mbps；将上下限留空以禁用 Brutal 拥塞控制。"
+
+msgid "Uplink"
+msgstr "上行"
+
+msgid "Uplink Only Timeout"
+msgstr "仅上行超时"
+
+msgid "Upstream"
+msgstr "上游"
+
+msgid "Use sniffed domain for routing only but still access through IP. Reduces unnecessary DNS requests. See <a href=\"https://github.com/XTLS/Xray-core/commit/a3023e43ef55d4498b1afbc9a7fe7b385138bb1a\">here</a> for help."
+msgstr "仅使用嗅探到的域名进行路由，但仍通过 IP 访问。减少不必要的 DNS 请求。有关帮助，请参见 <a href=\"https://github.com/XTLS/Xray-core/commit/a3023e43ef55d4498b1afbc9a7fe7b385138bb1a\">此处</a>。"
+
+msgid "UserId / Password"
+msgstr "用户ID / 密码"
+
+msgid "Username (Optional)"
+msgstr "用户名 (可选)"
+
+msgid "VideoCall (SRTP)"
+msgstr "视频通话 (SRTP)"
+
+msgid "WARNING: These features are experimental, may cause a lot of problems and are not guaranteed to be compatible across minor versions."
+msgstr "警告：这些功能是实验性的，可能会导致很多问题，并且不保证在次要版本之间兼容。"
+
+msgid "WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href=\"https://github.com/yichya/luci-app-xray\">here</a> for help."
+msgstr "警告：在 /usr/share/xray 下找不到资产文件 (geoip.dat, geosite.dat) 中的至少一个。Xray 可能无法正常工作。有关帮助，请参见 <a href=\"https://github.com/yichya/luci-app-xray\">此处</a>。"
+
+msgid "WechatVideo"
+msgstr "微信视频"
+
+msgid "Whether to use IPv4 or IPv6 address if Server Hostname is a domain."
+msgstr "如果服务器主机名是域名，是否使用 IPv4 或 IPv6 地址。"
+
+msgid "Xray"
+msgstr "Xray"
+
+msgid "Xray (geodata)"
+msgstr "Xray (GeoData)"
+
+msgid "Xray (preview)"
+msgstr "Xray (预览)"
+
+msgid "Xray (status)"
+msgstr "Xray (状态)"
+
+msgid "Xray API Service uses port 8080 and GRPC protocol. Also callable via <code>xray api</code> or <code>ubus call xray</code>. See <a href=\"https://xtls.github.io/document/command.html#xray-api\">here</a> for help."
+msgstr "Xray API 服务使用端口 8080 和 GRPC 协议。也可以通过 <code>xray api</code> 或 <code>ubus call xray</code> 调用。有关帮助，请参见 <a href=\"https://xtls.github.io/document/command.html#xray-api\">此处</a>。"
+
+msgid "Xray DNS Server Port"
+msgstr "Xray DNS 服务器端口"
+
+msgid "Xray Executable Path"
+msgstr "Xray 可执行文件路径"
+
+msgid "Xray HTTPS Server Port"
+msgstr "Xray HTTPS 服务器端口"
+
+msgid "Xray Metrics Server Port"
+msgstr "Xray 指标服务器端口"
+
+msgid "Xray Servers"
+msgstr "Xray 服务器"
+
+msgid "Xray metrics server not enabled. Enable Xray metrics server to see details."
+msgstr "Xray 指标服务器未启用。启用 Xray 指标服务器以查看详细信息。"
+
+msgid "Xver"
+msgstr "Xver"
+
+msgid "[Xray is running]"
+msgstr "[Xray 运行中]"
+
+msgid "[Xray is stopped]"
+msgstr "[Xray 已停止]"
+
+msgid "[grpc] Health Check"
+msgstr "[grpc] 健康检查"
+
+msgid "[grpc] Health Check Timeout"
+msgstr "[grpc] 健康检查超时"
+
+msgid "[grpc] Idle Timeout"
+msgstr "[grpc] 空闲超时"
+
+msgid "[grpc] Initial Windows Size"
+msgstr "[grpc] 初始窗口大小"
+
+msgid "[grpc] Multi Mode"
+msgstr "[grpc] 多模式"
+
+msgid "[grpc] Permit Without Stream"
+msgstr "[grpc] 允许无流"
+
+msgid "[grpc] Service Name"
+msgstr "[grpc] 服务名称"
+
+msgid "[h2] Health Check"
+msgstr "[h2] 健康检查"
+
+msgid "[h2] Health Check Timeout"
+msgstr "[h2] 健康检查超时"
+
+msgid "[h2] Read Idle Timeout"
+msgstr "[h2] 读取空闲超时"
+
+msgid "[http2] Host"
+msgstr "[http2] 主机"
+
+msgid "[http2] Path"
+msgstr "[http2] 路径"
+
+msgid "[httpupgrade] Host"
+msgstr "[httpupgrade] 主机"
+
+msgid "[httpupgrade] Path"
+msgstr "[httpupgrade] 路径"
+
+msgid "[hysteria] Down Speed Limit"
+msgstr "[hysteria] 下载速度限制"
+
+msgid "[hysteria] UDP Hop"
+msgstr "[hysteria] UDP 跳频"
+
+msgid "[hysteria] UDP Hop Interval"
+msgstr "[hysteria] UDP 跳频间隔"
+
+msgid "[hysteria] Up Speed Limit"
+msgstr "[hysteria] 上传速度限制"
+
+msgid "[mkcp] Congestion Control"
+msgstr "[mkcp] 拥塞控制"
+
+msgid "[mkcp] Downlink Capacity"
+msgstr "[mkcp] 下行容量"
+
+msgid "[mkcp] Fake Header Type"
+msgstr "[mkcp] 伪装头部类型"
+
+msgid "[mkcp] Maximum Transmission Unit"
+msgstr "[mkcp] 最大传输单元"
+
+msgid "[mkcp] Read Buffer Size"
+msgstr "[mkcp] 读取缓冲区大小"
+
+msgid "[mkcp] Seed"
+msgstr "[mkcp] 种子"
+
+msgid "[mkcp] Transmission Time Interval"
+msgstr "[mkcp] 传输时间间隔"
+
+msgid "[mkcp] Uplink Capacity"
+msgstr "[mkcp] 上行容量"
+
+msgid "[mkcp] Write Buffer Size"
+msgstr "[mkcp] 写入缓冲区大小"
+
+msgid "[quic] Fake Header Type"
+msgstr "[quic] 伪装头部类型"
+
+msgid "[quic] Key"
+msgstr "[quic] 密钥"
+
+msgid "[quic] Security"
+msgstr "[quic] 安全"
+
+msgid "[shadowsocks] Encrypt Method"
+msgstr "[shadowsocks] 加密方法"
+
+msgid "[shadowsocks] UDP over TCP"
+msgstr "[shadowsocks] UDP over TCP"
+
+msgid "[splithttp] Host"
+msgstr "[splithttp] 主机"
+
+msgid "[splithttp] Path"
+msgstr "[splithttp] 路径"
+
+msgid "[tcp] Fake Header Type"
+msgstr "[tcp] 伪装头部类型"
+
+msgid "[tcp][fake_http] Host"
+msgstr "[tcp][fake_http] 主机"
+
+msgid "[tcp][fake_http] Path"
+msgstr "[tcp][fake_http] 路径"
+
+msgid "[vless] Decrypt Method"
+msgstr "[vless] 解密方法"
+
+msgid "[vless] Encrypt Method"
+msgstr "[vless] 加密方法"
+
+msgid "[vmess] AlterId"
+msgstr "[vmess] AlterId"
+
+msgid "[vmess] Encrypt Method"
+msgstr "[vmess] 加密方法"
+
+msgid "[websocket] Host"
+msgstr "[websocket] 主机"
+
+msgid "[websocket] Path"
+msgstr "[websocket] 路径"
+
+msgid "available"
+msgstr "可用"
+
+msgid "direct"
+msgstr "直连"
+
+msgid "domains"
+msgstr ""
+
+msgid "ms"
+msgstr "毫秒"
+
+msgid "results will be shown. Load GeoData files cost"
+msgstr ""
+
+msgid "s ago"
+msgstr "秒前"
+
+msgid "seconds"
+msgstr "秒"
+
+msgid "unavailable"
+msgstr "不可用"
+
+msgid "use global settings"
+msgstr "使用全局设置"
