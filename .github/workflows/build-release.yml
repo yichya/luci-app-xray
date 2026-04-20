@@ -21,6 +21,9 @@ jobs:
           - arch: x86_64
             sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
             sdk_name: -sdk-23.05.5-x86-64_
+          - arch: aarch64_cortex-a53
+            sdk_url_path: https://downloads.openwrt.org/releases/24.10.5/targets/bcm27xx/bcm2710
+            sdk_name: openwrt-sdk-24.10.5-bcm27xx-bcm2710_gcc-13.3.0_musl.Linux-x86_64            
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
