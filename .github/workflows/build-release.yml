@@ -1,137 +1,148 @@
-name: Build and Release
+name: Build openWRT ipk/apk package
+
+permissions:
+  contents: write
 
 on:
   push:
     tags:
-      - "*"
-  workflow_dispatch:
-
-env:
-  PACKAGE_NAME: luci-app-xray
-  CACHE_DIR: ~/cache
+        - '0.*.*'
 
 jobs:
+  build_apk:
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-apk
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git wget curl unzip rsync
+
+    - name: Download OpenWrt Snapshot SDK
+      run: |
+        PAGE_CONTENT=$(curl -s https://downloads.openwrt.org/snapshots/targets/x86/64/)
+        # Extract SDK filenames using regular expressions (supports .tar.zst format).
+        SDK_FILENAME=$(echo "$PAGE_CONTENT" | grep -oP 'openwrt-sdk-x86-64_gcc-.*?_musl\.Linux-x86_64\.tar\.zst' | head -1)
+        
+        if [ -z "$SDK_FILENAME" ]; then
+          echo "SDK file not found"
+          exit 1
+        fi
+        
+        # Build a complete URL
+        SDK_URL="https://downloads.openwrt.org/snapshots/targets/x86/64/$SDK_FILENAME"
+
+        echo "Find the SDK file: $SDK_FILENAME"
+        sdk_name=${SDK_FILENAME%.tar.zst}
+        wget -c https://downloads.openwrt.org/snapshots/targets/x86/64/${sdk_name}.tar.zst
+        tar axf ${sdk_name}.tar.zst
+        ln -sf ${sdk_name} openwrt_sdk
+
+    - name: Set up OpenWrt SDK
+      run: |
+        cd openwrt_sdk
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+        path: openwrt_sdk/package/luci-app-xray
+
+    - name: Build APK package
+      run: |
+        cd openwrt_sdk/
+        make defconfig
+        make package/luci-app-xray/status/{clean,compile} V=s -j$(nproc)
+
+    - name: Upload .apk package
+      id: upload_apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: luci-app-xray-apk
+        path: openwrt_sdk/bin/packages/x86_64/base/luci-app-xray*.apk
+
+  build_ipk:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-ipk
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git wget curl unzip rsync
+
+    - name: Download OpenWrt release SDK
+      run: |
+        # Find SDK Name #
+        PAGE_CONTENT=$(curl -s https://downloads.openwrt.org/releases/24.10.1/targets/x86/64/)
+        SDK_FILENAME=$(echo "$PAGE_CONTENT" | grep -oP 'openwrt-sdk-24\.10\.1-x86-64_gcc-.*?_musl\.Linux-x86_64\.tar\.zst' | head -1)
+        if [ -z "$SDK_FILENAME" ]; then
+          echo "SDK file not foun"
+          exit 1
+        fi
+        # Build Full URL
+        sdk_name=${SDK_FILENAME%.tar.zst}
+        wget -c https://downloads.openwrt.org/releases/24.10.1/targets/x86/64/${sdk_name}.tar.zst
+        tar axf $sdk_name.tar.zst
+        ln -sf $sdk_name openwrt_sdk
+
+    - name: Set up OpenWrt SDK
+      run: |
+        cd openwrt_sdk
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+        path: openwrt_sdk/package/luci-app-xray
+    
+    - name: Generate ChangeLog by conventional-changelog
+      run: |
+        npm install -g conventional-changelog-cli
+        cd openwrt_sdk/package/luci-app-xray
+        conventional-changelog -p angular -r 2 -i CHANGELOG.md -s
+
+    - name: Upload ChangeLog
+      uses: actions/upload-artifact@v4
+      with:
+        name: luci-app-xray-changelog
+        path: openwrt_sdk/package/luci-app-xray/CHANGELOG.md
+
+    - name: Build IPK package
+      run: |
+        cd openwrt_sdk
+        make defconfig
+        make package/luci-app-xray/status/{clean,compile} V=s -j$(nproc)
+
+    - name: Upload .ipk package
+      uses: actions/upload-artifact@v4
+      with:
+        name: luci-app-xray-ipk
+        path: openwrt_sdk/bin/packages/x86_64/base/luci-app-xray*.ipk
+
   release:
-    name: Build for ${{ matrix.arch }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
-            sdk_name: -sdk-23.05.5-x86-64_
-
-    env:
-      SDK_URL_PATH: ${{ matrix.sdk_url_path }}
-      SDK_NAME: ${{ matrix.sdk_name }}
-      CCACHE_DIR: ~/.ccache
-      CONFIG_CCACHE: y
+    needs: [build_ipk, build_apk]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Prepare Cache Key
-        id: cache_key
-        run: echo "::set-output name=timestamp::$(date +"%s")"
-
-      - name: Setup Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.CACHE_DIR }}
-            ${{ env.CCACHE_DIR }}
-          key: openwrt-${{ matrix.arch }}-${{ env.PACKAGE_NAME }}-${{ steps.cache_key.outputs.timestamp }}
-          restore-keys: |
-            openwrt-${{ matrix.arch }}-${{ env.PACKAGE_NAME }}-
-      - name: Install Dependencies
-        run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache gettext libncurses5-dev xsltproc p7zip-full
-      - name: Create Directories
-        run: |
-          CACHE_DIR_SDK="$(eval echo "$CACHE_DIR/sdk")"
-          CACHE_DIR_DL="$(eval echo "$CACHE_DIR/dl")"
-          CACHE_DIR_FEEDS="$(eval echo "$CACHE_DIR/feeds")"
-          echo "CACHE_DIR_SDK: $CACHE_DIR_SDK"
-          echo "CACHE_DIR_DL: $CACHE_DIR_DL"
-          echo "CACHE_DIR_FEEDS: $CACHE_DIR_FEEDS"
-          test -d "$CACHE_DIR_SDK" || mkdir -p "$CACHE_DIR_SDK"
-          test -d "$CACHE_DIR_DL" || mkdir -p "$CACHE_DIR_DL"
-          test -d "$CACHE_DIR_FEEDS" || mkdir -p "$CACHE_DIR_FEEDS"
-          echo "CACHE_DIR_SDK=$CACHE_DIR_SDK" >> $GITHUB_ENV
-          echo "CACHE_DIR_DL=$CACHE_DIR_DL" >> $GITHUB_ENV
-          echo "CACHE_DIR_FEEDS=$CACHE_DIR_FEEDS" >> $GITHUB_ENV
-          echo "SDK_HOME=$(mktemp -d)" >> $GITHUB_ENV
-      - name: Download and Unzip SDK
-        run: |
-          cd "$CACHE_DIR_SDK"
-          if ! ( wget -q -O - "$SDK_URL_PATH/sha256sums" | grep -- "$SDK_NAME" > sha256sums.small 2>/dev/null ) ; then
-            echo "::error::Can not find ${SDK_NAME} file in sha256sums."
-            exit 1
-          fi
-          SDK_FILE="$(cat sha256sums.small | cut -d' ' -f2 | sed 's/*//g')"
-          if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-            wget -q -O "$SDK_FILE" "$SDK_URL_PATH/$SDK_FILE"
-            if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-              echo "::error::SDK can not be verified!"
-              exit 1
-            fi
-          fi
-          cd -
-          file "$CACHE_DIR_SDK/$SDK_FILE"
-          7z x "$CACHE_DIR_SDK/$SDK_FILE" -so | tar -C "$SDK_HOME" -xvf - --strip=1
-          cd "$SDK_HOME"
-          test -d "dl" && rm -rf "dl" || true
-          test -d "feeds" && rm -rf "feeds" || true
-          ln -s "$CACHE_DIR_DL" "dl"
-          ln -s "$CACHE_DIR_FEEDS" "feeds"
-          cp feeds.conf.default feeds.conf
-          sed -i 's#git.openwrt.org/openwrt/openwrt#github.com/openwrt/openwrt#' feeds.conf
-          sed -i 's#git.openwrt.org/feed/packages#github.com/openwrt/packages#' feeds.conf
-          sed -i 's#git.openwrt.org/project/luci#github.com/openwrt/luci#' feeds.conf
-          sed -i 's#git.openwrt.org/feed/telephony#github.com/openwrt/telephony#' feeds.conf
-          cd -
-      - name: Update and Install Packages
-        run: |
-          cd "$SDK_HOME"
-          ./scripts/feeds update -a
-          ln -s "${{ github.workspace }}" "package/$PACKAGE_NAME"
-          ./scripts/feeds install -a
-          cd -
-      - name: Build Packages
-        run: |
-          cd "$SDK_HOME"
-          make defconfig
-          make package/${PACKAGE_NAME}/status/{clean,compile} V=s
-          find "$SDK_HOME/bin/" -type f -name "*.ipk" -exec ls -lh {} \;
-          cd -
-      - name: Copy Bin Files
-        run: |
-          find "$SDK_HOME/bin/" -type f -name "${PACKAGE_NAME}*.ipk" -exec cp {} "${{ github.workspace }}" \;
-          find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
-      - name: Release and Upload Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "*.ipk"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  notify:
-    name: Notify Release Publish
-    runs-on: ubuntu-latest
-    env:
-      TRIGGER_URL: ${{ secrets.TRIGGER_URL }}
-      TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
-    needs: release
-    steps:
-      - name: Notify Jenkins
-        run: |
-          if [ -z "$TRIGGER_URL" ] ; then
-            echo "::warning::No trigger url found, skip..."
-            exit 0
-          fi
-          curl -X POST \
-              -H "Content-Type: application/json; charset=utf-8" \
-              -H "Authorization: Bearer $TRIGGER_TOKEN" \
-              -d "{\"event\":\"release\",\"repository\":\"${{ github.repository }}\",\"ref\":\"${{ github.ref }}\"}" \
-              "$TRIGGER_URL" || true
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+    - name: Display structure of downloaded files
+      run: ls -R
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        files: |
+          luci-app-xray-apk/*.apk
+          luci-app-xray-ipk/*.ipk
+        body_path: luci-app-xray-changelog/CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
