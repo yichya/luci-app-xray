@@ -6,6 +6,9 @@
                 "xray_core"
             ],
             "file": {
+                "/usr/bin/curl": [
+                    "exec"
+                ],
                 "/usr/bin/wget": [
                     "exec"
                 ],
