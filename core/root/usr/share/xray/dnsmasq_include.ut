@@ -9,10 +9,10 @@
     const manual_tproxy = filter(keys(config), k => config[k][".type"] == "manual_tproxy") || [];
 %}
 # Generated dnsmasq configurations by luci-app-xray
-strict-order
+no-resolv
 server=/#/127.0.0.1#{{ dns_port }}
-{% for (let i = dns_port; i <= dns_port + dns_count; i++): %}
-server=127.0.0.1#{{ i }}
+{% for (let i = dns_port + 1; i <= dns_port + dns_count; i++): %}
+server=/#/127.0.0.1#{{ i }}
 {% endfor %}
 {% for (let i in manual_tproxy): %}
 {% if (config[i]["rebind_domain_ok"] == "1"): %}
