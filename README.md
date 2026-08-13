@@ -129,4 +129,4 @@ Some features are deprecated / unstable so they are placed in preview app. To en
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yichya/luci-app-xray&type=Date)](https://star-history.com/#yichya/luci-app-xray&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=yichya/luci-app-xray&type=Date)](https://star-history.dera.page/#yichya/luci-app-xray&Date)
