@@ -26,6 +26,21 @@ jobs:
             arch: x86_64
             sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/x86/64
             sdk_name: -sdk-25.12.2-x86-64_
+          # aarch64_cortex-a53: 64-bit ARMv8 Qualcomm IPQ boards.
+          # Covers GL.iNet GL-E5800 (Mudi 7), whose Qualcomm IPQ9574 (quad Cortex-A73)
+          # maps to the qualcommbe/ipq95xx target -- that target is marked source-only
+          # upstream, so no prebuilt SDK is published for it. The ipq807x / qualcommax
+          # SDKs below share the exact same package architecture (ARCH aarch64 +
+          # CPU_TYPE cortex-a53), so they produce feed-compatible packages.
+          # The GL-E5800 ships OpenWrt 23.05.x (opkg / .ipk), so use the 23.05 build.
+          - id: 23.05
+            arch: aarch64_cortex-a53
+            sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/ipq807x/generic
+            sdk_name: -sdk-23.05.5-ipq807x-generic_
+          - id: 25.12
+            arch: aarch64_cortex-a53
+            sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/qualcommax/ipq807x
+            sdk_name: -sdk-25.12.2-qualcommax-ipq807x_
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
