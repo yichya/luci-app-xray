@@ -139,6 +139,9 @@ return view.extend({
         const status_text = xray_running ? _("[Xray is running]") : _("[Xray is stopped]");
         const hosts = load_result[2].hosts;
 
+        const style = E('style', {type: 'text/css'}, '.cbi-section[data-tab="general"]:not(.cbi-section-node *) > .cbi-value .cbi-input-text, .cbi-section-node [data-tab="general"] .cbi-input-text, [data-tab="protocol"] .cbi-input-text {width: 350px !important;}');
+        document.head.appendChild(style);
+
         let asset_file_status = _('WARNING: at least one of asset files (geoip.dat, geosite.dat) is not found under /usr/share/xray. Xray may not work properly. See <a href="https://github.com/yichya/luci-app-xray">here</a> for help.');
         if (geoip_existence) {
             if (geosite_existence) {
