@@ -23,6 +23,7 @@ jobs:
             sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
             sdk_name: -sdk-23.05.5-x86-64_
           - id: 24.10
+            arch: x86_64
             sdk_url_path: https://downloads.openwrt.org/releases/24.10.8/targets/x86/64
             sdk_name: -sdk-24.10.8-x86-64_
           - id: 25.12
