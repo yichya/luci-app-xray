@@ -18,14 +18,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - id: 23.05
+          - id: "24.10"
             arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
-            sdk_name: -sdk-23.05.5-x86-64_
-          - id: 25.12
+            sdk_url_path: https://downloads.openwrt.org/releases/24.10.8/targets/x86/64
+            sdk_name: -sdk-24.10.8-x86-64_
+          - id: "25.12"
             arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/x86/64
-            sdk_name: -sdk-25.12.2-x86-64_
+            sdk_url_path: https://downloads.openwrt.org/releases/25.12.6/targets/x86/64
+            sdk_name: -sdk-25.12.6-x86-64_
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
@@ -51,7 +51,7 @@ jobs:
             openwrt-${{ matrix.arch }}-${{ matrix.id }}-${{ env.PACKAGE_NAME }}-
       - name: Install Dependencies
         run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache gettext libncurses5-dev xsltproc zstd
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache coreutils gettext libncurses5-dev xsltproc zstd
       - name: Create Directories
         run: |
           CACHE_DIR_SDK="$(eval echo "$CACHE_DIR/sdk")"
