@@ -169,9 +169,12 @@ function shadowsocks_client(protocol, sub_section, tab_name) {
     let shadowsocks_security = sub_section.taboption(tab_name, form.ListValue, "shadowsocks_security", _("[shadowsocks] Encrypt Method"));
     shadowsocks_security.depends("protocol", "shadowsocks");
     shadowsocks_security.value("none", "none");
-    shadowsocks_security.value("aes-256-gcm", "aes-256-gcm");
     shadowsocks_security.value("aes-128-gcm", "aes-128-gcm");
+    shadowsocks_security.value("aes-256-gcm", "aes-256-gcm");
     shadowsocks_security.value("chacha20-poly1305", "chacha20-poly1305");
+    shadowsocks_security.value("chacha20-ietf-poly1305", "chacha20-ietf-poly1305");
+    shadowsocks_security.value("xchacha20-poly1305", "xchacha20-poly1305");
+    shadowsocks_security.value("xchacha20-ietf-poly1305", "xchacha20-ietf-poly1305");
     shadowsocks_security.value("2022-blake3-aes-128-gcm", "2022-blake3-aes-128-gcm");
     shadowsocks_security.value("2022-blake3-aes-256-gcm", "2022-blake3-aes-256-gcm");
     shadowsocks_security.value("2022-blake3-chacha20-poly1305", "2022-blake3-chacha20-poly1305");
